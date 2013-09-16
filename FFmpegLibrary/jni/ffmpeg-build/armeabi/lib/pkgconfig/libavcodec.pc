@@ -1,0 +1,14 @@
+prefix=../ffmpeg-build/armeabi
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 55.31.101
+Requires: libavutil = 52.43.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir} -lavcodec -lvo-amrwbenc -lvo-aacenc -L/home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi/lib -L/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi/lib -L/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi/lib -lass -lm -lfribidi -lfreetype -lm -lz -lgcc
+Libs.private: 
+Cflags: -I${includedir}

@@ -1,0 +1,202 @@
+x264 configure script
+Command line options: "--prefix=/home/jun-young/workspace/FFmpegLibrary/jni/x264/../ffmpeg-build/armeabi" "--host=arm-linux" "--enable-static" "--disable-asm" "--disable-yasm"
+
+checking whether /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ works... yes
+checking whether /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ supports for( int i = 0; i < 9; i++ ); with -std=gnu99... yes
+checking for pthread.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lpthread  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lpthread
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <pthread.h>
+int main () {  return 0; }
+--------------------------------------------------
+checking for return log2f(2); in math.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -Werror  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+cc1: warnings being treated as errors
+conftest.c: In function 'main':
+conftest.c:2: error: implicit declaration of function 'log2f'
+conftest.c:2: error: incompatible implicit declaration of built-in function 'log2f'
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <math.h>
+int main () { return log2f(2); return 0; }
+--------------------------------------------------
+checking for sws_init_context(0,0,0); in libswscale/swscale.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99  -lswscale -lavutil  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+conftest.c:1:32: error: libswscale/swscale.h: No such file or directory
+conftest.c: In function 'main':
+conftest.c:2: warning: implicit declaration of function 'sws_init_context'
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <libswscale/swscale.h>
+int main () { sws_init_context(0,0,0); return 0; }
+--------------------------------------------------
+checking for -lpostproc... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lpostproc  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lpostproc
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for -lavcodec... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lavcodec  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lavcodec
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for -lavcore... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lavcore  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lavcore
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for -lswscale... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lswscale  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lswscale
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for -lavutil... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lavutil  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lavutil
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for -lm... yes
+checking for -lz... yes
+checking for -lbz2... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lbz2  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lbz2
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for -lavifil32... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lavifil32  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: cannot find -lavifil32
+collect2: ld returned 1 exit status
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+int main () {  return 0; }
+--------------------------------------------------
+checking for avformat_find_stream_info(0,0); avcodec_open2(0,0,0); in libavformat/avformat.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99  -L. -lavformat -lm -lz  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+conftest.c:1:34: error: libavformat/avformat.h: No such file or directory
+conftest.c: In function 'main':
+conftest.c:2: warning: implicit declaration of function 'avformat_find_stream_info'
+conftest.c:2: warning: implicit declaration of function 'avcodec_open2'
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <libavformat/avformat.h>
+int main () { avformat_find_stream_info(0,0); avcodec_open2(0,0,0); return 0; }
+--------------------------------------------------
+checking for FFMS_DestroyVideoSource(0); in ffms.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99  -lffms2  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+conftest.c:1:18: error: ffms.h: No such file or directory
+conftest.c: In function 'main':
+conftest.c:2: warning: implicit declaration of function 'FFMS_DestroyVideoSource'
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <ffms.h>
+int main () { FFMS_DestroyVideoSource(0); return 0; }
+--------------------------------------------------
+checking for FFMS_DestroyVideoSource(0); in ffms.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99  -lffms2 -lstdc++ -L. -lavformat -lm -lz  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+conftest.c:1:18: error: ffms.h: No such file or directory
+conftest.c: In function 'main':
+conftest.c:2: warning: implicit declaration of function 'FFMS_DestroyVideoSource'
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <ffms.h>
+int main () { FFMS_DestroyVideoSource(0); return 0; }
+--------------------------------------------------
+checking for -lz... yes
+checking for gpac/isomedia.h... no
+Failed commandline was:
+--------------------------------------------------
+/home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc-4.4.3 --sysroot=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm/ conftest.c -marm -march=armv5 -Wall -I. -I$(SRCPATH) -std=gnu99 -lgpac_static -lz  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-5/arch-arm//usr/lib -nostdlib -lc -lm -ldl -llog -lm -o conftest
+conftest.c:1:27: error: gpac/isomedia.h: No such file or directory
+--------------------------------------------------
+Failed program was:
+--------------------------------------------------
+#include <gpac/isomedia.h>
+int main () {  return 0; }
+--------------------------------------------------
+checking for uint32_t test_vec __attribute__ ((vector_size (16))) = {0,1,2,3}; in stdint.h... yes
+checking for -fno-tree-vectorize... yes
+checking for fseeko(stdin,0,0); in stdio.h... yes
+checking for -Wshadow... yes
+
+platform:      ARM
+system:        LINUX
+cli:           yes
+libx264:       internal
+shared:        no
+static:        yes
+asm:           no
+interlaced:    yes
+avs:           no
+lavf:          no
+ffms:          no
+gpac:          no
+gpl:           yes
+thread:        no
+filters:       crop select_every 
+debug:         no
+gprof:         no
+strip:         no
+PIC:           no
+visualize:     no
+bit depth:     8
+chroma format: all
