@@ -380,4 +380,5 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	}
 	
 	// 제발되라...commit...
+	// ㅠㅠ
 }
