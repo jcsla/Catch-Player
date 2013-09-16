@@ -101,26 +101,30 @@ containing a value of this type.
         public static final int pause=0x7f020004;
         public static final int play=0x7f020005;
         public static final int prev=0x7f020006;
-        public static final int video_progress=0x7f020007;
-        public static final int zoom_crop=0x7f020008;
-        public static final int zoom_inside=0x7f020009;
-        public static final int zoom_original=0x7f02000a;
-        public static final int zoom_stretch=0x7f02000b;
+        public static final int rotate_norm=0x7f020007;
+        public static final int video_progress=0x7f020008;
+        public static final int zoom_crop=0x7f020009;
+        public static final int zoom_inside=0x7f02000a;
+        public static final int zoom_original=0x7f02000b;
+        public static final int zoom_stretch=0x7f02000c;
     }
     public static final class id {
-        public static final int buttons=0x7f090006;
-        public static final int controls=0x7f090002;
-        public static final int current_time=0x7f090003;
+        public static final int buttons=0x7f090009;
+        public static final int controls=0x7f090005;
+        public static final int current_time=0x7f090006;
         public static final int full_layout=0x7f090000;
-        public static final int hold_video=0x7f090007;
-        public static final int next_video=0x7f09000a;
-        public static final int play_pause=0x7f090009;
-        public static final int prev_video=0x7f090008;
-        public static final int ratio_video=0x7f09000b;
-        public static final int refresh=0x7f09000c;
-        public static final int search=0x7f09000d;
-        public static final int seek_bar=0x7f090005;
-        public static final int total_time=0x7f090004;
+        public static final int hold_video=0x7f09000a;
+        public static final int next_video=0x7f09000d;
+        public static final int play_pause=0x7f09000c;
+        public static final int prev_video=0x7f09000b;
+        public static final int ratio_video=0x7f09000e;
+        public static final int refresh=0x7f09000f;
+        public static final int screen_change=0x7f090004;
+        public static final int search=0x7f090010;
+        public static final int seek_bar=0x7f090008;
+        public static final int title=0x7f090003;
+        public static final int title_bar=0x7f090002;
+        public static final int total_time=0x7f090007;
         public static final int video_view=0x7f090001;
     }
     public static final class layout {

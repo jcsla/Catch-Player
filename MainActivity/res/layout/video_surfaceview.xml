@@ -10,6 +10,43 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:visibility="visible" />
+    
+    <LinearLayout
+        android:id="@+id/title_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="top"
+        android:background="#a8000000"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#ffffffff"
+            android:textSize="14.0sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/screen_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="10dp"
+            android:background="@null"
+            android:src="@drawable/rotate_norm" />
+        
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/controls"
@@ -17,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#a8000000"
-        android:visibility="invisible" >
+        android:visibility="gone" >
         
         <TextView
             android:id="@+id/current_time"

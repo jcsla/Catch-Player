@@ -59,6 +59,9 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	private View mFullLayout;
 	private boolean mTouchPressed = false;
 	
+	private View mTitleBar;
+	private TextView mTitle;
+	
 	private View mVideoView;
 	
 	private View mControlsView;
@@ -83,8 +86,8 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 
 		super.onCreate(savedInstanceState);
 
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		getWindow().setBackgroundDrawable(null);
 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -93,6 +96,9 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		
 		mFullLayout = this.findViewById(R.id.full_layout);
 		mFullLayout.setOnTouchListener(this);
+		
+		mTitleBar = this.findViewById(R.id.title_bar);
+		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
 		
@@ -147,6 +153,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		Intent intent = getIntent();
 		Uri uri = intent.getData();
 		String path;
+		String fileName = null;
 		if (uri != null)
 		{
 			path = uri.toString();
@@ -154,11 +161,14 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		else
 		{
 			path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
+			fileName = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_NAME);
 			if (path == null)
 			{
 				throw new IllegalArgumentException(String.format("\"%s\" did not provided", AppConstants.VIDEO_PLAY_ACTION_PATH));
 			}
 		}
+		
+		mTitle.setText(fileName);
 
 		this.mPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
 		this.mPlayPauseButton.setEnabled(true);
@@ -177,11 +187,15 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			if(mTouchPressed == false)
 			{
 				mTouchPressed = true;
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				this.mTitleBar.setVisibility(View.VISIBLE);
 				this.mControlsView.setVisibility(View.VISIBLE);
 			}
 			else
 			{
 				mTouchPressed = false;
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				this.mTitleBar.setVisibility(View.GONE);
 				this.mControlsView.setVisibility(View.GONE);
 			}
 		}
@@ -214,7 +228,6 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			mMpegPlayer.seek(value);
 		}
 	}
-	
 	
 	//////////////
 	@Override
@@ -252,7 +265,6 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			mSeekBar.setMax(videoDurationS);
 			mSeekBar.setProgress(currentTimeS);
 			
-			System.out.println(currentTimeS + " " + videoDurationS);
 			mCurrentTime.setText(parseTime(currentTimeS));
 			mTotalTime.setText(parseTime(videoDurationS));
 		}
@@ -378,8 +390,4 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		
 		return result;
 	}
-	
-	// 제발되라...commit...
-	// ㅠㅠ
-	// 됏따!!!!!
 }

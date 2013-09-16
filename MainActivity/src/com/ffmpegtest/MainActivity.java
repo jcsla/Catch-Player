@@ -121,9 +121,11 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		else
 		{
 			String path = cursor.getString(MainAdapter.PROJECTION_PATH);
+			String fileName = cursor.getString(MainAdapter.PROJECTION_NAME);
 			
 			Intent intent = new Intent(AppConstants.VIDEO_PLAY_ACTION);
 			intent.putExtra(AppConstants.VIDEO_PLAY_ACTION_PATH, path);
+			intent.putExtra(AppConstants.VIDEO_PLAY_ACTION_NAME, fileName);
 			
 			startActivity(intent);
 		}
