@@ -6,7 +6,7 @@ includedir=${prefix}/include
 Name: libavresample
 Description: Libav audio resampling library
 Version: 1.1.0
-Requires: libavutil = 52.43.100
+Requires: libavutil = 52.44.100
 Requires.private: 
 Conflicts:
 Libs: -L${libdir} -lavresample -lvo-amrwbenc -lvo-aacenc -L/home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a/lib -L/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a/lib -L/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a/lib -lass -lm -lfribidi -lfreetype -lm -lz -lgcc

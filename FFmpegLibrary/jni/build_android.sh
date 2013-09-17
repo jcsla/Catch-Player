@@ -42,13 +42,7 @@ function build_x264
 	export LDFLAGS="-Wl,-rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -nostdlib -lc -lm -ldl -llog"
 
 	cd x264
-	./configure --prefix=$(pwd)/$PREFIX \
-		--host=$ARCH-linux \
-		--enable-static \
-		--disable-asm \
-		--disable-yasm \
-		$ADDITIONAL_CONFIGURE_FLAG \
-		|| exit 1
+	./configure --prefix=$(pwd)/$PREFIX --host=$ARCH-linux --enable-static $ADDITIONAL_CONFIGURE_FLAG || exit 1
 
 	make clean || exit 1
 	make -j4 install || exit 1
@@ -280,8 +274,6 @@ EOF
 	    --enable-demuxer=rtp \
 	    --enable-demuxer=hls \
 	    --enable-demuxer=matroska \
-	    --enable-demuxer=avi \
-	    --enable-ffmpeg \
 	    --enable-muxer=rtsp \
 	    --enable-muxer=mp4 \
 	    --enable-muxer=mov \
@@ -366,7 +358,6 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-5
-#build_x264
 build_amr
 build_aac
 build_fribidi
@@ -385,7 +376,6 @@ ADDITIONAL_CONFIGURE_FLAG=--disable-asm
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/x86-4.4.3/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-9
-#build_x264
 build_amr
 build_aac
 build_fribidi
@@ -423,7 +413,6 @@ ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-5
-#build_x264
 build_amr
 build_aac
 build_fribidi
@@ -443,7 +432,6 @@ ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 SONAME=libffmpeg-neon.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$OS-x86_64
 PLATFORM_VERSION=android-9
-#build_x264
 build_amr
 build_aac
 build_fribidi

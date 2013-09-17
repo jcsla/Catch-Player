@@ -90,8 +90,6 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		getWindow().setBackgroundDrawable(null);
 
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
 		setContentView(R.layout.video_surfaceview);
 		
 		mFullLayout = this.findViewById(R.id.full_layout);
@@ -229,7 +227,6 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		}
 	}
 	
-	//////////////
 	@Override
 	public void onFFDataSourceLoaded(FFmpegError err, FFmpegStreamInfo[] streams)
 	{
@@ -271,35 +268,46 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		
 		if (isFinished)
 		{
-			new AlertDialog.Builder(this)
-					.setTitle(R.string.dialog_end_of_video_title)
-					.setMessage(R.string.dialog_end_of_video_message)
-					.setCancelable(true).show();
+			mSeekBar.setProgress(0);
+			
+			// 다음 동영상 재생 여부 확인
+			// ok이면 다음 동영상으로 넘어감.
+			
+			//new AlertDialog.Builder(this)
+			//		.setTitle(R.string.dialog_end_of_video_title)
+			//		.setMessage(R.string.dialog_end_of_video_message)
+			//		.setCancelable(true).show();
 		}
 	}
 
 	@Override
-	public void onFFResume(NotPlayingException result) {
+	public void onFFResume(NotPlayingException result)
+	{
 		this.mPlayPauseButton.setImageResource(R.drawable.pause);
 		this.mPlayPauseButton.setEnabled(true);
 
 		displaySystemMenu(false);
+		
 		mPlay = true;
 	}
 
 	@Override
-	public void onFFPause(NotPlayingException err) {
+	public void onFFPause(NotPlayingException err)
+	{
 		this.mPlayPauseButton.setImageResource(R.drawable.play);
 		this.mPlayPauseButton.setEnabled(true);
 		mPlay = false;
 	}
 	
 	@Override
-	public void onFFStop() {
+	public void onFFStop()
+	{
+		
 	}
 	
 	@Override
-	public void onFFSeeked(NotPlayingException result) {
+	public void onFFSeeked(NotPlayingException result)
+	{
 		//if (result != null)
 		//	throw new RuntimeException(result);
 	}
@@ -332,28 +340,37 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		}
 	}
 
-	public void resumePause() {
+	public void resumePause()
+	{
 		this.mPlayPauseButton.setEnabled(false);
-		if (mPlay) {
+		
+		if (mPlay)
+		{
 			mMpegPlayer.pause();
-		} else {
+		}
+		else
+		{
 			mMpegPlayer.resume();
 			displaySystemMenu(true);
 		}
+		
 		mPlay = !mPlay;
 	}
 	
-	private void stop() {
+	private void stop()
+	{
 		this.mControlsView.setVisibility(View.GONE);
 	}
 
 	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
+	public void onStartTrackingTouch(SeekBar seekBar)
+	{
 		mTracking = true;
 	}
 
 	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
+	public void onStopTrackingTouch(SeekBar seekBar)
+	{
 		mTracking = false;
 	}
 	

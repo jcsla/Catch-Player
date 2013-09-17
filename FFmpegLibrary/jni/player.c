@@ -415,7 +415,7 @@ int player_decode_audio(struct DecoderData * decoder_data, JNIEnv * env,
 	LOGI(3, "player_decode_audio decoding");
 	AVPacket *packet = packet_data->packet;
 	int len = avcodec_decode_audio4(ctx, frame, &got_frame_ptr, packet);
-
+	LOGE(1, "decoding audio %d\n", len);
 	int64_t pts = packet->pts;
 
 	if (len < 0) {
