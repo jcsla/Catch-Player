@@ -2,90 +2,86 @@ package com.ffmpegtest;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.MatrixCursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.widget.CursorAdapter;
-import android.view.KeyEvent;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.ffmpegtest.adapter.MainAdapter;
-
-@SuppressLint("NewApi")
 public class MainActivity extends Activity implements OnItemClickListener {
 
 	private ActionBar mActionBar;
-	private ListView mListView;
-	private CursorAdapter mAdapter;
-	private ArrayList<String> fileList = new ArrayList<String>();
-	private String currentPath;
-	private String moviesPath = "/storage/sdcard0/Movies/";
-	private String cameraPath = "/storage/sdcard0/DCIM/Camera/";
+	private ArrayList<String> item = null;
+	private ArrayList<String> path = null;
+	private String root;
+	private ListView listView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		
-		setDefaultLayout();
-	}
-	
-	public void setDefaultLayout()
-	{
-		currentPath = "default";
-		
-		MatrixCursor cursor = new MatrixCursor(MainAdapter.PROJECTION);
-		cursor.addRow(new Object[] {
-				1,
-				"Movies",
-				moviesPath});
-		cursor.addRow(new Object[] {
-				2,
-				"Camera",
-				cameraPath});
-		
-		mAdapter = new MainAdapter(this);
-		mAdapter.swapCursor(cursor);
+		listView = (ListView)findViewById(R.id.list);
+		listView.setOnItemClickListener(this);
 
-		mListView = (ListView) findViewById(android.R.id.list);
-		mListView.setAdapter(mAdapter);
-		mListView.setOnItemClickListener(this);
+		mActionBar = getActionBar();
+		mActionBar.setDisplayShowHomeEnabled(false);
+
+		root = Environment.getExternalStorageDirectory().getPath();
+
+
+		getDir(root);
+	}
+
+	private void getDir(String dirPath)
+	{
+		item = new ArrayList<String>();
+		path = new ArrayList<String>();
+		File f = new File(dirPath);
+		File[] files = f.listFiles();
+		mActionBar.setTitle(dirPath);
+
+		if(!dirPath.equals(root))
+		{
+			item.add("../");
+			path.add(f.getParent()); 
+		}
+
+		for(int i=0; i < files.length; i++)
+		{
+			File file = files[i];
+
+			if(!file.isHidden() && file.canRead()){
+				path.add(file.getPath());
+				if(file.isDirectory()){
+					item.add(file.getName() + "/");
+				}else{
+					item.add(file.getName());
+				}
+			} 
+		}
+
+		ArrayAdapter<String> fileList =
+				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, item);
+		listView.setAdapter(fileList); 
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu, menu);
-		
-		mActionBar = getActionBar();
-		mActionBar.setDisplayShowHomeEnabled(false);
-		mActionBar.setTitle("폴더");
-		
+
 		return true;
 	}
-	
-	public boolean onKeyDown(int keyCode, KeyEvent event)
-	{
-		switch(keyCode)
-		{
-		case KeyEvent.KEYCODE_BACK:
-			clickBackButton();
-			break;
-		}
-		
-		return true;
-	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -96,86 +92,41 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		case R.id.search:
 			break;
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public void onItemClick(AdapterView<?> listView, View view, int position, long id)
 	{
-		Cursor cursor = (Cursor) mAdapter.getItem(position);
-		String name = cursor.getString(MainAdapter.PROJECTION_NAME);
-		
-		if(name.compareTo("Movies") == 0)
-		{
-			currentPath = "Movies";
-			openPath(moviesPath);
-			updateAdapter(moviesPath);
-		}
-		else if(name.compareTo("Camera") == 0)
-		{
-			currentPath = "Camera";
-			openPath(cameraPath);
-			updateAdapter(cameraPath);
-		}
-		else
-		{
-			String path = cursor.getString(MainAdapter.PROJECTION_PATH);
-			String fileName = cursor.getString(MainAdapter.PROJECTION_NAME);
-			
-			Intent intent = new Intent(AppConstants.VIDEO_PLAY_ACTION);
-			intent.putExtra(AppConstants.VIDEO_PLAY_ACTION_PATH, path);
-			intent.putExtra(AppConstants.VIDEO_PLAY_ACTION_NAME, fileName);
-			
-			startActivity(intent);
-		}
-	}
-	
-	public boolean openPath(String path)
-	{
-		fileList.clear();
+		File file = new File(path.get(position));
+		Log.e("file", ""+file.getAbsolutePath());
 
-		File file = new File(path);
-		File[] files = file.listFiles();
-		if (files == null)
-			return false;
-		
-		for (int i = 0; i < files.length; i++)
+		if (file.isDirectory())
 		{
-			if(files[i].isFile())
-				fileList.add(files[i].getName());
+			if(file.canRead()){
+				getDir(path.get(position));
+			} else{
+				new AlertDialog.Builder(this)
+				.setIcon(R.drawable.ic_launcher)
+				.setTitle("[" + file.getName() + "] folder can't be read!")
+				.setPositiveButton("OK", null).show(); 
+			} 
 		}
-		
-		Collections.sort(fileList);
-		
-		return true;
-	}
-	
-	public void updateAdapter(String path)
-	{
-		MatrixCursor cursor = new MatrixCursor(MainAdapter.PROJECTION);
-		
-		for(int i=0 ; i<fileList.size() ; i++)
-		{
-			String fileName = fileList.get(i);
-			String filePath = path + fileName;
-			
-			cursor.addRow(new Object[] {
-				i,
-				fileName,
-				filePath});
-		}
-		
-		mAdapter.swapCursor(cursor);
-		
-		mListView.setAdapter(mAdapter);
-	}
-	
-	public void clickBackButton()
-	{
-		if(currentPath.compareTo("default") == 0)
-			System.exit(0);
 		else
-			setDefaultLayout();
+		{
+			Intent i = new Intent(MainActivity.this, VideoActivity.class);
+			Uri uri = Uri.fromFile(file);
+			i.setDataAndType(uri, "video/*");
+			startActivity(i);
+		}
 	}
+
+	@Override
+    public void onBackPressed() {
+		if(item.get(0).equals("../"))
+			getDir(path.get(0));
+		else
+			finish();
+    }
 }
