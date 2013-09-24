@@ -56,31 +56,31 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 {
 	private FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
-	
+
 	private View mFullLayout;
 	private boolean mTouchPressed = false;
-	
+
 	private View mTitleBar;
 	private TextView mTitle;
-	
+
 	private View mVideoView;
-	
+
 	private View mControlsView;
 	private SeekBar mSeekBar;
 	private ImageButton mPlayPauseButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
-	
+
 	private boolean mTracking = false;
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-		
+
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFormat(PixelFormat.RGBA_8888);
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DITHER);
@@ -92,31 +92,31 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		getWindow().setBackgroundDrawable(null);
 
 		setContentView(R.layout.video_surfaceview);
-		
+
 		mFullLayout = this.findViewById(R.id.full_layout);
 		mFullLayout.setOnTouchListener(this);
-		
+
 		mTitleBar = this.findViewById(R.id.title_bar);
 		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
-		
+
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
 
 		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
 		mPlayPauseButton.setOnClickListener(this);
-		
+
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
-		
+
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
-		
+
 		setDataSource();
-		
+
 		mMpegPlayer.resume();
 	}
 
@@ -144,27 +144,40 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	private void setDataSource()
 	{
 		HashMap<String, String> params = new HashMap<String, String>();
-		
+
 		// set font for ass
 		File assFont = new File(Environment.getExternalStorageDirectory(), "DroidSansFallback.ttf");
 		params.put("ass_default_font_path", assFont.getAbsolutePath());
-		
+
 		Intent intent = getIntent();
 		Uri uri = intent.getData();
-		String path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
-		String fileName = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_NAME);
-		
+		String path;
+		String fileName = null;
+		if (uri != null)
+		{
+			path = uri.toString();
+		}
+		else
+		{
+			path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
+			fileName = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_NAME);
+			if (path == null)
+			{
+				throw new IllegalArgumentException(String.format("\"%s\" did not provided", AppConstants.VIDEO_PLAY_ACTION_PATH));
+			}
+		}
+
 		mTitle.setText(fileName);
 
 		this.mPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
 		this.mPlayPauseButton.setEnabled(true);
-		
+
 		mPlay = true;
 		mTouchPressed = false;
 
 		mMpegPlayer.setDataSource(path, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
 	}
-	
+
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
@@ -201,7 +214,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			throw new RuntimeException();
 		}
 	}
-	
+
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 	{
@@ -214,7 +227,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			mMpegPlayer.seek(value);
 		}
 	}
-	
+
 	@Override
 	public void onFFDataSourceLoaded(FFmpegError err, FFmpegStreamInfo[] streams)
 	{
@@ -226,15 +239,15 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 
 			Builder builder = new AlertDialog.Builder(VideoActivity.this);
 			builder.setTitle(R.string.app_name)
-					.setMessage(message)
-					.setOnCancelListener(
-							new DialogInterface.OnCancelListener() {
+			.setMessage(message)
+			.setOnCancelListener(
+					new DialogInterface.OnCancelListener() {
 
-								@Override
-								public void onCancel(DialogInterface dialog) {
-									VideoActivity.this.finish();
-								}
-							}).show();
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							VideoActivity.this.finish();
+						}
+					}).show();
 			return;
 		}
 		mPlayPauseButton.setEnabled(true);
@@ -249,18 +262,18 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
 			mSeekBar.setMax(videoDurationS);
 			mSeekBar.setProgress(currentTimeS);
-			
+
 			mCurrentTime.setText(parseTime(currentTimeS));
 			mTotalTime.setText(parseTime(videoDurationS));
 		}
-		
+
 		if (isFinished)
 		{
 			mSeekBar.setProgress(0);
-			
+
 			// 다음 동영상 재생 여부 확인
 			// ok이면 다음 동영상으로 넘어감.
-			
+
 			//new AlertDialog.Builder(this)
 			//		.setTitle(R.string.dialog_end_of_video_title)
 			//		.setMessage(R.string.dialog_end_of_video_message)
@@ -275,7 +288,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		this.mPlayPauseButton.setEnabled(true);
 
 		displaySystemMenu(false);
-		
+
 		mPlay = true;
 	}
 
@@ -286,13 +299,13 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		this.mPlayPauseButton.setEnabled(true);
 		mPlay = false;
 	}
-	
+
 	@Override
 	public void onFFStop()
 	{
-		
+
 	}
-	
+
 	@Override
 	public void onFFSeeked(NotPlayingException result)
 	{
@@ -324,14 +337,14 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			this.mVideoView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 		} else {
 			this.mVideoView
-					.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+			.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 		}
 	}
 
 	public void resumePause()
 	{
 		this.mPlayPauseButton.setEnabled(false);
-		
+
 		if (mPlay)
 		{
 			mMpegPlayer.pause();
@@ -341,10 +354,10 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			mMpegPlayer.resume();
 			displaySystemMenu(true);
 		}
-		
+
 		mPlay = !mPlay;
 	}
-	
+
 	private void stop()
 	{
 		this.mControlsView.setVisibility(View.GONE);
@@ -361,7 +374,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	{
 		mTracking = false;
 	}
-	
+
 	/**
 	 * 작성자 : 이준영
 	 * 메소드 이름 : parseTIme
@@ -375,13 +388,13 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		String secS = null;
 		int total = time;
 		int spare;
-		
+
 		int hour = total / (60 * 60);
 		spare = total % (60 * 60);
 		int min = spare / (60);
 		spare = spare % (60);
 		int sec = spare;
-		
+
 		if (min < 10)
 			minS = "0" + min;
 		else
@@ -390,9 +403,9 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			secS = "0" + sec;
 		else
 			secS = sec + "";
-		
+
 		String result = hour + " : " + minS + " : " + secS;
-		
+
 		return result;
 	}
 }
