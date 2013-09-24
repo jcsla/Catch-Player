@@ -100,7 +100,6 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> listView, View view, int position, long id)
 	{
 		File file = new File(path.get(position));
-		Log.e("file", ""+file.getAbsolutePath());
 
 		if (file.isDirectory())
 		{
@@ -117,6 +116,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		{
 			Intent i = new Intent(MainActivity.this, VideoActivity.class);
 			Uri uri = Uri.fromFile(file);
+			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_NAME, file.getName());
+			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_PATH, file.getAbsolutePath());
 			i.setDataAndType(uri, "video/*");
 			startActivity(i);
 		}

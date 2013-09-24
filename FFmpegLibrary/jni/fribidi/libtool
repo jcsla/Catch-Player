@@ -278,7 +278,7 @@ hardcode_into_libs=yes
 sys_lib_search_path_spec="/home/jun-young/android-ndk-r9/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/lib/gcc/arm-linux-androideabi/4.4.3/armv7-a/thumb /home/jun-young/android-ndk-r9/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/lib/gcc /home/jun-young/android-ndk-r9/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/arm-linux-androideabi/lib/armv7-a/thumb /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/lib "
 
 # Run-time system search path for libraries.
-sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/local/lib /usr/lib/nvidia-settings /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/nvidia-current /usr/lib32/nvidia-current /lib32 /usr/lib32 "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /usr/local/lib /usr/lib/nvidia-settings /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/nvidia-current /usr/lib32/nvidia-current /lib32 /usr/lib32 "
 
 # Whether dlopen is supported.
 dlopen_support=unknown

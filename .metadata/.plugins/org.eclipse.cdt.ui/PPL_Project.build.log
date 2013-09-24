@@ -1,0 +1,13 @@
+03:27:48 **** Clean-only build of configuration Default for project PPL_Project ****
+/home/jun-young/android-ndk-r9/ndk-build clean 
+Android NDK: WARNING: APP_PLATFORM android-18 is larger than android:minSdkVersion 8 in ./AndroidManifest.xml    
+Clean: avcodec [armeabi-v7a]
+Clean: avformat [armeabi-v7a]
+Clean: avutil [armeabi-v7a]
+Clean: cpufeatures [armeabi-v7a]
+Clean: player [armeabi-v7a]
+Clean: stdc++ [armeabi-v7a]
+Clean: swscale [armeabi-v7a]
+
+03:27:49 Build Finished (took 616ms)
+

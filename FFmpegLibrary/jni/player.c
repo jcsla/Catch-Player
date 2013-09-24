@@ -41,6 +41,9 @@
 #include <jni.h>
 #include <pthread.h>
 
+#include <GLES/gl.h>
+#include <GLES/glext.h>
+
 /* Android profiler */
 #ifdef PROFILER
 #include <android-ndk-profiler-3.1/prof.h>
@@ -55,6 +58,31 @@
 #include "jni-protocol.h"
 #include "aes-protocol.h"
 #include "sync.h"
+
+uint8_t* gFrameData[3];
+
+// fragmentShaderSource 변수 선언.
+static const char* fragmentShaderSource =
+		"uniform sampler2D sampler0;\n"
+		"uniform sampler2D sampler1;\n"
+		"uniform sampler2D sampler2;\n"
+		"varying highp vec2 _texcoord;\n"
+		"void main()\n"
+		"{\n"
+		"highp float y = texture2D(sampler0, _texcoord).r;\n"
+		"highp float u = texture2D(sampler1, _texcoord).r;\n"
+		"highp float v = texture2D(sampler2, _texcoord).r;\n"
+		"\n"
+		"y = 1.1643 * (y - 0.0625);\n"
+		"u = u - 0.5;\n"
+		"v = v - 0.5;\n"
+		"\n"
+		"highp float r = y + 1.5958 * v;\n"
+		"highp float g = y - 0.39173 * u - 0.81290 * v;\n"
+		"highp float b = y + 2.017 * u;\n"
+		"\n"
+		"gl_FragColor = vec4(r, g, b, 1.0);\n"
+		"}\n";
 
 #define FFMPEG_LOG_LEVEL AV_LOG_WARNING
 #define LOG_LEVEL 2
@@ -906,9 +934,18 @@ int player_decode_video(struct DecoderData * decoder_data, JNIEnv * env,
 			", to :%d\n", ctx->pix_fmt, out_format);
 			// TODO some error
 		}
-		sws_scale(sws_context, (const uint8_t * const *) frame->data,
-				frame->linesize, 0, ctx->height, out_frame->data,
-				out_frame->linesize);
+
+		// sws_scale 지우고, YUV -> RGB로 변환, fragment shader로 변환해야됨!
+		// 1. copy
+		// 2. setTexture
+		// 3. execute convert funtion
+		// 4. copy to out_frame
+		// 이런식으로 하면 될까?
+		opengl_copydata(out_frame);
+
+		//sws_scale(sws_context, (const uint8_t * const *) frame->data,
+		//		frame->linesize, 0, ctx->height, out_frame->data,
+		//		out_frame->linesize);
 	}
 
 	if (rescale) {
@@ -1015,6 +1052,13 @@ int player_decode_video(struct DecoderData * decoder_data, JNIEnv * env,
 	ANativeWindow_unlockAndPost(window);
 skip_frame:
 	return err;
+}
+
+void opengl_copydata(void* data)
+{
+	gFrameData[0] = ((uint8_t**)data)[0];
+	gFrameData[1] = ((uint8_t**)data)[1];
+	gFrameData[2] = ((uint8_t**)data)[2];
 }
 
 void * player_decode(void * data) {
@@ -2660,9 +2704,9 @@ int jni_player_init(JNIEnv *env, jobject thiz) {
 	}
 
 	{
-		jclass player_class = (*env)->FindClass(env, player_class_path_name);
+		player->player_class = (*env)->FindClass(env, player_class_path_name);
 
-		if (player_class == NULL) {
+		if (player->player_class == NULL) {
 			err = ERROR_NOT_FOUND_PLAYER_CLASS;
 			goto free_player;
 		}
@@ -2677,7 +2721,7 @@ int jni_player_init(JNIEnv *env, jobject thiz) {
 		(*env)->SetIntField(env, thiz, player_m_native_player_field,
 				(jint) player);
 
-		player->player_prepare_frame_method = java_get_method(env, player_class,
+		player->player_prepare_frame_method = java_get_method(env, player->player_class,
 				player_prepare_frame);
 		if (player->player_prepare_frame_method == NULL) {
 			err = ERROR_NOT_FOUND_PREPARE_FRAME_METHOD;
@@ -2685,27 +2729,27 @@ int jni_player_init(JNIEnv *env, jobject thiz) {
 		}
 
 		player->player_on_update_time_method = java_get_method(env,
-				player_class, player_on_update_time);
+				player->player_class, player_on_update_time);
 		if (player->player_on_update_time_method == NULL) {
 			err = ERROR_NOT_FOUND_ON_UPDATE_TIME_METHOD;
 			goto free_player;
 		}
 
 		player->player_prepare_audio_track_method = java_get_method(env,
-				player_class, player_prepare_audio_track);
+				player->player_class, player_prepare_audio_track);
 		if (player->player_prepare_audio_track_method == NULL) {
 			err = ERROR_NOT_FOUND_PREPARE_AUDIO_TRACK_METHOD;
 			goto free_player;
 		}
 
 		player->player_set_stream_info_method = java_get_method(env,
-				player_class, player_set_stream_info);
+				player->player_class, player_set_stream_info);
 		if (player->player_set_stream_info_method == NULL) {
 			err = ERROR_NOT_FOUND_SET_STREAM_INFO_METHOD;
 			goto free_player;
 		}
 
-		(*env)->DeleteLocalRef(env, player_class);
+		(*env)->DeleteLocalRef(env, player->player_class);
 	}
 
 	{

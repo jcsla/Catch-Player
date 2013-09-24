@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -150,21 +151,8 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		
 		Intent intent = getIntent();
 		Uri uri = intent.getData();
-		String path;
-		String fileName = null;
-		if (uri != null)
-		{
-			path = uri.toString();
-		}
-		else
-		{
-			path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
-			fileName = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_NAME);
-			if (path == null)
-			{
-				throw new IllegalArgumentException(String.format("\"%s\" did not provided", AppConstants.VIDEO_PLAY_ACTION_PATH));
-			}
-		}
+		String path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
+		String fileName = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_NAME);
 		
 		mTitle.setText(fileName);
 

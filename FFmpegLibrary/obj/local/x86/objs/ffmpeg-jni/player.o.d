@@ -99,6 +99,10 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/asm-generic/signal.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/asm/sigcontext.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sched.h \
+ /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/GLES/gl.h \
+ /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/GLES/glplatform.h \
+ /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/KHR/khrplatform.h \
+ /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/GLES/glext.h \
  /home/jun-young/workspace/FFmpegLibrary/jni/convert.h \
  /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
  /home/jun-young/workspace/FFmpegLibrary/jni/helpers.h \
@@ -310,6 +314,14 @@
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/asm/sigcontext.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sched.h:
+
+/home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/GLES/gl.h:
+
+/home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/GLES/glplatform.h:
+
+/home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/KHR/khrplatform.h:
+
+/home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/GLES/glext.h:
 
 /home/jun-young/workspace/FFmpegLibrary/jni/convert.h:
 
