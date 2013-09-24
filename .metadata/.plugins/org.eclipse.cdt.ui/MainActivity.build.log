@@ -1,7 +1,0 @@
-04:01:39 **** Incremental Build of configuration Default for project MainActivity ****
-/home/jun-young/android-ndk-r9/ndk-build all 
-Android NDK: WARNING: APP_PLATFORM android-14 is larger than android:minSdkVersion 9 in ./AndroidManifest.xml    
-Install        : libffmpeg.so => libs/armeabi/libffmpeg.so
-
-04:01:39 Build Finished (took 60ms)
-

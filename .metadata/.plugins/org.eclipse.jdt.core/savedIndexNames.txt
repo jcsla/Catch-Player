@@ -1,7 +1,0 @@
-INDEX VERSION 1.126+/home/jun-young/workspace/.metadata/.plugins/org.eclipse.jdt.core
-765453901.index
-3010851405.index
-280605791.index
-1914339489.index
-1234435837.index
-3674186815.index
