@@ -1,5 +1,5 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/armeabi/objs/tropicssl/tropicssl/library/havege.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/library/havege.c \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/armeabi/objs/tropicssl/tropicssl/library/havege.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/library/havege.c \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/string.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/cdefs.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/cdefs_elf.h \
@@ -22,9 +22,9 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/linux/time.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/asm/siginfo.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/asm-generic/siginfo.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/havege.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/timing.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/havege.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/timing.h
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/string.h:
 
@@ -70,8 +70,8 @@
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/asm-generic/siginfo.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/havege.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/havege.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/timing.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/timing.h:

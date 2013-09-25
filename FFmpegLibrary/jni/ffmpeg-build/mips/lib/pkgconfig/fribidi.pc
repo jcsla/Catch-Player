@@ -1,6 +1,6 @@
 # fribidi.pc.  Generated from fribidi.pc.in by configure.
 
-prefix=/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/mips
+prefix=/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/fribidi/../ffmpeg-build/mips
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

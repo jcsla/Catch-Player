@@ -5,10 +5,10 @@ includedir=${prefix}/include
 
 Name: libavformat
 Description: FFmpeg container format library
-Version: 55.17.100
+Version: 55.16.102
 Requires: libavcodec = 55.31.101
 Requires.private: 
 Conflicts:
-Libs: -L${libdir} -lavformat -lvo-amrwbenc -lvo-aacenc -L/home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a/lib -L/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a/lib -L/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a/lib -lass -lm -lfribidi -lfreetype -lm -lz -lgcc
+Libs: -L${libdir} -lavformat -lvo-amrwbenc -lvo-aacenc -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a/lib -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a/lib -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a/lib -lass -lm -lfribidi -lfreetype -lm -lz -lgcc
 Libs.private: 
 Cflags: -I${includedir}

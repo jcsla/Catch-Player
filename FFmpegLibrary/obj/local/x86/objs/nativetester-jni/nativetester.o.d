@@ -1,5 +1,5 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/x86/objs/nativetester-jni/nativetester.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/nativetester.c \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/x86/objs/nativetester-jni/nativetester.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/nativetester.c \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/jni.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/android/log.h \
  /home/jun-young/android-ndk-r9/sources//android/cpufeatures/cpu-features.h \
@@ -25,7 +25,7 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/machine/kernel.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/sysmacros.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/memory.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/nativetester.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/nativetester.h
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/jni.h:
 
@@ -77,4 +77,4 @@
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/memory.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/nativetester.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/nativetester.h:

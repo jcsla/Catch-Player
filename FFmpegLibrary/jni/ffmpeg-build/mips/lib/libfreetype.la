@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/mips/lib'
+libdir='/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/mips/lib'

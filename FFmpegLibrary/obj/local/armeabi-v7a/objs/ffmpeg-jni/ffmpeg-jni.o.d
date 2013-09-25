@@ -1,5 +1,5 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/armeabi-v7a/objs/ffmpeg-jni/ffmpeg-jni.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-jni.c \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/armeabi-v7a/objs/ffmpeg-jni/ffmpeg-jni.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-jni.c \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/jni.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/android/log.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/time.h \
@@ -48,11 +48,11 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/linux/capability.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/pathconf.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/assert.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/helpers.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/player.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/audioconvert.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/version.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/channel_layout.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/helpers.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/player.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/audioconvert.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/version.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/channel_layout.h
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/jni.h:
 
@@ -150,12 +150,12 @@
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/assert.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/helpers.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/helpers.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/player.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/player.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/audioconvert.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/audioconvert.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/version.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/version.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/channel_layout.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/armeabi-v7a/include/libavutil/channel_layout.h:

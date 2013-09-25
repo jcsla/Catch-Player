@@ -144,17 +144,17 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/jun-young/workspace/FFmpegLibrary/jni/libass/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/missing --run aclocal-1.11
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ar
-AUTOCONF = ${SHELL} /home/jun-young/workspace/FFmpegLibrary/jni/libass/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/jun-young/workspace/FFmpegLibrary/jni/libass/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/jun-young/workspace/FFmpegLibrary/jni/libass/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/missing --run automake-1.11
 AWK = gawk
 CC = /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc --sysroot=/home/jun-young/android-ndk-r9//platforms/android-9/arch-arm/
 CCDEPMODE = depmode=none
-CFLAGS = -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8 -mthumb -D__thumb__  -I/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include/freetype2 -I/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include   -I/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/include/fribidi  
+CFLAGS = -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8 -mthumb -D__thumb__  -I/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include/freetype2 -I/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include   -I/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/include/fribidi  
 CPP = /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc --sysroot=/home/jun-young/android-ndk-r9//platforms/android-9/arch-arm/ -E
 CPPFLAGS = -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8 -mthumb -D__thumb__ 
 CYGPATH_W = echo
@@ -173,10 +173,10 @@ EXEEXT =
 FGREP = /bin/grep -F
 FONTCONFIG_CFLAGS = 
 FONTCONFIG_LIBS = 
-FREETYPE_CFLAGS = -I/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include/freetype2 -I/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include  
-FREETYPE_LIBS = -L/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/lib -lfreetype  
-FRIBIDI_CFLAGS = -I/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/include/fribidi  
-FRIBIDI_LIBS = -L/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/lib -lfribidi  
+FREETYPE_CFLAGS = -I/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include/freetype2 -I/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/include  
+FREETYPE_LIBS = -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/lib -lfreetype  
+FRIBIDI_CFLAGS = -I/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/include/fribidi  
+FRIBIDI_LIBS = -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/lib -lfribidi  
 GREP = /bin/grep
 HARFBUZZ_CFLAGS = 
 HARFBUZZ_LIBS = 
@@ -190,12 +190,12 @@ LDFLAGS = -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-9/ar
 LIBOBJS = 
 LIBPNG_CFLAGS = 
 LIBPNG_LIBS = 
-LIBS = -lm  -L/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/lib -lfreetype   -L/home/jun-young/workspace/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/lib -lfribidi  
+LIBS = -lm  -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a-neon/lib -lfreetype   -L/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/fribidi/../ffmpeg-build/armeabi-v7a-neon/lib -lfribidi  
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/jun-young/workspace/FFmpegLibrary/jni/libass/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/missing --run makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-nm
@@ -213,8 +213,8 @@ PACKAGE_URL =
 PACKAGE_VERSION = 0.10.0
 PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
-PKG_CONFIG_LIBDIR = /home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon/lib/pkgconfig/
-PKG_CONFIG_PATH = /home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon/lib/pkgconfig/
+PKG_CONFIG_LIBDIR = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon/lib/pkgconfig/
+PKG_CONFIG_PATH = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon/lib/pkgconfig/
 PKG_LIBS_DEFAULT = -lm
 PKG_LIBS_PRIVATE = 
 PKG_REQUIRES_DEFAULT = fribidi >= 0.19.0, freetype2 >= 9.6.3
@@ -225,10 +225,10 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-strip
 VERSION = 0.10.0
-abs_builddir = /home/jun-young/workspace/FFmpegLibrary/jni/libass
-abs_srcdir = /home/jun-young/workspace/FFmpegLibrary/jni/libass
-abs_top_builddir = /home/jun-young/workspace/FFmpegLibrary/jni/libass
-abs_top_srcdir = /home/jun-young/workspace/FFmpegLibrary/jni/libass
+abs_builddir = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass
+abs_srcdir = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass
+abs_top_builddir = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass
+abs_top_srcdir = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass
 ac_ct_AR = 
 ac_ct_CC = 
 ac_ct_DUMPBIN = 
@@ -257,7 +257,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/jun-young/workspace/FFmpegLibrary/jni/libass/install-sh
+install_sh = ${SHELL} /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -266,7 +266,7 @@ mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon
+prefix = /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin

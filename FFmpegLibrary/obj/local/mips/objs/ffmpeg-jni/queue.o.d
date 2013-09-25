@@ -1,6 +1,6 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/mips/objs/ffmpeg-jni/queue.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/queue.c \
- /home/jun-young/workspace/FFmpegLibrary/jni/queue.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/mips/objs/ffmpeg-jni/queue.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/queue.c \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/queue.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/pthread.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/time.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/cdefs.h \
@@ -44,7 +44,7 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/stdio.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/assert.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/queue.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/queue.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/pthread.h:
 

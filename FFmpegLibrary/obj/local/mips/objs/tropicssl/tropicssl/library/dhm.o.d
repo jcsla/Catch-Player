@@ -1,8 +1,8 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/mips/objs/tropicssl/tropicssl/library/dhm.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/library/dhm.c \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/dhm.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/mips/objs/tropicssl/tropicssl/library/dhm.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/library/dhm.c \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/dhm.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/stdio.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/cdefs.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/cdefs_elf.h \
@@ -23,11 +23,11 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/string.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/malloc.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/dhm.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/dhm.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/stdio.h:
 

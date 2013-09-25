@@ -1,7 +1,7 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/mips/objs/yuv_static/source/cpu_id.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/source/cpu_id.cc \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/cpu_id.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/mips/objs/yuv_static/source/cpu_id.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/source/cpu_id.cc \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/cpu_id.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/stdint.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/_types.h \
@@ -26,9 +26,9 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/memory.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/stdio.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/cpu_id.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/cpu_id.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/types.h:
 

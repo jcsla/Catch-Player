@@ -1,5 +1,5 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/mips/objs/ffmpeg-jni/ffmpeg-jni.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-jni.c \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/mips/objs/ffmpeg-jni/ffmpeg-jni.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-jni.c \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/jni.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/android/log.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/time.h \
@@ -49,11 +49,11 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/linux/capability.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/pathconf.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/assert.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/helpers.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/player.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/audioconvert.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/version.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/channel_layout.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/helpers.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/player.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/audioconvert.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/version.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/channel_layout.h
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/jni.h:
 
@@ -153,12 +153,12 @@
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/assert.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/helpers.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/helpers.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/player.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/player.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/audioconvert.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/audioconvert.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/version.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/version.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/channel_layout.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/channel_layout.h:

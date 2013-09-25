@@ -1,8 +1,8 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/armeabi-v7a/objs/tropicssl/tropicssl/library/aes.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/library/aes.c \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/aes.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/padlock.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/armeabi-v7a/objs/tropicssl/tropicssl/library/aes.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/library/aes.c \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/aes.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/padlock.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/string.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/cdefs.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/cdefs_elf.h \
@@ -22,11 +22,11 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/machine/kernel.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/sysmacros.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/aes.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/aes.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/padlock.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/padlock.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/string.h:
 

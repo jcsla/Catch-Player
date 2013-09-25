@@ -1,6 +1,6 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/x86/objs/yuv_static/source/compare_posix.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/source/compare_posix.cc \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/x86/objs/yuv_static/source/compare_posix.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/source/compare_posix.cc \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/stdint.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/_types.h \
@@ -17,9 +17,9 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/linux/types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/machine/kernel.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/sysmacros.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/row.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/row.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/types.h:
 
@@ -53,4 +53,4 @@
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/sysmacros.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/row.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/row.h:

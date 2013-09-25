@@ -1,7 +1,7 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/x86/objs/yuv_static/source/row_common.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/source/row_common.cc \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/row.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/x86/objs/yuv_static/source/row_common.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/source/row_common.cc \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/row.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/stdint.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/_types.h \
@@ -21,9 +21,9 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/string.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/malloc.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/row.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/row.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libyuv/include/libyuv/basic_types.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/types.h:
 

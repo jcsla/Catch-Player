@@ -1,7 +1,7 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/armeabi/objs/tropicssl/tropicssl/library/net.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/library/net.c \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/net.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/armeabi/objs/tropicssl/tropicssl/library/net.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/library/net.c \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/net.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/stdint.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/_types.h \
@@ -75,9 +75,9 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/stdio.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/time.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/net.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/net.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/sys/types.h:
 

@@ -173,7 +173,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 
 		mTitle.setText(fileName);
 
-		this.mPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+		this.mPlayPauseButton.setImageResource(R.drawable.pause);
 		this.mPlayPauseButton.setEnabled(true);
 
 		mPlay = true;

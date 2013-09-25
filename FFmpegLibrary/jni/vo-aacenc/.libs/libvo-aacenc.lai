@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/jun-young/workspace/FFmpegLibrary/jni/vo-aacenc/../ffmpeg-build/armeabi-v7a-neon/lib'
+libdir='/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/vo-aacenc/../ffmpeg-build/armeabi-v7a-neon/lib'

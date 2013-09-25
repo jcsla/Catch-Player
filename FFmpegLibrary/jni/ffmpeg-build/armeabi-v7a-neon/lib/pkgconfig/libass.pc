@@ -1,4 +1,4 @@
-prefix=/home/jun-young/workspace/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon
+prefix=/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/libass/../ffmpeg-build/armeabi-v7a-neon
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

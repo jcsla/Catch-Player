@@ -1,4 +1,4 @@
-prefix=/home/jun-young/workspace/FFmpegLibrary/jni/vo-amrwbenc/../ffmpeg-build/mips
+prefix=/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/vo-amrwbenc/../ffmpeg-build/mips
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

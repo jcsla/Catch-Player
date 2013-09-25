@@ -1,7 +1,7 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/x86/objs/tropicssl/tropicssl/library/bignum.o: \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/library/bignum.c \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/x86/objs/tropicssl/tropicssl/library/bignum.o: \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/library/bignum.c \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/stdio.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/cdefs.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/cdefs_elf.h \
@@ -19,7 +19,7 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/linux/types.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/machine/kernel.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/sysmacros.h \
- /home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/bn_mul.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/bn_mul.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/string.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/malloc.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/stdlib.h \
@@ -27,9 +27,9 @@
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/strings.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/memory.h
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/config.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/bignum.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/stdio.h:
 
@@ -65,7 +65,7 @@
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/sys/sysmacros.h:
 
-/home/jun-young/workspace/FFmpegLibrary/jni/tropicssl/include/tropicssl/bn_mul.h:
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/tropicssl/include/tropicssl/bn_mul.h:
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/string.h:
 

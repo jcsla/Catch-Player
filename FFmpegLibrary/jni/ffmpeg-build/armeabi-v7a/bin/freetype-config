@@ -9,7 +9,7 @@
 # indicate that you have read the license and understand and accept it
 # fully.
 
-prefix=/home/jun-young/workspace/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a
+prefix=/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/freetype2/../ffmpeg-build/armeabi-v7a
 exec_prefix=${prefix}
 exec_prefix_set=no
 includedir=${prefix}/include

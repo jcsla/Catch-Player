@@ -1,4 +1,4 @@
-/home/jun-young/workspace/FFmpegLibrary/obj/local/mips/objs/cpufeatures/cpu-features.o: \
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/obj/local/mips/objs/cpufeatures/cpu-features.o: \
  /home/jun-young/android-ndk-r9/sources//android/cpufeatures/cpu-features.c \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/system_properties.h \
  /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/sys/cdefs.h \
