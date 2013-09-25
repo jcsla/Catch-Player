@@ -143,8 +143,9 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			mActionBar.setTitle(name.get(position));
 		} else {
 			Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
-			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_NAME, f.getName());
-			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_PATH, f.getPath());
+			i.putStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, video.get(currentPath));
+			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_PATH, currentPath);
+			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, position);
 			
 			startActivity(i);
 		}

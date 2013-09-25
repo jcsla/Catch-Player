@@ -110,7 +110,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
                 android:background="@null"
-                android:src="@drawable/prev" />
+                android:src="@drawable/prev" 
+                android:onClick="onClick" />
 
             <ImageButton
                 android:id="@+id/play_pause"
@@ -128,7 +129,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
                 android:background="@null"
-                android:src="@drawable/next" />
+                android:src="@drawable/next"
+                android:onClick="onClick" />
             
             <ImageButton
                 android:id="@+id/ratio_video"

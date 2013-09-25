@@ -19,6 +19,7 @@
 package com.ffmpegtest;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.annotation.TargetApi;
@@ -42,6 +43,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
@@ -56,6 +58,8 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 {
 	private FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
+	ArrayList<String> videoList;
+	String path;
 
 	private View mFullLayout;
 	private boolean mTouchPressed = false;
@@ -75,6 +79,8 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
+	private int index;
+	private String fileName;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -116,7 +122,6 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
-
 		mMpegPlayer.resume();
 	}
 
@@ -149,21 +154,20 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		File assFont = new File(Environment.getExternalStorageDirectory(), "DroidSansFallback.ttf");
 		params.put("ass_default_font_path", assFont.getAbsolutePath());
 
-		Intent intent = getIntent();
-		Uri uri = intent.getData();
-		String path;
-		String fileName = null;
-		if (uri != null)
-		{
-			path = uri.toString();
-		}
-		else
-		{
-			path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
-			fileName = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_NAME);
-			if (path == null)
+		if(videoList == null) {
+			Intent intent = getIntent();
+			Uri uri = intent.getData();
+
+			if (uri != null)
 			{
-				throw new IllegalArgumentException(String.format("\"%s\" did not provided", AppConstants.VIDEO_PLAY_ACTION_PATH));
+				path = uri.toString();
+			}
+			else
+			{
+				videoList = intent.getStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST);
+				path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
+				index = intent.getIntExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, 0);
+				fileName = videoList.get(index);
 			}
 		}
 
@@ -175,7 +179,24 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		mPlay = true;
 		mTouchPressed = false;
 
-		mMpegPlayer.setDataSource(path, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
+		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
+		Log.e("filePath : ", path + ('/' + fileName));
+	}
+
+	public void nextVideo() {
+		if(videoList != null && index < videoList.size() - 1) {
+			fileName = videoList.get(++index);
+			setDataSource();
+			mMpegPlayer.resume();
+		}
+	}
+
+	public void prevVideo() {
+		if(index > 0) {
+			fileName = videoList.get(--index);
+			setDataSource();
+			mMpegPlayer.resume();
+		}
 	}
 
 	@Override
@@ -204,12 +225,18 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	@Override
 	public void onClick(View v)
 	{
-		int viewId = v.getId();
-		switch (viewId)
+		switch (v.getId())
 		{
 		case R.id.play_pause:
 			resumePause();
-			return;
+			Log.e("Stop","Play");
+			break;
+		case R.id.next_video:
+			nextVideo();
+			break;
+		case R.id.prev_video:
+			prevVideo();
+			break;
 		default:
 			throw new RuntimeException();
 		}
