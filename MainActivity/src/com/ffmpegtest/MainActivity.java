@@ -3,14 +3,11 @@ package com.ffmpegtest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -127,13 +124,16 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> listView, View view, int position, long id)
 	{
 		File f = null;
-		if(currentPath.equals(root))
+		if(currentPath.equals(root)) {
 			f = new File(path.get(position));
-		else
+			currentPath = f.getAbsolutePath();
+		}
+		
+		else {
+			Log.e("currentPath : ", currentPath);
+			Log.e("name : ", video.get(currentPath).get(position));
 			f = new File(currentPath + '/' + video.get(currentPath).get(position));
-
-		currentPath = f.getAbsolutePath();
-		Log.e("currentPath = ", currentPath);
+		}
 
 		if(f.isDirectory()) {
 			ArrayAdapter<String> fileList =
