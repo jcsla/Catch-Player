@@ -33,6 +33,7 @@ PATH: /usr/sbin
 PATH: /usr/bin
 PATH: /sbin
 PATH: /bin
+PATH: /home/jun-young/android-ndk-r9/
 PATH: /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/
 PATH: /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/
 PATH: /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/
@@ -839,7 +840,7 @@ configure:12854: result: yes
 configure:12865: checking for library containing iconv_open
 configure:12896: /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc --sysroot=/home/jun-young/android-ndk-r9//platforms/android-9/arch-arm/ -o conftest -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8 -mthumb -D__thumb__  -mfloat-abi=softfp -mfpu=neon -marm -march=armv7-a -mtune=cortex-a8 -mthumb -D__thumb__  -Wl,-rpath-link=/home/jun-young/android-ndk-r9//platforms/android-9/arch-arm//usr/lib -L/home/jun-young/android-ndk-r9//platforms/android-9/arch-arm//usr/lib  -nostdlib -lc -lm -ldl -llog conftest.c  >&5
 /home/jun-young/android-ndk-r9//toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.4.3/../../../../arm-linux-androideabi/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000008210
-/tmp/ccSFtVqd.o: In function `main':
+/tmp/cc4bz1OH.o: In function `main':
 conftest.c:(.text+0x4): undefined reference to `iconv_open'
 collect2: ld returned 1 exit status
 configure:12896: $? = 1
