@@ -249,10 +249,9 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		String value = String.valueOf(seekBar.getProgress());
 		if (fromUser)
 		{
-			//System.out.println(seekBar.getProgress());
-			//long timeUs = Long.parseLong(value) * 1000 * 1000;
-			//System.out.println("timeUs = " + timeUs);
-			mMpegPlayer.seek(value);
+			long timeUs = Long.parseLong(value) * 1000 * 1000;
+			int currentTimeS = (int)(timeUs / 1000 / 1000);
+			mCurrentTime.setText(parseTime(currentTimeS));
 		}
 	}
 	
