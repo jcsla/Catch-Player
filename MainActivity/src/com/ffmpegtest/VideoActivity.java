@@ -122,6 +122,7 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
+		
 		mMpegPlayer.resume();
 	}
 
@@ -254,6 +255,27 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 			mMpegPlayer.seek(value);
 		}
 	}
+	
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar)
+	{
+		mTracking = true;
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar)
+	{
+		mTracking = false;
+		
+		String value = String.valueOf(seekBar.getProgress());
+		//if (fromUser)
+		//{
+			//System.out.println(seekBar.getProgress());
+			//long timeUs = Long.parseLong(value) * 1000 * 1000;
+			//System.out.println("timeUs = " + timeUs);
+			mMpegPlayer.seek(value);
+		//}
+	}
 
 	@Override
 	public void onFFDataSourceLoaded(FFmpegError err, FFmpegStreamInfo[] streams)
@@ -283,16 +305,13 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	@Override
 	public void onFFUpdateTime(long currentTimeUs, long videoDurationUs, boolean isFinished)
 	{
-		if (!mTracking)
-		{
-			int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
-			int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
-			mSeekBar.setMax(videoDurationS);
-			mSeekBar.setProgress(currentTimeS);
+		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
+		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
+		mSeekBar.setMax(videoDurationS);
+		mSeekBar.setProgress(currentTimeS);
 
-			mCurrentTime.setText(parseTime(currentTimeS));
-			mTotalTime.setText(parseTime(videoDurationS));
-		}
+		mCurrentTime.setText(parseTime(currentTimeS));
+		mTotalTime.setText(parseTime(videoDurationS));
 
 		if (isFinished)
 		{
@@ -388,18 +407,6 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 	private void stop()
 	{
 		this.mControlsView.setVisibility(View.GONE);
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar)
-	{
-		mTracking = true;
-	}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar)
-	{
-		mTracking = false;
 	}
 
 	/**

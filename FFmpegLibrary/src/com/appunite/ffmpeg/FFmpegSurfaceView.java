@@ -27,6 +27,8 @@ import android.view.SurfaceView;
 
 public class FFmpegSurfaceView extends SurfaceView implements FFmpegDisplay,
 		SurfaceHolder.Callback {
+	
+	public Surface surface;
 
 	public static enum ScaleType {
 		CENTER_CROP, CENTER_INSIDE, FIT_XY
@@ -72,7 +74,7 @@ public class FFmpegSurfaceView extends SurfaceView implements FFmpegDisplay,
 			surfaceDestroyed(holder);
 		}
 
-		Surface surface = holder.getSurface();
+		surface = holder.getSurface();
 		mMpegPlayer.render(surface);
 		mCreated = true;
 	}
@@ -83,4 +85,8 @@ public class FFmpegSurfaceView extends SurfaceView implements FFmpegDisplay,
 		mCreated = false;
 	}
 
+	public Surface getSurface()
+	{
+		return surface;
+	}
 }

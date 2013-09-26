@@ -284,6 +284,8 @@ public class FFmpegPlayer {
 	private native void pauseNative() throws NotPlayingException;
 
 	private native void resumeNative() throws NotPlayingException;
+	
+	
 
 	public void pause() {
 		new PauseTask(this).execute();

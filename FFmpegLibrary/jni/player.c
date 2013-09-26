@@ -1359,7 +1359,7 @@ void * player_read_from_stream(void *data) {
 		seek_target = av_rescale_q(
 				player->seek_position, AV_TIME_BASE_Q,
 				seek_input_stream->time_base);
-		LOGI(3, "player_read_from_stream seeking to: "
+		LOGI(1, "player_read_from_stream seeking to: "
 		"%ds, time_base: %f", player->seek_position / 1000000.0, seek_target);
 
 		// seeking
