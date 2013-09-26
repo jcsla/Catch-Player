@@ -1364,7 +1364,7 @@ void * player_read_from_stream(void *data) {
 
 		// seeking
 		if (av_seek_frame(player->input_format_ctx, seek_input_stream_number,
-				seek_target, AVSEEK_FLAG_ANY) < 0) {
+				seek_target, AVSEEK_FLAG_BACKWARD) < 0) {
 			// seeking error - trying to play movie without it
 			LOGE(1, "Error while seeking");
 			player->seek_position = DO_NOT_SEEK;
