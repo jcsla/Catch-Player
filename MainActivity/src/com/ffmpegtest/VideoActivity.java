@@ -30,7 +30,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,9 +41,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -73,6 +83,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageButton mPlayPauseButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
+	private ImageView mPPLButton;
+	private ListView mPPLList;
 
 	private boolean mTracking = false;
 
@@ -114,16 +126,38 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
 		mPlayPauseButton.setOnClickListener(this);
 
+		mPPLButton = (ImageView) this.findViewById(R.id.btn_ppl);
+		mPPLButton.setOnClickListener(this);
+
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
 
+		mPPLList = (ListView) this.findViewById(R.id.lv_ppl);
+		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
+		params.width = (getDeviceWidth() / 2);
+		params.height = LayoutParams.MATCH_PARENT;
+		mPPLList.setLayoutParams(params);
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		list.add("가나다라");
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+		mPPLList.setAdapter(adapter);
+
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
-		
+
 		mMpegPlayer.resume();
 	}
 
@@ -206,19 +240,25 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
-			if(mTouchPressed == false)
-			{
-				mTouchPressed = true;
-				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				this.mTitleBar.setVisibility(View.VISIBLE);
-				this.mControlsView.setVisibility(View.VISIBLE);
-			}
-			else
-			{
-				mTouchPressed = false;
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				this.mTitleBar.setVisibility(View.GONE);
-				this.mControlsView.setVisibility(View.GONE);
+			if(mPPLList.getVisibility() == View.GONE) {
+				if(mTouchPressed == false)
+				{
+					mTouchPressed = true;
+					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					this.mTitleBar.setVisibility(View.VISIBLE);
+					this.mControlsView.setVisibility(View.VISIBLE);
+					this.mPPLButton.setVisibility(View.VISIBLE);
+				}
+				else
+				{
+					mTouchPressed = false;
+					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					this.mTitleBar.setVisibility(View.GONE);
+					this.mControlsView.setVisibility(View.GONE);
+					this.mPPLButton.setVisibility(View.GONE);
+				}
+			} else {
+				mPPLList.setVisibility(View.GONE);
 			}
 		}
 		return false;
@@ -239,6 +279,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		case R.id.prev_video:
 			prevVideo();
 			break;
+		case R.id.btn_ppl:
+			mPPLList.setVisibility(View.VISIBLE);
+			break;
 		default:
 			throw new RuntimeException();
 		}
@@ -255,7 +298,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mCurrentTime.setText(parseTime(currentTimeS));
 		}
 	}
-	
+
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar)
 	{
@@ -266,14 +309,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void onStopTrackingTouch(SeekBar seekBar)
 	{
 		mTracking = false;
-		
+
 		String value = String.valueOf(seekBar.getProgress());
 		//if (fromUser)
 		//{
-			//System.out.println(seekBar.getProgress());
-			//long timeUs = Long.parseLong(value) * 1000 * 1000;
-			//System.out.println("timeUs = " + timeUs);
-			mMpegPlayer.seek(value);
+		//System.out.println(seekBar.getProgress());
+		//long timeUs = Long.parseLong(value) * 1000 * 1000;
+		//System.out.println("timeUs = " + timeUs);
+		mMpegPlayer.seek(value);
 		//}
 	}
 
@@ -441,5 +484,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		String result = hour + " : " + minS + " : " + secS;
 
 		return result;
+	}
+	
+	private int getDeviceWidth() {
+		if (12 < Build.VERSION.SDK_INT) {
+			Point p = new Point();
+			getWindowManager().getDefaultDisplay().getSize(p);
+			return p.x;
+		} else {
+			return getWindowManager().getDefaultDisplay().getWidth();
+		}
 	}
 }
