@@ -128,7 +128,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:barColor
+          @attr name android:barColor
         */
         public static final int SeekerView_barColor = 3;
         /**
@@ -144,7 +144,7 @@ in (inches), mm (millimeters).
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:barMinHeight
+          @attr name android:barMinHeight
         */
         public static final int SeekerView_barMinHeight = 4;
         /**
@@ -160,7 +160,7 @@ in (inches), mm (millimeters).
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:barMinWidth
+          @attr name android:barMinWidth
         */
         public static final int SeekerView_barMinWidth = 5;
         /**
@@ -175,7 +175,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:borderColor
+          @attr name android:borderColor
         */
         public static final int SeekerView_borderColor = 0;
         /**
@@ -191,7 +191,7 @@ in (inches), mm (millimeters).
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:borderPadding
+          @attr name android:borderPadding
         */
         public static final int SeekerView_borderPadding = 2;
         /**
@@ -207,7 +207,7 @@ in (inches), mm (millimeters).
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:borderWidth
+          @attr name android:borderWidth
         */
         public static final int SeekerView_borderWidth = 1;
         /**
@@ -221,7 +221,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:currentValue
+          @attr name android:currentValue
         */
         public static final int SeekerView_currentValue = 7;
         /**
@@ -235,7 +235,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.appunite.ffmpeg:maxValue
+          @attr name android:maxValue
         */
         public static final int SeekerView_maxValue = 6;
     };

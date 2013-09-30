@@ -56,17 +56,18 @@ public class FFmpegPlayer {
 		FFmpegStreamInfo[] streams;
 	}
 
-	private static class SetDataSourceTask extends
-			AsyncTask<Object, Void, SetDataSourceTaskResult> {
-
+	private static class SetDataSourceTask extends AsyncTask<Object, Void, SetDataSourceTaskResult>
+	{
 		private final FFmpegPlayer player;
 
-		public SetDataSourceTask(FFmpegPlayer player) {
+		public SetDataSourceTask(FFmpegPlayer player)
+		{
 			this.player = player;
 		}
 
 		@Override
-		protected SetDataSourceTaskResult doInBackground(Object... params) {
+		protected SetDataSourceTaskResult doInBackground(Object... params)
+		{
 			String url = (String) params[0];
 			@SuppressWarnings("unchecked")
 			Map<String, String> map = (Map<String, String>) params[1];
@@ -370,18 +371,17 @@ public class FFmpegPlayer {
 		setDataSource(url, null, UNKNOWN_STREAM, UNKNOWN_STREAM, NO_STREAM);
 	}
 
-	public void setDataSource(String url, Map<String, String> dictionary,
-			int videoStream, int audioStream, int subtitlesStream) {
-		new SetDataSourceTask(this).execute(url, dictionary,
-				Integer.valueOf(videoStream), Integer.valueOf(audioStream),
-				Integer.valueOf(subtitlesStream));
+	public void setDataSource(String url, Map<String, String> dictionary, int videoStream, int audioStream, int subtitlesStream)
+	{
+		new SetDataSourceTask(this).execute(url, dictionary, Integer.valueOf(videoStream), Integer.valueOf(audioStream), Integer.valueOf(subtitlesStream));
 	}
 
 	public FFmpegListener getMpegListener() {
 		return mpegListener;
 	}
 
-	public void setMpegListener(FFmpegListener mpegListener) {
+	public void setMpegListener(FFmpegListener mpegListener)
+	{
 		this.mpegListener = mpegListener;
 	}
 }
