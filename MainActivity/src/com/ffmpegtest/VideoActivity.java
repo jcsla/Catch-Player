@@ -54,12 +54,11 @@ import com.appunite.ffmpeg.FFmpegPlayer;
 import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
 
-public class VideoActivity extends Activity implements OnClickListener, FFmpegListener, OnSeekBarChangeListener, OnTouchListener
+public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
 	private FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
 	ArrayList<String> videoList;
-	String path;
 
 	private View mFullLayout;
 	private boolean mTouchPressed = false;
@@ -79,8 +78,10 @@ public class VideoActivity extends Activity implements OnClickListener, FFmpegLi
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
-	private int index;
+	
+	String path;
 	private String fileName;
+	private int index;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
