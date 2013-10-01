@@ -43,6 +43,26 @@
             android:background="@null"
             android:paddingRight="10dp"
             android:src="@drawable/rotate_norm" />
+        
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/hold_area"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:layout_margin="20dip" >
+        
+        <ImageButton
+            android:id="@+id/unhold_video"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:padding="10dip"
+            android:background="#a8000000"
+            android:src="@drawable/lock" />
+        
     </LinearLayout>
 
     <ImageView
@@ -145,7 +165,9 @@
                 android:layout_weight="0.2"
                 android:background="@null"
                 android:src="@drawable/zoom_stretch" />
+            
         </LinearLayout>
+        
     </RelativeLayout>
 
     <RelativeLayout
@@ -167,7 +189,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignLeft="@id/lv_ppl"
-            android:text="PPL 정보임" />
+            android:text="PPL Information" />
+        
     </RelativeLayout>
 
 </RelativeLayout>

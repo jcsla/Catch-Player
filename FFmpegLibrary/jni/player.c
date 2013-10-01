@@ -1246,7 +1246,7 @@ void * player_read_from_stream(void *data) {
 					LOGI(2, "player_read_from_stream queue interrupt stop");
 					goto exit_loop;
 				} else if (interrupt_ret == READ_FROM_STREAM_CHECK_MSG_SEEK) {
-					LOGI(2, "player_read_from_stream queue interrupt seek");
+					LOGI(1, "a");
 					goto seek_loop;
 				} else {
 					assert(FALSE);
@@ -1261,7 +1261,10 @@ void * player_read_from_stream(void *data) {
 				if (player->stop)
 					goto exit_loop;
 				if (player->seek_position != DO_NOT_SEEK)
+				{
+					LOGI(1, "b");
 					goto seek_loop;
+				}
 				pthread_cond_wait(&player->cond_queue, &player->mutex_queue);
 			}
 			pthread_mutex_unlock(&player->mutex_queue);
@@ -1274,6 +1277,7 @@ void * player_read_from_stream(void *data) {
 			goto exit_loop;
 		}
 		if (player->seek_position != DO_NOT_SEEK) {
+			LOGI(1, "c");
 			goto seek_loop;
 		}
 		int stream_no;
@@ -1305,7 +1309,7 @@ void * player_read_from_stream(void *data) {
 				LOGI(2, "player_read_from_stream queue interrupt stop");
 				goto exit_loop;
 			} else if (interrupt_ret == READ_FROM_STREAM_CHECK_MSG_SEEK) {
-				LOGI(2, "player_read_from_stream queue interrupt seek");
+				LOGI(1, "d");
 				goto seek_loop;
 			} else {
 				assert(FALSE);
@@ -1829,10 +1833,8 @@ int player_alloc_queues(struct State *state) {
 	int capture_streams_no = player->caputre_streams_no;
 	int stream_no;
 	for (stream_no = 0; stream_no < capture_streams_no; ++stream_no) {
-		player->packets[stream_no] = queue_init_with_custom_lock(50,
-				(queue_fill_func) player_fill_packet,
-				(queue_free_func) player_free_packet, state, state,
-				&player->mutex_queue, &player->cond_queue);
+		player->packets[stream_no] =
+				queue_init_with_custom_lock(50, (queue_fill_func) player_fill_packet, (queue_free_func) player_free_packet, state, state, &player->mutex_queue, &player->cond_queue);
 		if (player->packets[stream_no] == NULL) {
 			return -ERROR_COULD_NOT_PREPARE_PACKETS_QUEUE;
 		}
@@ -2026,6 +2028,7 @@ int player_start_decoding_threads(struct Player *player) {
 		err = -ERROR_COULD_NOT_INIT_PTHREAD_ATTR;
 		goto end;
 	}
+
 	for (i = 0; i < player->caputre_streams_no; ++i) {
 		struct DecoderData * decoder_data = malloc(sizeof(decoder_data));
 		*decoder_data = (struct DecoderData) {player: player, stream_no: i};
@@ -2355,20 +2358,18 @@ int player_set_data_source(struct State *state, const char *file_path,
 	if ((err = player_find_stream_info(player)) < 0)
 		goto error;
 
-	player_print_video_informations(player, file_path);
+	//player_print_video_informations(player, file_path);
 
-	if ((err = player_print_report_video_streams(state->env, player->thiz,
-			player)) < 0)
-		goto error;
+	//if ((err = player_print_report_video_streams(state->env, player->thiz,
+	//		player)) < 0)
+	//	goto error;
 
-	if ((player->video_stream_no = player_find_stream(player,
-			AVMEDIA_TYPE_VIDEO, video_stream_no)) < 0) {
+	if ((player->video_stream_no = player_find_stream(player, AVMEDIA_TYPE_VIDEO, video_stream_no)) < 0) {
 		err = player->video_stream_no;
 		goto error;
 	}
 
-	if ((player->audio_stream_no = player_find_stream(player,
-			AVMEDIA_TYPE_AUDIO, audio_stream_no)) < 0) {
+	if ((player->audio_stream_no = player_find_stream(player, AVMEDIA_TYPE_AUDIO, audio_stream_no)) < 0) {
 		err = player->audio_stream_no;
 		goto error;
 	}

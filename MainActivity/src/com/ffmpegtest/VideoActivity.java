@@ -83,12 +83,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageButton mPlayPauseButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
+	
 	private ImageView mPPLButton;
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
+	
+	private View mHoldButtonView;
 
 	private boolean mTracking = false;
 	private boolean onPPL = false;
+	private boolean mHold = false;
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
@@ -228,6 +232,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
 		Log.e("filePath : ", path + ('/' + fileName));
 	}
+	
+	public void holdVideo() {
+		
+	}
 
 	public void nextVideo() {
 		if(videoList != null && index < videoList.size() - 1) {
@@ -251,7 +259,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		Log.e(v.toString(),""+v.getId());
 		if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
-			if(mPPLLayout.getVisibility() == View.GONE) {
+			if(mPPLLayout.getVisibility() == View.GONE)
+			{
 				if(mTouchPressed == false)
 				{
 					mTouchPressed = true;
@@ -268,7 +277,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					this.mControlsView.setVisibility(View.GONE);
 					this.mPPLButton.setVisibility(View.GONE);
 				}
-			} else {
+			}
+			else
+			{
 				if(mPlay) {
 					mMpegPlayer.resume();
 					mTouchPressed = false;
@@ -292,6 +303,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if(onPPL == false) {
 			switch (v.getId())
 			{
+			case R.id.hold_video:
+				holdVideo();
+				break;
 			case R.id.play_pause:
 				resumePause();
 				Log.e("Stop","Play");
