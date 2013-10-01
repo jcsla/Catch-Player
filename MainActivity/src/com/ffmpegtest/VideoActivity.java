@@ -28,14 +28,15 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,15 +46,13 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
@@ -63,6 +62,7 @@ import com.appunite.ffmpeg.FFmpegListener;
 import com.appunite.ffmpeg.FFmpegPlayer;
 import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
+import com.ffmpegtest.adapter.CustomBaseAdapter;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
@@ -85,12 +85,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mTotalTime;
 	private ImageView mPPLButton;
 	private ListView mPPLList;
+	private RelativeLayout mPPLLayout;
 
 	private boolean mTracking = false;
+	private boolean onPPL = false;
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
-	
+
 	String path;
 	private String fileName;
 	private int index;
@@ -135,10 +137,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mVideoView = this.findViewById(R.id.video_view);
 
 		mPPLList = (ListView) this.findViewById(R.id.lv_ppl);
+
+		mPPLLayout = (RelativeLayout) this.findViewById(R.id.ll_ppl);
+		Paint paint = new Paint();
+		paint.setColor(Color.BLACK);
+		paint.setAlpha(160);
+		mPPLLayout.setBackgroundColor(paint.getColor());
+
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
 		params.height = LayoutParams.MATCH_PARENT;
 		mPPLList.setLayoutParams(params);
+		mPPLList.setBackgroundColor(paint.getColor());
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("가나다라");
 		list.add("가나다라");
@@ -150,7 +160,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		list.add("가나다라");
 		list.add("가나다라");
 		list.add("가나다라");
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+		CustomBaseAdapter adapter = new CustomBaseAdapter(this, list);
 		mPPLList.setAdapter(adapter);
 
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
@@ -238,9 +248,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
+		Log.e(v.toString(),""+v.getId());
 		if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
-			if(mPPLList.getVisibility() == View.GONE) {
+			if(mPPLLayout.getVisibility() == View.GONE) {
 				if(mTouchPressed == false)
 				{
 					mTouchPressed = true;
@@ -258,7 +269,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					this.mPPLButton.setVisibility(View.GONE);
 				}
 			} else {
-				mPPLList.setVisibility(View.GONE);
+				if(mPlay) {
+					mMpegPlayer.resume();
+					mTouchPressed = false;
+					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					this.mTitleBar.setVisibility(View.GONE);
+					this.mControlsView.setVisibility(View.GONE);
+					this.mPPLButton.setVisibility(View.GONE);
+				}
+
+				mPPLLayout.setVisibility(View.GONE);
+				mSeekBar.setEnabled(true);
+				onPPL = false;
 			}
 		}
 		return false;
@@ -267,23 +289,29 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onClick(View v)
 	{
-		switch (v.getId())
-		{
-		case R.id.play_pause:
-			resumePause();
-			Log.e("Stop","Play");
-			break;
-		case R.id.next_video:
-			nextVideo();
-			break;
-		case R.id.prev_video:
-			prevVideo();
-			break;
-		case R.id.btn_ppl:
-			mPPLList.setVisibility(View.VISIBLE);
-			break;
-		default:
-			throw new RuntimeException();
+		if(onPPL == false) {
+			switch (v.getId())
+			{
+			case R.id.play_pause:
+				resumePause();
+				Log.e("Stop","Play");
+				break;
+			case R.id.next_video:
+				nextVideo();
+				break;
+			case R.id.prev_video:
+				prevVideo();
+				break;
+			case R.id.btn_ppl:
+				mPPLLayout.setVisibility(View.VISIBLE);
+				onPPL = true;
+				mSeekBar.setEnabled(false);
+				if(mPlay) 
+					mMpegPlayer.pause();
+				break;
+			default:
+				throw new RuntimeException();
+			}
 		}
 	}
 
@@ -377,8 +405,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mPlayPauseButton.setEnabled(true);
 
 		displaySystemMenu(false);
-
-		mPlay = true;
 	}
 
 	@Override
@@ -386,7 +412,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		this.mPlayPauseButton.setImageResource(R.drawable.play);
 		this.mPlayPauseButton.setEnabled(true);
-		mPlay = false;
 	}
 
 	@Override
@@ -485,7 +510,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		return result;
 	}
-	
+
 	private int getDeviceWidth() {
 		if (12 < Build.VERSION.SDK_INT) {
 			Point p = new Point();
@@ -494,5 +519,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		} else {
 			return getWindowManager().getDefaultDisplay().getWidth();
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if(onPPL)
+			dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100, 100, 0));
+		else
+			finish();
 	}
 }

@@ -148,11 +148,26 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/lv_ppl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:visibility="gone" />
+    <RelativeLayout
+        android:id="@+id/ll_ppl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" >
+
+        <ListView
+            android:id="@+id/lv_ppl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tv_ppl" />
+
+        <TextView
+            android:id="@+id/tv_ppl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@id/lv_ppl"
+            android:text="PPL 정보임" />
+    </RelativeLayout>
 
 </RelativeLayout>

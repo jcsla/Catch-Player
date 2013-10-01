@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp" >
+
+    <ImageView
+        android:id="@+id/iv_pplimg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/tv_ppltitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/iv_pplimg"
+        android:text="데이터임"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tv_pplinfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/iv_pplimg"
+        android:layout_alignLeft="@+id/tv_ppltitle"
+        android:layout_below="@+id/tv_ppltitle"
+        android:text="쏼라쏼라쏼쏼라쏼라쏼" />
+
+</RelativeLayout>
