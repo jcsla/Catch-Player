@@ -81,6 +81,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private View mControlsView;
 	private SeekBar mSeekBar;
 	private ImageButton mPlayPauseButton;
+	private ImageButton mHoldButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
 	
@@ -88,7 +89,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
 	
-	private View mHoldButtonView;
+	private View mUnHoldButtonView;
 
 	private boolean mTracking = false;
 	private boolean onPPL = false;
@@ -131,6 +132,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
 		mPlayPauseButton.setOnClickListener(this);
+		
+		mHoldButton = (ImageButton) this.findViewById(R.id.hold_video);
+		mHoldButton.setOnClickListener(this);
 
 		mPPLButton = (ImageView) this.findViewById(R.id.btn_ppl);
 		mPPLButton.setOnClickListener(this);
@@ -166,6 +170,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		list.add("가나다라");
 		CustomBaseAdapter adapter = new CustomBaseAdapter(this, list);
 		mPPLList.setAdapter(adapter);
+		
+		mUnHoldButtonView = this.findViewById(R.id.hold_area);
 
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
@@ -228,13 +234,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPlay = true;
 		mTouchPressed = false;
+		mHold = false;
 
 		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
 		Log.e("filePath : ", path + ('/' + fileName));
 	}
 	
 	public void holdVideo() {
-		
+		mHold = true;
 	}
 
 	public void nextVideo() {
@@ -256,42 +263,48 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		Log.e(v.toString(),""+v.getId());
 		if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
-			if(mPPLLayout.getVisibility() == View.GONE)
+			if(mHold == false)
 			{
-				if(mTouchPressed == false)
+				if(mPPLLayout.getVisibility() == View.GONE)
 				{
-					mTouchPressed = true;
-					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-					this.mTitleBar.setVisibility(View.VISIBLE);
-					this.mControlsView.setVisibility(View.VISIBLE);
-					this.mPPLButton.setVisibility(View.VISIBLE);
+					if(mTouchPressed == false)
+					{
+						mTouchPressed = true;
+						getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						this.mTitleBar.setVisibility(View.VISIBLE);
+						this.mControlsView.setVisibility(View.VISIBLE);
+						this.mPPLButton.setVisibility(View.VISIBLE);
+					}
+					else
+					{
+						mTouchPressed = false;
+						getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						this.mTitleBar.setVisibility(View.GONE);
+						this.mControlsView.setVisibility(View.GONE);
+						this.mPPLButton.setVisibility(View.GONE);
+					}
 				}
 				else
 				{
-					mTouchPressed = false;
-					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-					this.mTitleBar.setVisibility(View.GONE);
-					this.mControlsView.setVisibility(View.GONE);
-					this.mPPLButton.setVisibility(View.GONE);
+					if(mPlay) {
+						mMpegPlayer.resume();
+						mTouchPressed = false;
+						getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						this.mTitleBar.setVisibility(View.GONE);
+						this.mControlsView.setVisibility(View.GONE);
+						this.mPPLButton.setVisibility(View.GONE);
+					}
+	
+					mPPLLayout.setVisibility(View.GONE);
+					mSeekBar.setEnabled(true);
+					onPPL = false;
 				}
 			}
 			else
 			{
-				if(mPlay) {
-					mMpegPlayer.resume();
-					mTouchPressed = false;
-					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-					this.mTitleBar.setVisibility(View.GONE);
-					this.mControlsView.setVisibility(View.GONE);
-					this.mPPLButton.setVisibility(View.GONE);
-				}
-
-				mPPLLayout.setVisibility(View.GONE);
-				mSeekBar.setEnabled(true);
-				onPPL = false;
+				mUnHoldButtonView.setVisibility(View.VISIBLE);
 			}
 		}
 		return false;
@@ -304,6 +317,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			switch (v.getId())
 			{
 			case R.id.hold_video:
+				Log.e("Hold","Hold");
 				holdVideo();
 				break;
 			case R.id.play_pause:
@@ -358,7 +372,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		//System.out.println(seekBar.getProgress());
 		//long timeUs = Long.parseLong(value) * 1000 * 1000;
 		//System.out.println("timeUs = " + timeUs);
-		mMpegPlayer.seek(value);
+		//mMpegPlayer.seek(value);
 		//}
 	}
 
