@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.ffmpegtest.adapter.VideoListAdapter;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -61,28 +63,28 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		videoCursor.moveToFirst();
 
 		if(videoCursor != null) {
-			while (!videoCursor.isAfterLast()) {
+			do {
 				int videoPath = videoCursor.getColumnIndex(MediaStore.Video.Media.DATA);
 
 				String[] videoFiles = videoCursor.getString(videoPath).split("/");
-				String data = "";
+				String videoFilePath = "";
 				for(int i=0; i<videoFiles.length - 1; i++) {
-					data += videoFiles[i] + "/";
+					videoFilePath += videoFiles[i] + "/";
 				}
-
-				File f = new File(data);
+				
+				File f = new File(videoFilePath);
 				if(f.canRead()) {
 					if(!video.containsKey(f.getAbsolutePath())) {
 						video.put(f.getAbsolutePath(), new ArrayList<String>());
 						Log.e("newKey", f.getAbsolutePath());
 					}
-
-					video.get(f.getAbsolutePath()).add(videoFiles[(videoFiles.length - 1)]);
-					Log.e("addValue : " + f.getAbsolutePath(), videoFiles[(videoFiles.length - 1)]);
+					
+					String videoName = videoFiles[(videoFiles.length - 1)];
+					video.get(f.getAbsolutePath()).add(videoName);
+					Log.e("addValue : " + f.getAbsolutePath(), videoName);
 				}
 
-				videoCursor.moveToNext();
-			}
+			} while(videoCursor.moveToNext());
 		}
 
 		path = new ArrayList<String>(video.keySet());
@@ -90,9 +92,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			String[] pathList = path.get(i).split("/");
 			name.add(pathList[pathList.length - 1]);
 		}
-		ArrayAdapter<String> fileList =
-				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, name);
-		listView.setAdapter(fileList); 
+		listView.setAdapter(new VideoListAdapter(this, video, currentPath)); 
 	}
 
 	@Override
@@ -136,10 +136,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		}
 
 		if(f.isDirectory()) {
-			ArrayAdapter<String> fileList =
-					new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 
-							video.get(path.get(position)));
-			this.listView.setAdapter(fileList);
+			this.listView.setAdapter(new VideoListAdapter(this, video, currentPath));
 			mActionBar.setTitle(name.get(position));
 		} else {
 			Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
@@ -162,9 +159,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	public void onBackPressed() {
 		if(!currentPath.equals(root)) {
 			currentPath = root;
-			ArrayAdapter<String> fileList =
-					new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, name);
-			listView.setAdapter(fileList);
+			listView.setAdapter(new VideoListAdapter(this, video, currentPath));
 			mActionBar.setTitle("폴더");
 		} else {
 			finish();

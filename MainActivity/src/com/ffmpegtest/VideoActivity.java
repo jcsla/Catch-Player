@@ -62,7 +62,7 @@ import com.appunite.ffmpeg.FFmpegListener;
 import com.appunite.ffmpeg.FFmpegPlayer;
 import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
-import com.ffmpegtest.adapter.CustomBaseAdapter;
+import com.ffmpegtest.adapter.PPLListAdapter;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
@@ -158,17 +158,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPPLList.setLayoutParams(params);
 		mPPLList.setBackgroundColor(paint.getColor());
 		ArrayList<String> list = new ArrayList<String>();
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		list.add("가나다라");
-		CustomBaseAdapter adapter = new CustomBaseAdapter(this, list);
+		list.add("짱좋은옷");
+		list.add("짱좋은가방");
+		list.add("짱좋은신발");
+		list.add("짱멋진우산");
+		list.add("완전쩌는스카프");
+		list.add("대박멋진목걸이");
+		list.add("그냥그런바지");
+		list.add("귀티나는양말");
+		list.add("이상한겉옷");
+		list.add("담요");
+		PPLListAdapter adapter = new PPLListAdapter(this, list);
 		mPPLList.setAdapter(adapter);
 		
 		mUnHoldButtonView = this.findViewById(R.id.hold_area);

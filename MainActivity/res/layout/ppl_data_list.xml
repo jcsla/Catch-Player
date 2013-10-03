@@ -5,26 +5,26 @@
     android:padding="10dp" >
 
     <ImageView
-        android:id="@+id/iv_pplimg"
+        android:id="@+id/iv_ppl_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/ic_launcher" />
 
     <TextView
-        android:id="@+id/tv_ppltitle"
+        android:id="@+id/tv_ppl_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/iv_pplimg"
+        android:layout_toRightOf="@+id/iv_ppl_img"
         android:text="데이터임"
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/tv_pplinfo"
+        android:id="@+id/tv_ppl_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/iv_pplimg"
-        android:layout_alignLeft="@+id/tv_ppltitle"
-        android:layout_below="@+id/tv_ppltitle"
+        android:layout_alignBottom="@+id/iv_ppl_img"
+        android:layout_alignLeft="@+id/tv_ppl_title"
+        android:layout_below="@+id/tv_ppl_title"
         android:text="쏼라쏼라쏼쏼라쏼라쏼" />
 
 </RelativeLayout>
