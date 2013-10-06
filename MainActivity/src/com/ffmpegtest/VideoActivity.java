@@ -110,6 +110,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DITHER);
 
+		Log.e("Flag", "onCreate");
 		super.onCreate(savedInstanceState);
 
 		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -186,18 +187,23 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	protected void onPause()
 	{
 		super.onPause();
+		mPlay = false;
+		mMpegPlayer.pause();
+		Log.e("Flag", "onPause");
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
+		Log.e("Flag", "onResume");
 	}
 
 	@Override
 	protected void onDestroy()
 	{
 		super.onDestroy();
+		Log.e("Flag", "onDestroy");
 		this.mMpegPlayer.setMpegListener(null);
 		this.mMpegPlayer.stop();
 		stop();

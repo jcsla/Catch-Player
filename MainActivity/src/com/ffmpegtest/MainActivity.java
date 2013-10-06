@@ -21,10 +21,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 public class MainActivity extends Activity implements OnItemClickListener {
 
 	private ActionBar mActionBar;
+	private SearchView mSearchView;
 	private HashMap<String, ArrayList<String>> video;
 	private ArrayList<String> path;
 	private ArrayList<String> name;
@@ -102,6 +104,33 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		mActionBar = getActionBar();
 		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setTitle("폴더");
+		
+		mSearchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
+		mSearchView.setQueryHint("비디오 파일 검색");
+		mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				ArrayList<String> key = new ArrayList<String>(video.keySet());
+				
+				for(int i=0; i<key.size(); i++) {
+					ArrayList<String> value = video.get(key.get(i));
+					for(int j=0; j<value.size(); j++) {
+						String file = key.get(i) + '/' + value.get(j);
+						if(file.contains(query))
+							Log.e("Search File", file);
+					}
+				}
+				
+				return false;
+			}
+			
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				Log.e("체인지", newText);
+				return false;
+			}
+		});
 
 		return true;
 	}
@@ -111,9 +140,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	{
 		switch(item.getItemId())
 		{
-		case R.id.refresh:
-			break;
-		case R.id.search:
+		case R.id.menu_refresh:
 			break;
 		}
 
