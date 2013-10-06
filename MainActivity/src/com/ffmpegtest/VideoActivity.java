@@ -297,7 +297,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			switch (v.getId())
 			{
 			case R.id.hold_video:
-				holdVideo();
+				if(mPlay)
+					holdVideo();
 				break;
 			case R.id.unhold_button:
 				unholdVideo();
@@ -322,17 +323,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				throw new RuntimeException();
 			}
 		}
-	}
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)
-	{
-		if(mHold==true && (keyCode==KeyEvent.KEYCODE_HOME))
-		{
-			return false;
-		}
-		else
-			return super.onKeyDown(keyCode, event);
 	}
 
 	@Override
@@ -578,11 +568,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 	}
 
-	//@Override
-	//public void onBackPressed() {
-	//	if(onPPL)
-	//		dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100, 100, 0));
-	//	else
-	//		finish();
-	//}
+	@Override
+	public void onBackPressed() {
+		if(onPPL)
+			dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100, 100, 0));
+		else if(mHold);
+		else
+			finish();
+	}
 }
