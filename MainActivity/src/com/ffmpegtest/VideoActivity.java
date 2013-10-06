@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,10 +47,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -68,7 +67,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 {
 	private FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
-	ArrayList<String> videoList;
 
 	private View mFullLayout;
 	private boolean mTouchPressed = false;
@@ -90,6 +88,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private RelativeLayout mPPLLayout;
 	
 	private View mUnHoldButtonView;
+	private ImageButton mUnHoldButton;
 
 	private boolean mTracking = false;
 	private boolean onPPL = false;
@@ -98,6 +97,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 
+	ArrayList<String> videoList;
 	String path;
 	private String fileName;
 	private int index;
@@ -105,10 +105,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFormat(PixelFormat.RGBA_8888);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DITHER);
 
 		super.onCreate(savedInstanceState);
@@ -171,7 +170,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		PPLListAdapter adapter = new PPLListAdapter(this, list);
 		mPPLList.setAdapter(adapter);
 		
-		mUnHoldButtonView = this.findViewById(R.id.hold_area);
+		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
+		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
+		mUnHoldButton.setOnClickListener(this);
 
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
@@ -239,26 +240,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
 		Log.e("filePath : ", path + ('/' + fileName));
 	}
-	
-	public void holdVideo() {
-		mHold = true;
-	}
-
-	public void nextVideo() {
-		if(videoList != null && index < videoList.size() - 1) {
-			fileName = videoList.get(++index);
-			setDataSource();
-			mMpegPlayer.resume();
-		}
-	}
-
-	public void prevVideo() {
-		if(index > 0) {
-			fileName = videoList.get(--index);
-			setDataSource();
-			mMpegPlayer.resume();
-		}
-	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
@@ -272,7 +253,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					if(mTouchPressed == false)
 					{
 						mTouchPressed = true;
-						getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						this.mTitleBar.setVisibility(View.VISIBLE);
 						this.mControlsView.setVisibility(View.VISIBLE);
 						this.mPPLButton.setVisibility(View.VISIBLE);
@@ -280,7 +260,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					else
 					{
 						mTouchPressed = false;
-						getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						this.mTitleBar.setVisibility(View.GONE);
 						this.mControlsView.setVisibility(View.GONE);
 						this.mPPLButton.setVisibility(View.GONE);
@@ -302,6 +281,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					onPPL = false;
 				}
 			}
+			// hold 상태일 때,
 			else
 			{
 				mUnHoldButtonView.setVisibility(View.VISIBLE);
@@ -317,12 +297,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			switch (v.getId())
 			{
 			case R.id.hold_video:
-				Log.e("Hold","Hold");
 				holdVideo();
+				break;
+			case R.id.unhold_button:
+				unholdVideo();
 				break;
 			case R.id.play_pause:
 				resumePause();
-				Log.e("Stop","Play");
 				break;
 			case R.id.next_video:
 				nextVideo();
@@ -341,6 +322,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				throw new RuntimeException();
 			}
 		}
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if(mHold==true && (keyCode==KeyEvent.KEYCODE_HOME))
+		{
+			return false;
+		}
+		else
+			return super.onKeyDown(keyCode, event);
 	}
 
 	@Override
@@ -372,7 +364,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		//System.out.println(seekBar.getProgress());
 		//long timeUs = Long.parseLong(value) * 1000 * 1000;
 		//System.out.println("timeUs = " + timeUs);
-		//mMpegPlayer.seek(value);
+		mMpegPlayer.seek(value);
 		//}
 	}
 
@@ -548,12 +540,49 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			return getWindowManager().getDefaultDisplay().getWidth();
 		}
 	}
-
-	@Override
-	public void onBackPressed() {
-		if(onPPL)
-			dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100, 100, 0));
-		else
-			finish();
+	
+	// 홀드 처리
+	public void holdVideo() {
+		mHold = true;
+		
+		mUnHoldButtonView.setVisibility(View.VISIBLE);
+		
+		this.mTitleBar.setVisibility(View.GONE);
+		this.mControlsView.setVisibility(View.GONE);
+		this.mPPLButton.setVisibility(View.GONE);
 	}
+	
+	public void unholdVideo() {
+		mHold = false;
+		
+		mUnHoldButtonView.setVisibility(View.GONE);
+		
+		this.mTitleBar.setVisibility(View.VISIBLE);
+		this.mControlsView.setVisibility(View.VISIBLE);
+		this.mPPLButton.setVisibility(View.VISIBLE);
+	}
+
+	public void nextVideo() {
+		if(videoList != null && index < videoList.size() - 1) {
+			fileName = videoList.get(++index);
+			setDataSource();
+			mMpegPlayer.resume();
+		}
+	}
+
+	public void prevVideo() {
+		if(index > 0) {
+			fileName = videoList.get(--index);
+			setDataSource();
+			mMpegPlayer.resume();
+		}
+	}
+
+	//@Override
+	//public void onBackPressed() {
+	//	if(onPPL)
+	//		dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100, 100, 0));
+	//	else
+	//		finish();
+	//}
 }

@@ -47,7 +47,7 @@
     </LinearLayout>
     
     <LinearLayout
-        android:id="@+id/hold_area"
+        android:id="@+id/unhold_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -55,7 +55,7 @@
         android:layout_margin="20dip" >
         
         <ImageButton
-            android:id="@+id/unhold_video"
+            android:id="@+id/unhold_button"
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
