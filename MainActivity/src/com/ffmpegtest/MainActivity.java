@@ -37,7 +37,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	public static final String supportedVideoFileFormats[] = 
 		{   "mp4","wmv","avi","mkv","dv",
 		"rm","mpg","mpeg","flv","divx",
-		"swf","dat","h264","h263","h261",
+		"swf","h264","h263","h261",
 		"3gp","3gpp","asf","mov","m4v", "ogv",
 		"vob", "vstream", "ts", "webm",
 		"vro", "tts", "tod", "rmvb", "rec", "ps", "ogx",
@@ -70,57 +70,33 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	 * 메소드 설명 : HashMap에 비디오 파일Path와 리스트를 초기화한다.
 	 */ 
 	public void getVideoFileList() {
-
-//		String[] videoProjection = { MediaStore.Video.Media._ID, MediaStore.Video.Media.DATA, MediaStore.Video.Media.DISPLAY_NAME, MediaStore.Video.Media.SIZE };
-//		Cursor videoCursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, videoProjection, null, null, null);
-//
-//		videoCursor.moveToFirst();
-//
-//		if(videoCursor != null) {
-//			do {
-//				int videoPath = videoCursor.getColumnIndex(MediaStore.Video.Media.DATA);
-//
-//				String[] videoFiles = videoCursor.getString(videoPath).split("/");
-//				String videoFilePath = "";
-//				for(int i=0; i<videoFiles.length - 1; i++) {
-//					videoFilePath += videoFiles[i] + "/";
-//				}
-//
-//				File f = new File(videoFilePath);
-//				if(f.canRead()) {
-//					if(!video.containsKey(f.getAbsolutePath())) {
-//						video.put(f.getAbsolutePath(), new ArrayList<String>());
-//						Log.e("newKey", f.getAbsolutePath());
-//					}
-//
-//					String videoName = videoFiles[(videoFiles.length - 1)];
-//					video.get(f.getAbsolutePath()).add(videoName);
-//					Log.e("addValue : " + f.getAbsolutePath(), videoName);
-//				}
-//
-//			} while(videoCursor.moveToNext());
-//		}
-		
 		getDir(root);
-//		path = new ArrayList<String>(video.keySet());
-//		for(int i=0; i<path.size(); i++) {
-//			String[] pathList = path.get(i).split("/");
-//			name.add(pathList[pathList.length - 1]);
-//		}
-//		listView.setAdapter(new VideoListAdapter(this, video, currentPath)); 
+		path = new ArrayList<String>(video.keySet());
+		for(int i=0; i<path.size(); i++) {
+			String[] pathList = path.get(i).split("/");
+			name.add(pathList[pathList.length - 1]);
+		}
+		listView.setAdapter(new VideoListAdapter(this, video, currentPath)); 
 	}
-	
+
 	public void getDir(String str_path) {
 		File f = new File(str_path);
 		File[] files = f.listFiles();
 		for(int i=0; i<files.length; i++) {
 			File file = files[i];
-			if(file.isDirectory() && !file.isHidden())
+			if(file.isDirectory() && !file.isHidden() && !file.getPath().contains("/Android/data/"))
 				getDir(file.getAbsolutePath());
-			else
-				Log.e("file = ", file.getAbsolutePath());
-				if(isVideoFile(file.getName()))
-					Log.e(file.getPath(), file.getName());
+			else {
+				if(isVideoFile(file.getName())) {
+					if(!video.containsKey(file.getParent())) {
+						video.put(file.getParent(), new ArrayList<String>());
+						Log.e("newKey", file.getParent());
+					}
+
+					video.get(file.getParent()).add(file.getName());
+					Log.e("addValue : " , file.getAbsolutePath());
+				}
+			}
 		}
 	}
 
