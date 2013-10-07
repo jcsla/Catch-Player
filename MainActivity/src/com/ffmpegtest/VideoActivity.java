@@ -99,6 +99,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private boolean onPPL = false;
 	private boolean mHold = false;
 	private boolean mMove = false;
+	private boolean mSeek = false;
+	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
 
@@ -137,7 +139,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
-
+		
 		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
 		mPlayPauseButton.setOnClickListener(this);
 		
@@ -261,10 +263,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
+		DisplayMetrics screen = new DisplayMetrics();
+       getWindowManager().getDefaultDisplay().getMetrics(screen);
+       
 		float x_changed = event.getRawX() - mTouchX;
 		float y_changed = event.getRawY() - mTouchY;
 		
 		float coef = Math.abs (y_changed / x_changed);
+		float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
 		
 		if(event.getAction() == MotionEvent.ACTION_MOVE)
 		{
@@ -282,7 +288,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					Log.e("Volume", "Volume");
 					doVolumeTouch(y_changed);
                 }
+				
+				return true;
 			}
+			//Log.e("Seek", "Seek");
+			doSeekTouch(coef, xgesturesize, false);
 			
 			return true;
 		}
@@ -294,7 +304,19 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 		}
 		else if(event.getAction() == MotionEvent.ACTION_UP)
-		{	
+		{
+			if(mMove==true && mSeek==true)
+			{
+				mMove = false;
+				mSeek = false;
+				
+				Log.e("SeekValue : ", String.valueOf(seekValue));
+				
+				mMpegPlayer.seek(String.valueOf(seekValue));
+				
+				return true;
+			}
+			
 			if(mMove == true)
 			{
 				mMove = false;
@@ -407,6 +429,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTracking = false;
 
 		String value = String.valueOf(seekBar.getProgress());
+		Log.e("seekbar value : ", value);
 		//if (fromUser)
 		//{
 		//System.out.println(seekBar.getProgress());
@@ -446,6 +469,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
+		Log.e("currentTimeS : ", String.valueOf(currentTimeS));
+		Log.e("videoDurationS : ", String.valueOf(videoDurationS));
+		
 		mSeekBar.setMax(videoDurationS);
 		mSeekBar.setProgress(currentTimeS);
 
@@ -658,5 +684,28 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
 
 		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
+	}
+	
+	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
+	{
+		if(coef > 0.5 || Math.abs(xgesturesize) < 1)
+			return;
+		
+		long mCurrentTimeUs = mMpegPlayer.getCurrentTime();
+		long mVideoDurationUs = mMpegPlayer.getVideoDuration();
+		long value;
+
+		int jump = (int) (Math.signum(xgesturesize) * ((600000 * Math.pow((xgesturesize), 4)) + 3000));
+
+		if((jump > 0) && ((mCurrentTimeUs + jump) > mVideoDurationUs))
+			jump = (int) (mVideoDurationUs - mCurrentTimeUs);
+		if((jump < 0) && ((mCurrentTimeUs + jump) < 0))
+			jump = (int) -mCurrentTimeUs;
+		
+		value = mCurrentTimeUs + jump;
+		
+		seekValue = (int)(value / 1000 / 1000);
+		
+		mSeek = true;
 	}
 }

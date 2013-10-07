@@ -218,6 +218,16 @@ public class FFmpegPlayer {
 	private long mVideoDurationUs;
 	private FFmpegStreamInfo[] mStreamsInfos = null;
 	private boolean mIsFinished = false;
+	
+	public long getCurrentTime()
+	{
+		return mCurrentTimeUs;
+	}
+	
+	public long getVideoDuration()
+	{
+		return mVideoDurationUs;
+	}
 
 	static class RenderedFrame {
 		public Bitmap bitmap;
