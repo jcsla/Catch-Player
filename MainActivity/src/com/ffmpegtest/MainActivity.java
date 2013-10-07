@@ -121,7 +121,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		mActionBar.setTitle("폴더");
 
 		mSearchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
-		mSearchView.setQueryHint("비디오 파일 검색");
+		mSearchView.setQueryHint("비디오 검색");
 		mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override

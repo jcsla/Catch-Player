@@ -32,13 +32,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -89,10 +90,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
+	
+	private AudioManager mAudioManager;
+	private int mAudioMax;
+	private float mVolume;
 
 	private boolean mTracking = false;
 	private boolean onPPL = false;
 	private boolean mHold = false;
+	private boolean mMove = false;
+	private float mTouchX;
+	private float mTouchY;
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
@@ -151,6 +159,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		paint.setColor(Color.BLACK);
 		paint.setAlpha(160);
 		mPPLLayout.setBackgroundColor(paint.getColor());
+		
+		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
+		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
+		mUnHoldButton.setOnClickListener(this);
+		
+		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+       mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
@@ -170,10 +185,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		list.add("담요");
 		PPLListAdapter adapter = new PPLListAdapter(this, list);
 		mPPLList.setAdapter(adapter);
-		
-		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
-		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
-		mUnHoldButton.setOnClickListener(this);
 
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
@@ -250,8 +261,46 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		if(event.getAction() == MotionEvent.ACTION_DOWN)
+		float x_changed = event.getRawX() - mTouchX;
+		float y_changed = event.getRawY() - mTouchY;
+		
+		float coef = Math.abs (y_changed / x_changed);
+		
+		if(event.getAction() == MotionEvent.ACTION_MOVE)
 		{
+			mMove = true;
+			
+			if(coef > 2)
+			{
+				if(mTouchX < (getDeviceWidth() / 2))
+				{
+					Log.e("Brightness", "Brightness");
+					doBrightnessTouch(y_changed);
+                }
+				if(mTouchX > (getDeviceWidth() / 2))
+				{
+					Log.e("Volume", "Volume");
+					doVolumeTouch(y_changed);
+                }
+			}
+			
+			return true;
+		}
+		else if(event.getAction() == MotionEvent.ACTION_DOWN)
+		{
+			mTouchX = event.getRawX();
+			mTouchY = event.getRawY();
+			
+			mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+		}
+		else if(event.getAction() == MotionEvent.ACTION_UP)
+		{	
+			if(mMove == true)
+			{
+				mMove = false;
+				return true;
+			}
+			
 			if(mHold == false)
 			{
 				if(mPPLLayout.getVisibility() == View.GONE)
@@ -292,8 +341,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			{
 				mUnHoldButtonView.setVisibility(View.VISIBLE);
 			}
+			
+			return true;
 		}
-		return false;
+		
+		return true;
 	}
 
 	@Override
@@ -537,6 +589,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 	}
 	
+	private int getDeviceHeight() {
+		if (12 < Build.VERSION.SDK_INT) {
+			Point p = new Point();
+			getWindowManager().getDefaultDisplay().getSize(p);
+			return p.y;
+		} else {
+			return getWindowManager().getDefaultDisplay().getHeight();
+		}
+	}
+	
 	// 홀드 처리
 	public void holdVideo() {
 		mHold = true;
@@ -581,5 +643,20 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else if(mHold);
 		else
 			finish();
+	}
+	
+	private void doBrightnessTouch(float y_changed) {
+		float delta = -y_changed / getDeviceHeight() * 0.07f;
+		WindowManager.LayoutParams lp = getWindow().getAttributes();
+		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
+		
+		getWindow().setAttributes(lp);
+	}
+
+	private void doVolumeTouch(float y_changed) {
+		int delta = -(int) ((y_changed / getDeviceHeight()) * mAudioMax);
+		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
+
+		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
 	}
 }
