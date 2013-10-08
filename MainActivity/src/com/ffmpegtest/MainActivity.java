@@ -1,6 +1,12 @@
 package com.ffmpegtest;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,18 +15,17 @@ import com.ffmpegtest.adapter.VideoListAdapter;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -28,12 +33,14 @@ public class MainActivity extends Activity implements OnItemClickListener {
 
 	private ActionBar mActionBar;
 	private SearchView mSearchView;
-	private HashMap<String, ArrayList<String>> video;
+	private HashMap<String, ArrayList<String>> video, save_video;
 	private ArrayList<String> path;
 	private ArrayList<String> name;
 	private ListView listView;
 	private String currentPath;
 	private String root;
+	boolean inRoot = false;
+	private Menu optionsMenu;
 	public static final String supportedVideoFileFormats[] = 
 		{   "mp4","wmv","avi","mkv","dv",
 		"rm","mpg","mpeg","flv","divx",
@@ -58,8 +65,10 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		path = new ArrayList<String>();
 		name = new ArrayList<String>();
 		video = new HashMap<String, ArrayList<String>>();
+		save_video = new HashMap<String, ArrayList<String>>();
 
 		getVideoFileList();
+		
 	}
 
 	/** 
@@ -70,7 +79,35 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	 * 메소드 설명 : HashMap에 비디오 파일Path와 리스트를 초기화한다.
 	 */ 
 	public void getVideoFileList() {
-		getDir(root);
+		
+		try {
+			InputStream in = openFileInput("cache.dat"); 
+			video.clear();
+			if(in != null){
+
+				InputStreamReader input = new InputStreamReader(in); 
+				BufferedReader reader = new BufferedReader(input); 
+
+				String line;
+				while((line = reader.readLine()) != null){
+					String[] split = line.split(";");
+					Log.e("line : ", line);
+					Log.e("up = " + split[0], "filePath = " + split[1]);
+					Log.e("fileName = " + split[2], "재생시간 = " + split[3]);
+					if(!video.containsKey(split[1]))
+						video.put(split[1], new ArrayList<String>());
+					video.get(split[1]).add(split[2]);
+				}
+				input.close(); 
+			}     
+			in.close();
+		} catch (IOException e) {
+			getDir(root);
+			saveCache();
+			video = new HashMap<String, ArrayList<String>>(save_video);
+			save_video.clear();
+		}
+		
 		path = new ArrayList<String>(video.keySet());
 		for(int i=0; i<path.size(); i++) {
 			String[] pathList = path.get(i).split("/");
@@ -88,16 +125,38 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				getDir(file.getAbsolutePath());
 			else {
 				if(isVideoFile(file.getName())) {
-					if(!video.containsKey(file.getParent())) {
-						video.put(file.getParent(), new ArrayList<String>());
+					if(!save_video.containsKey(file.getParent())) {
+						save_video.put(file.getParent(), new ArrayList<String>());
 						Log.e("newKey", file.getParent());
 					}
 
-					video.get(file.getParent()).add(file.getName());
+					save_video.get(file.getParent()).add(file.getName());
 					Log.e("addValue : " , file.getAbsolutePath());
 				}
 			}
 		}
+	}
+	
+	public boolean saveCache() {
+		try {
+			OutputStream out = openFileOutput("cache.dat", MODE_PRIVATE); 
+			if(out != null){
+				OutputStreamWriter output = new OutputStreamWriter(out); 
+				ArrayList<String> key = new ArrayList<String>(save_video.keySet());
+				for(int i=0; i<key.size(); i++) {
+					for(int j=0; j<save_video.get(key.get(i)).size(); j++) {
+						output.write("0;" + key.get(i) + ';' + save_video.get(key.get(i)).get(j) + ';' + "0:00:00" + '\n');
+					}
+				}
+				output.close(); 
+			}
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 
 	public static Boolean isVideoFile(String file){
@@ -114,6 +173,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.optionsMenu = menu;
 		getMenuInflater().inflate(R.menu.menu, menu);
 
 		mActionBar = getActionBar();
@@ -132,7 +192,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 					ArrayList<String> value = video.get(key.get(i));
 					for(int j=0; j<value.size(); j++) {
 						String file = key.get(i) + '/' + value.get(j);
-						if(file.contains(query))
+						if(file.contains(query.replace(root, "")))
 							Log.e("Search File", file);
 					}
 				}
@@ -147,6 +207,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			}
 		});
 
+		new RefreshTask().execute(root);
+		setRefreshActionButtonState(true);
 		return true;
 	}
 
@@ -156,19 +218,40 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		switch(item.getItemId())
 		{
 		case R.id.menu_refresh:
+			setRefreshActionButtonState(true);
+			new RefreshTask().execute(root);
 			break;
 		}
 
 		return true;
 	}
-
+	
+	public void setRefreshActionButtonState(final boolean refreshing) {
+		if (optionsMenu != null) {
+	        final MenuItem refreshItem = optionsMenu
+	            .findItem(R.id.menu_refresh);
+	        if (refreshItem != null) {
+	            if (refreshing) {
+	                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+	            } else {
+	                refreshItem.setActionView(null);
+	            }
+				refreshItem.expandActionView();
+	        }
+	    }
+	}
+	
 	@Override
 	public void onItemClick(AdapterView<?> listView, View view, int position, long id)
 	{
 		File f = null;
-		if(currentPath.equals(root)) {
+		if(currentPath.equals(root) && !inRoot) {
 			f = new File(path.get(position));
 			currentPath = f.getAbsolutePath();
+			if(currentPath.equals(root)) {
+				this.listView.setAdapter(new VideoListAdapter(this, video, currentPath, true));
+				inRoot = true;
+			}
 		}
 
 		else {
@@ -177,10 +260,10 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			f = new File(currentPath + '/' + video.get(currentPath).get(position));
 		}
 
-		if(f.isDirectory()) {
+		if(f.isDirectory() && !inRoot) {
 			this.listView.setAdapter(new VideoListAdapter(this, video, currentPath));
 			mActionBar.setTitle(name.get(position));
-		} else {
+		} else if(f.isFile()){
 			Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
 			i.putStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, video.get(currentPath));
 			i.putExtra(AppConstants.VIDEO_PLAY_ACTION_PATH, currentPath);
@@ -199,12 +282,37 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	 */ 
 	@Override
 	public void onBackPressed() {
-		if(!currentPath.equals(root)) {
+		if(!currentPath.equals(root) || inRoot) {
 			currentPath = root;
 			listView.setAdapter(new VideoListAdapter(this, video, currentPath));
 			mActionBar.setTitle("폴더");
+			inRoot = false;
 		} else {
 			finish();
+		}
+	}
+	
+	private class RefreshTask extends AsyncTask<String, Void, Boolean> {
+		
+		@Override
+		protected Boolean doInBackground(String... params) {
+			getDir(params[0]);
+			saveCache();
+			
+			return true;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			setRefreshActionButtonState(false);
+			video = new HashMap<String, ArrayList<String>>(save_video);
+			save_video.clear();
+			path = new ArrayList<String>(video.keySet());
+			for(int i=0; i<path.size(); i++) {
+				String[] pathList = path.get(i).split("/");
+				name.add(pathList[pathList.length - 1]);
+			}
+			listView.setAdapter(new VideoListAdapter(MainActivity.this, video, currentPath, inRoot)); 
 		}
 	}
 }

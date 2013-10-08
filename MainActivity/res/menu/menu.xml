@@ -4,6 +4,7 @@
     <item
         android:id="@+id/menu_refresh"
         android:icon="@drawable/ic_menu_refresh"
+        android:alphabeticShortcut="r"
         android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_search"
