@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		listView = (ListView)findViewById(R.id.list);
+		listView = (ListView)findViewById(R.id.video_list);
 		listView.setOnItemClickListener(this);
 
 		currentPath = Environment.getExternalStorageDirectory().getPath();
@@ -187,15 +187,22 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				ArrayList<String> key = new ArrayList<String>(video.keySet());
+				ArrayList<String> find = new ArrayList<String>();
 
 				for(int i=0; i<key.size(); i++) {
 					ArrayList<String> value = video.get(key.get(i));
 					for(int j=0; j<value.size(); j++) {
 						String file = key.get(i) + '/' + value.get(j);
-						if(file.contains(query.replace(root, "")))
-							Log.e("Search File", file);
+						if(file.contains(query.replace(root, ""))) {
+							find.add(file);
+						}
 					}
 				}
+				
+				Intent i = new Intent(MainActivity.this, FindActivity.class);
+				i.putExtra("video", find);
+				i.putExtra("find", query);
+				startActivity(i);
 
 				return false;
 			}

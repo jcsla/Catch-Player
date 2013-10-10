@@ -6,7 +6,7 @@
     tools:context=".MainActivity" >
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/video_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:divider="#000000"
