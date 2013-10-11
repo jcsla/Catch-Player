@@ -39,6 +39,12 @@ public class VideoListAdapter extends BaseAdapter {
 		keySet = new ArrayList<String>(video.keySet());
 	}
 	
+	public VideoListAdapter(Context c, ArrayList<String> video) {
+		this.keySet = video;
+		this.inflater = LayoutInflater.from(c);
+		this.mContext = c;
+	}
+	
 	public VideoListAdapter(Context c , HashMap<String, ArrayList<String>> video, String currentPath, boolean inRoot){
 		this(c, video, currentPath);
 		this.inRoot = inRoot;
@@ -47,7 +53,9 @@ public class VideoListAdapter extends BaseAdapter {
 	// Adapter가 관리할 List의 개수를 설정 합니다.
 	@Override
 	public int getCount() {
-		if(!currentPath.equals(root) || inRoot) 
+		if(video == null)
+			return keySet.size();
+		else if(!currentPath.equals(root) || inRoot) 
 			return video.get(currentPath).size();
 		else
 			return keySet.size();
@@ -56,7 +64,9 @@ public class VideoListAdapter extends BaseAdapter {
 	// Adapter가 관리하는 List의 Item 의 Position을 <객체> 형태로 얻어 옵니다.
 	@Override
 	public String getItem(int position) {
-		if(!currentPath.equals(root) || inRoot) 
+		if(video == null)
+			return keySet.get(position);
+		else if(!currentPath.equals(root) || inRoot) 
 			return currentPath + '/' + video.get(currentPath).get(position);
 		else
 			return keySet.get(position);
