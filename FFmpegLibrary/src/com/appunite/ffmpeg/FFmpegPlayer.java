@@ -185,9 +185,11 @@ public class FFmpegPlayer {
 	static {
 		NativeTester nativeTester = new NativeTester();
 		if (nativeTester.isNeon()) {
+			System.out.println("neon");
 			System.loadLibrary("ffmpeg-neon");
-			System.loadLibrary("ffmpeg-jni-neon");
+			//System.loadLibrary("ffmpeg-jni-neon");
 		} else {
+			System.out.println("default");
 			System.loadLibrary("ffmpeg");
 			System.loadLibrary("ffmpeg-jni");
 		}
@@ -269,6 +271,8 @@ public class FFmpegPlayer {
 	private native long getVideoDurationNative();
 
 	public native void render(Surface surface);
+	
+	public native void changeRatioNative();
 
 	/**
 	 * 

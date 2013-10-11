@@ -2327,6 +2327,9 @@ int player_set_data_source(struct State *state, const char *file_path,
 	if (player->playing)
 		goto end;
 
+	LOGI(1, "audio_stream_no: %d", player->audio_stream_no);
+	LOGI(1, "subtitle_stream_no: %d", player->subtitle_stream_no);
+
 #ifdef SUBTITLES
 	char *font_path = NULL;
 	AVDictionaryEntry *entry = av_dict_get(dictionary, "ass_default_font_path",
@@ -2385,10 +2388,13 @@ int player_set_data_source(struct State *state, const char *file_path,
 
 	if ((player->subtitle_stream_no >= 0)) {
 		err = player_prepare_ass_decoder(player, font_path);
+		LOGI(1, "exist subtitle");
 		if (err < 0)
 			goto error;
 	}
 #endif // SUBTITLES
+	LOGI(1, "audio_stream_no: %d", player->audio_stream_no);
+	LOGI(1, "subtitle_stream_no: %d", player->subtitle_stream_no);
 	if ((err = player_alloc_video_frames(player)) < 0) {
 		goto error;
 	}
@@ -2877,4 +2883,9 @@ void jni_player_render_frame_stop(JNIEnv *env, jobject thiz) {
 	player->window = NULL;
 	pthread_cond_broadcast(&player->cond_queue);
 	pthread_mutex_unlock(&player->mutex_queue);
+}
+
+void jni_player_change_ratio(JNIEnv *env, jobject thiz)
+{
+
 }

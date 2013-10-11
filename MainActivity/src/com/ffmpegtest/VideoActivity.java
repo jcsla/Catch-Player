@@ -392,6 +392,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.prev_video:
 				prevVideo();
 				break;
+			case R.id.ratio_video:
+				mMpegPlayer.changeRatioNative();
+				mFullLayout.invalidate();
+				break;
 			case R.id.btn_ppl:
 				mPPLLayout.setVisibility(View.VISIBLE);
 				onPPL = true;
@@ -469,8 +473,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
-		Log.e("currentTimeS : ", String.valueOf(currentTimeS));
-		Log.e("videoDurationS : ", String.valueOf(videoDurationS));
 		
 		mSeekBar.setMax(videoDurationS);
 		mSeekBar.setProgress(currentTimeS);
@@ -671,7 +673,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			finish();
 	}
 	
-	private void doBrightnessTouch(float y_changed) {
+	private void doBrightnessTouch(float y_changed)
+	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
@@ -679,7 +682,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		getWindow().setAttributes(lp);
 	}
 
-	private void doVolumeTouch(float y_changed) {
+	private void doVolumeTouch(float y_changed)
+	{
 		int delta = -(int) ((y_changed / getDeviceHeight()) * mAudioMax);
 		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
 
@@ -707,5 +711,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		seekValue = (int)(value / 1000 / 1000);
 		
 		mSeek = true;
+	}
+	
+	private void changeRatioVideo()
+	{
+		int dw = getWindow().getDecorView().getWidth();
+		int dh = getWindow().getDecorView().getHeight();
 	}
 }
