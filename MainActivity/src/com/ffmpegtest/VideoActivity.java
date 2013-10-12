@@ -37,6 +37,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -103,6 +105,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
+	private static final int SURFACE_BEST_FIT = 0;
+	private static final int SURFACE_4_3 = 1;
+	private static final int SURFACE_16_9 = 2;
+	private int mCurrentSize = SURFACE_BEST_FIT;
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
@@ -392,10 +398,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.prev_video:
 				prevVideo();
 				break;
-			case R.id.ratio_video:
-				mMpegPlayer.changeRatioNative();
-				mFullLayout.invalidate();
-				break;
+			//case R.id.ratio_video:
+			//	changeRatio();
+			//	break;
 			case R.id.btn_ppl:
 				mPPLLayout.setVisibility(View.VISIBLE);
 				onPPL = true;
@@ -713,9 +718,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mSeek = true;
 	}
 	
-	private void changeRatioVideo()
+	private void changeRatio()
 	{
-		int dw = getWindow().getDecorView().getWidth();
-		int dh = getWindow().getDecorView().getHeight();
+		if(mCurrentSize < SURFACE_BEST_FIT)
+			mCurrentSize = mCurrentSize + 1;
+		else
+			mCurrentSize = SURFACE_BEST_FIT;
+		
+		switch(mCurrentSize)
+		{
+		case SURFACE_BEST_FIT:
+			mMpegPlayer.changeRatioNative(SURFACE_BEST_FIT);
+			break;
+		case SURFACE_4_3:
+			mMpegPlayer.changeRatioNative(SURFACE_4_3);
+			break;
+		case SURFACE_16_9:
+			mMpegPlayer.changeRatioNative(SURFACE_16_9);
+			break;
+		}
 	}
 }

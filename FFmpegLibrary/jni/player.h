@@ -131,7 +131,7 @@ void jni_player_render_frame_stop(JNIEnv *env, jobject thiz);
 jlong jni_player_get_video_duration(JNIEnv *env, jobject thiz);
 void jni_player_render(JNIEnv *env, jobject thiz, jobject surface);
 
-void jni_player_change_ratio(JNIEnv *env, jobject thiz);
+void jni_player_change_ratio(JNIEnv *env, jobject thiz, int surfaceType);
 
 static JNINativeMethod player_methods[] = {
 
@@ -151,7 +151,7 @@ static JNINativeMethod player_methods[] = {
 
 	{"getVideoDurationNative", "()J", (void*) jni_player_get_video_duration},
 	{"render", "(Landroid/view/Surface;)V", (void*) jni_player_render},
-	{"changeRatioNative", "()V", (void*)jni_player_change_ratio},
+	{"changeRatioNative", "(I)V", (void*) jni_player_change_ratio},
 };
 
 #endif

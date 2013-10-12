@@ -73,7 +73,7 @@ public class FFmpegSurfaceView extends SurfaceView implements FFmpegDisplay,
 		if (mCreated  == true) {
 			surfaceDestroyed(holder);
 		}
-
+		
 		surface = holder.getSurface();
 		mMpegPlayer.render(surface);
 		mCreated = true;

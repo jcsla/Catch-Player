@@ -2885,7 +2885,8 @@ void jni_player_render_frame_stop(JNIEnv *env, jobject thiz) {
 	pthread_mutex_unlock(&player->mutex_queue);
 }
 
-void jni_player_change_ratio(JNIEnv *env, jobject thiz)
-{
-
+void jni_player_change_ratio(JNIEnv *env, jobject thiz, int surfaceType) {
+	struct Player *player = player_get_player_field(env, thiz);
+	float aspect_ratio;
+	int w, h, x, y;
 }
