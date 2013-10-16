@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ffmpegtest.R;
+import com.ffmpegtest.VideoFile;
 
 import android.content.Context;
 import android.os.Environment;
@@ -22,54 +23,32 @@ public class VideoListAdapter extends BaseAdapter {
 	private static final int GB = MB * KB;
 
 	private LayoutInflater inflater = null;
-	private HashMap<String, ArrayList<String>> video = null;
-	private ArrayList<String> keySet = null;
+	private ArrayList<String> fileList = null;
+	private ArrayList<Integer> videoLength = null;
 	private ViewHolder viewHolder = null;
 	private Context mContext = null;
-	private String currentPath = null;
-	private String root = null;
-	private boolean inRoot = false;
 
-	public VideoListAdapter(Context c , HashMap<String, ArrayList<String>> video, String currentPath){
-		this.mContext = c;
-		this.inflater = LayoutInflater.from(c);
-		this.video = video;
-		this.currentPath = currentPath;
-		root = Environment.getExternalStorageDirectory().getPath();
-		keySet = new ArrayList<String>(video.keySet());
+	public VideoListAdapter(Context c , ArrayList<String> fileList , ArrayList<Integer> videoLength){
+		this(c, fileList);
+		this.videoLength = videoLength;
 	}
 	
-	public VideoListAdapter(Context c, ArrayList<String> video) {
-		this.keySet = video;
-		this.inflater = LayoutInflater.from(c);
+	public VideoListAdapter(Context c , ArrayList<String> fileList){
 		this.mContext = c;
-	}
-	
-	public VideoListAdapter(Context c , HashMap<String, ArrayList<String>> video, String currentPath, boolean inRoot){
-		this(c, video, currentPath);
-		this.inRoot = inRoot;
+		this.inflater = LayoutInflater.from(c);
+		this.fileList = fileList;
 	}
 
 	// Adapter가 관리할 List의 개수를 설정 합니다.
 	@Override
 	public int getCount() {
-		if(video == null)
-			return keySet.size();
-		else if(!currentPath.equals(root) || inRoot) 
-			return video.get(currentPath).size();
-		else
-			return keySet.size();
+		return fileList.size();
 	}
 
 	// Adapter가 관리하는 List의 Item 의 Position을 <객체> 형태로 얻어 옵니다.
 	@Override
 	public String getItem(int position) {
-		if(video == null)
-			return keySet.get(position);
-		else if(!currentPath.equals(root) || inRoot) 
-			return currentPath + '/' + video.get(currentPath).get(position);
-		else
-			return keySet.get(position);
+		return fileList.get(position);
 	}
 
 	// Adapter가 관리하는 List의 Item 의 position 값의 ID 를 얻어 옵니다.
@@ -96,16 +75,16 @@ public class VideoListAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder)v.getTag();
 		}
 
-		String[] split = getItem(position).split("/");
-		String fileName = split[split.length - 1];
+
+		File file = new File(getItem(position));
+		String fileName = file.getName();
 		viewHolder.tv_title.setText(fileName);
 		
-		File f = new File(getItem(position));
-		if(f.isDirectory())
-			viewHolder.tv_size.setText(video.get(f.getAbsolutePath()).size() + " 비디오");
+		if(file.isDirectory()) 
+			viewHolder.tv_size.setText(videoLength.get(position) + " 비디오");
 		else {
 			String display_size;
-			double size = f.length();
+			double size = file.length();
 			
 			if (size > GB)
 				display_size = String.format("%.2f GB ", (double)size / GB);
@@ -120,10 +99,6 @@ public class VideoListAdapter extends BaseAdapter {
 		}
 
 		return v;
-	}
-
-	public ArrayList<String> getArrayList(){
-		return video.get(currentPath);
 	}
 
 	/*
@@ -144,7 +119,6 @@ public class VideoListAdapter extends BaseAdapter {
 
 	private void free(){
 		inflater = null;
-		video = null;
 		viewHolder = null;
 		mContext = null;
 	}

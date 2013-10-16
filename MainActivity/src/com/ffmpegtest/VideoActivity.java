@@ -37,8 +37,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -85,14 +83,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageButton mHoldButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
-	
+
 	private ImageView mPPLButton;
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
-	
+
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
-	
+
 	private AudioManager mAudioManager;
 	private int mAudioMax;
 	private float mVolume;
@@ -113,14 +111,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 
-	ArrayList<String> videoList;
+	ArrayList<VideoFile> videoList;
 	String path;
 	private String fileName;
 	private int index;
+	private ArrayList<Integer> save_index, save_time;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
+
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFormat(PixelFormat.RGBA_8888);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -145,10 +145,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
-		
+
 		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
 		mPlayPauseButton.setOnClickListener(this);
-		
+
 		mHoldButton = (ImageButton) this.findViewById(R.id.hold_video);
 		mHoldButton.setOnClickListener(this);
 
@@ -167,13 +167,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		paint.setColor(Color.BLACK);
 		paint.setAlpha(160);
 		mPPLLayout.setBackgroundColor(paint.getColor());
-		
+
 		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
 		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
 		mUnHoldButton.setOnClickListener(this);
-		
+
 		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-       mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		
+		save_index = new ArrayList<Integer>();
+		save_time = new ArrayList<Integer>();
 
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
@@ -246,10 +249,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 			else
 			{
-				videoList = intent.getStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST);
-				path = intent.getStringExtra(AppConstants.VIDEO_PLAY_ACTION_PATH);
+				videoList = intent.getParcelableArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST);
 				index = intent.getIntExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, 0);
-				fileName = videoList.get(index);
+				path = videoList.get(index).getPath();
+				fileName = videoList.get(index).getName();
 			}
 		}
 
@@ -261,8 +264,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPlay = true;
 		mTouchPressed = false;
 		mHold = false;
+		
+		int time = videoList.get(index).getTime();
 
 		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
+		if(time > 0)
+			mMpegPlayer.seek(String.valueOf(time));
+		
 		Log.e("filePath : ", path + ('/' + fileName));
 	}
 
@@ -270,43 +278,43 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public boolean onTouch(View v, MotionEvent event)
 	{
 		DisplayMetrics screen = new DisplayMetrics();
-       getWindowManager().getDefaultDisplay().getMetrics(screen);
-       
+		getWindowManager().getDefaultDisplay().getMetrics(screen);
+
 		float x_changed = event.getRawX() - mTouchX;
 		float y_changed = event.getRawY() - mTouchY;
-		
+
 		float coef = Math.abs (y_changed / x_changed);
 		float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
-		
+
 		if(event.getAction() == MotionEvent.ACTION_MOVE)
 		{
 			mMove = true;
-			
+
 			if(coef > 2)
 			{
 				if(mTouchX < (getDeviceWidth() / 2))
 				{
 					Log.e("Brightness", "Brightness");
 					doBrightnessTouch(y_changed);
-                }
+				}
 				if(mTouchX > (getDeviceWidth() / 2))
 				{
 					Log.e("Volume", "Volume");
 					doVolumeTouch(y_changed);
-                }
-				
+				}
+
 				return true;
 			}
 			//Log.e("Seek", "Seek");
 			doSeekTouch(coef, xgesturesize, false);
-			
+
 			return true;
 		}
 		else if(event.getAction() == MotionEvent.ACTION_DOWN)
 		{
 			mTouchX = event.getRawX();
 			mTouchY = event.getRawY();
-			
+
 			mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 		}
 		else if(event.getAction() == MotionEvent.ACTION_UP)
@@ -315,20 +323,20 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			{
 				mMove = false;
 				mSeek = false;
-				
+
 				Log.e("SeekValue : ", String.valueOf(seekValue));
-				
+
 				mMpegPlayer.seek(String.valueOf(seekValue));
-				
+
 				return true;
 			}
-			
+
 			if(mMove == true)
 			{
 				mMove = false;
 				return true;
 			}
-			
+
 			if(mHold == false)
 			{
 				if(mPPLLayout.getVisibility() == View.GONE)
@@ -358,7 +366,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						this.mControlsView.setVisibility(View.GONE);
 						this.mPPLButton.setVisibility(View.GONE);
 					}
-	
+
 					mPPLLayout.setVisibility(View.GONE);
 					mSeekBar.setEnabled(true);
 					onPPL = false;
@@ -369,10 +377,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			{
 				mUnHoldButtonView.setVisibility(View.VISIBLE);
 			}
-			
+
 			return true;
 		}
-		
+
 		return true;
 	}
 
@@ -398,9 +406,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.prev_video:
 				prevVideo();
 				break;
-			//case R.id.ratio_video:
-			//	changeRatio();
-			//	break;
+				//case R.id.ratio_video:
+				//	changeRatio();
+				//	break;
 			case R.id.btn_ppl:
 				mPPLLayout.setVisibility(View.VISIBLE);
 				onPPL = true;
@@ -478,7 +486,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
-		
+
 		mSeekBar.setMax(videoDurationS);
 		mSeekBar.setProgress(currentTimeS);
 
@@ -621,7 +629,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			return getWindowManager().getDefaultDisplay().getWidth();
 		}
 	}
-	
+
 	private int getDeviceHeight() {
 		if (12 < Build.VERSION.SDK_INT) {
 			Point p = new Point();
@@ -631,23 +639,23 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			return getWindowManager().getDefaultDisplay().getHeight();
 		}
 	}
-	
+
 	// 홀드 처리
 	public void holdVideo() {
 		mHold = true;
-		
+
 		mUnHoldButtonView.setVisibility(View.VISIBLE);
-		
+
 		this.mTitleBar.setVisibility(View.GONE);
 		this.mControlsView.setVisibility(View.GONE);
 		this.mPPLButton.setVisibility(View.GONE);
 	}
-	
+
 	public void unholdVideo() {
 		mHold = false;
-		
+
 		mUnHoldButtonView.setVisibility(View.GONE);
-		
+
 		this.mTitleBar.setVisibility(View.VISIBLE);
 		this.mControlsView.setVisibility(View.VISIBLE);
 		this.mPPLButton.setVisibility(View.VISIBLE);
@@ -655,7 +663,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void nextVideo() {
 		if(videoList != null && index < videoList.size() - 1) {
-			fileName = videoList.get(++index);
+			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
+			fileName = videoList.get(++index).getName();
+			path = videoList.get(index).getPath();
 			setDataSource();
 			mMpegPlayer.resume();
 		}
@@ -663,7 +673,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void prevVideo() {
 		if(index > 0) {
-			fileName = videoList.get(--index);
+			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
+			fileName = videoList.get(--index).getName();
+			path = videoList.get(index).getPath();
 			setDataSource();
 			mMpegPlayer.resume();
 		}
@@ -671,19 +683,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	@Override
 	public void onBackPressed() {
-		if(onPPL)
-			dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 100, 100, 0));
+		if(onPPL) {
+			long downTime = SystemClock.uptimeMillis();
+			long eventTime = SystemClock.uptimeMillis();
+			MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, 100,100, 0);
+			mVideoView.dispatchTouchEvent(event);
+		}
 		else if(mHold);
-		else
+		else 
 			finish();
+		
 	}
-	
+
 	private void doBrightnessTouch(float y_changed)
 	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
-		
+
 		getWindow().setAttributes(lp);
 	}
 
@@ -694,12 +711,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
 	}
-	
+
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
 	{
 		if(coef > 0.5 || Math.abs(xgesturesize) < 1)
 			return;
-		
+
 		long mCurrentTimeUs = mMpegPlayer.getCurrentTime();
 		long mVideoDurationUs = mMpegPlayer.getVideoDuration();
 		long value;
@@ -710,21 +727,21 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			jump = (int) (mVideoDurationUs - mCurrentTimeUs);
 		if((jump < 0) && ((mCurrentTimeUs + jump) < 0))
 			jump = (int) -mCurrentTimeUs;
-		
+
 		value = mCurrentTimeUs + jump;
-		
+
 		seekValue = (int)(value / 1000 / 1000);
-		
+
 		mSeek = true;
 	}
-	
+
 	private void changeRatio()
 	{
 		if(mCurrentSize < SURFACE_BEST_FIT)
 			mCurrentSize = mCurrentSize + 1;
 		else
 			mCurrentSize = SURFACE_BEST_FIT;
-		
+
 		switch(mCurrentSize)
 		{
 		case SURFACE_BEST_FIT:
