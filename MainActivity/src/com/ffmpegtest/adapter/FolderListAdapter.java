@@ -8,31 +8,28 @@ import com.ffmpegtest.R;
 import com.ffmpegtest.VideoFile;
 
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-public class VideoListAdapter extends BaseAdapter {
-
-	private static final int KB = 1024;
-	private static final int MB = KB * KB;
-	private static final int GB = MB * KB;
+public class FolderListAdapter extends BaseAdapter {
 
 	private LayoutInflater inflater = null;
-	private ArrayList<VideoFile> fileList = null;
+	private ArrayList<String> fileList = null;
 	private ArrayList<Integer> videoLength = null;
 	private ViewHolder viewHolder = null;
 	private Context mContext = null;
 
-	public VideoListAdapter(Context c , ArrayList<VideoFile> fileList , ArrayList<Integer> videoLength){
+	public FolderListAdapter(Context c , ArrayList<String> fileList , ArrayList<Integer> videoLength){
 		this(c, fileList);
 		this.videoLength = videoLength;
 	}
 	
-	public VideoListAdapter(Context c , ArrayList<VideoFile> fileList){
+	public FolderListAdapter(Context c , ArrayList<String> fileList){
 		this.mContext = c;
 		this.inflater = LayoutInflater.from(c);
 		this.fileList = fileList;
@@ -46,7 +43,7 @@ public class VideoListAdapter extends BaseAdapter {
 
 	// Adapter가 관리하는 List의 Item 의 Position을 <객체> 형태로 얻어 옵니다.
 	@Override
-	public VideoFile getItem(int position) {
+	public String getItem(int position) {
 		return fileList.get(position);
 	}
 
@@ -67,7 +64,6 @@ public class VideoListAdapter extends BaseAdapter {
 			v = inflater.inflate(R.layout.video_list, null);
 			viewHolder.tv_title = (TextView)v.findViewById(R.id.tv_video_title);
 			viewHolder.tv_size = (TextView)v.findViewById(R.id.tv_video_size);
-			viewHolder.iv_new_video = (ImageView)v.findViewById(R.id.iv_new_video);
 
 			v.setTag(viewHolder);
 
@@ -76,34 +72,14 @@ public class VideoListAdapter extends BaseAdapter {
 		}
 
 
-		File file = new File(getfilePath(getItem(position)));
+		File file = new File(getItem(position));
 		String fileName = file.getName();
 		viewHolder.tv_title.setText(fileName);
 		
-		if(getItem(position).getNew_video() == 1)
-			viewHolder.iv_new_video.setBackgroundResource(R.drawable.play);
-		double size = file.length();
-		
-		if(file.canRead() && size > 0) {
-			String display_size;
-			
-			if (size > GB)
-				display_size = String.format("%.2f GB ", (double)size / GB);
-			else if (size < GB && size > MB)
-				display_size = String.format("%.2f MB ", (double)size / MB);
-			else if (size < MB && size > KB)
-				display_size = String.format("%.2f KB ", (double)size/ KB);
-			else
-				display_size = String.format("%.2f Bytes ", (double)size);
-			
-			viewHolder.tv_size.setText(display_size);
-		}
+		if(file.isDirectory()) 
+			viewHolder.tv_size.setText(videoLength.get(position) + " 비디오");
 
 		return v;
-	}
-
-	public String getfilePath(VideoFile videoFile) {
-		return videoFile.getPath() + '/' + videoFile.getName();
 	}
 
 	/*
@@ -114,7 +90,6 @@ public class VideoListAdapter extends BaseAdapter {
 	class ViewHolder{
 		public TextView tv_title = null;
 		public TextView tv_size = null;
-		public ImageView iv_new_video = null;
 	}
 
 	@Override

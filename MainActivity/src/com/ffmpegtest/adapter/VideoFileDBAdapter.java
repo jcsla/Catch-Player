@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 
 public class VideoFileDBAdapter {
 	static final String db_name = "videoFileDB";
@@ -58,6 +59,8 @@ public class VideoFileDBAdapter {
 
 		String whereClause = "filePath=? and fileName=?"; 
 		String[] whereArgs = new String [] { path, name };
+		Log.e("newVideo = "+newVideo, "path = " + path);
+		Log.e("name = "+name, "time = " + playTime);
 
 		db.update( db_name, cv, whereClause , whereArgs);
 	}
@@ -83,7 +86,7 @@ public class VideoFileDBAdapter {
 				int playTime = c.getInt(idxPlayTime);
 				if(!video.containsKey(filePath))
 					video.put(filePath, new ArrayList<VideoFile>());
-				video.get(filePath).add(new VideoFile(filePath, fileName, playTime));
+				video.get(filePath).add(new VideoFile(filePath, fileName, playTime, newVideo));
 				
 			} while(c.moveToNext());
 		}

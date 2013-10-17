@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.adapter.VideoListAdapter;
+import com.ffmpegtest.adapter.FolderListAdapter;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -43,7 +44,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	private String root;
 	private ArrayList<String> path;
 	private ArrayList<Integer> videoLength;
-	private VideoFileDBAdapter videoFileDBAdapter;
+	private VideoFileDBAdapter dbAdapter;
 	private boolean inRoot;
 	private Menu optionsMenu;
 	public static final String supportedVideoFileFormats[] = 
@@ -70,7 +71,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		root = Environment.getExternalStorageDirectory().getPath();
 		video = new HashMap<String, ArrayList<VideoFile>>();
 		save_video = new HashMap<String, ArrayList<VideoFile>>();
-		videoFileDBAdapter = new VideoFileDBAdapter(this);
+		dbAdapter = new VideoFileDBAdapter(this);
 		videoLength = new ArrayList<Integer>();
 
 		initVideoMap();
@@ -85,13 +86,13 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	 * 메소드 설명 : HashMap에 비디오 파일Path와 리스트를 초기화한다.
 	 */ 
 	public void initVideoMap() {
-		save_video = videoFileDBAdapter.getVideoFileDB();
+		save_video = dbAdapter.getVideoFileDB();
 		if(save_video.size() == 0) {
 			new RefreshTask().execute(root);
 			setRefreshActionButtonState(true);
 		} else {
 			initFinalize();
-			listView.setAdapter(new VideoListAdapter(this, path, videoLength)); 
+			listView.setAdapter(new FolderListAdapter(this, path, videoLength)); 
 		}
 	}
 
@@ -121,8 +122,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	{
 		if(currentPath.equals(root) && !inRoot) {
 			currentPath = path.get(position);
-			ArrayList<String> fileList = getVideoFileList(position);
-			this.listView.setAdapter(new VideoListAdapter(this, fileList));
+			this.listView.setAdapter(new VideoListAdapter(this, video.get(currentPath)));
 			String[] split = currentPath.split("/");
 			String title = split[split.length - 1];
 			mActionBar.setTitle(title);
@@ -190,14 +190,14 @@ public class MainActivity extends Activity implements OnItemClickListener {
 						ArrayList<VideoFile> videoList = video.get(filePath);
 						for(int j=0; j<videoList.size(); j++) {
 							if(videoList.get(j).getName().equals(fileName)) {
-								save_video.get(filePath).add(new VideoFile(filePath, fileName, videoList.get(j).getTime()));
+								save_video.get(filePath).add(new VideoFile(filePath, fileName, videoList.get(j).getTime(), videoList.get(j).getNew_video()));
 								timeFlag = true;
 							}
 						}
 					}
 
 					if(timeFlag == false)
-						save_video.get(filePath).add(new VideoFile(filePath, fileName));
+						save_video.get(filePath).add(new VideoFile(filePath, fileName, 0, 1));
 					Log.e("addValue : " , file.getAbsolutePath());
 				}
 			}
@@ -228,7 +228,15 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		i.putParcelableArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, video.get(currentPath));
 		i.putExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, position);
 
-		startActivity(i);
+		startActivityForResult(i, 0);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		video = dbAdapter.getVideoFileDB();
+		listView.setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 	}
 
 	@Override
@@ -325,12 +333,10 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	public void onBackPressed() {
 		if(!currentPath.equals(root) || inRoot) {
 			currentPath = root;
-			listView.setAdapter(new VideoListAdapter(this, path, videoLength));
+			listView.setAdapter(new FolderListAdapter(this, path, videoLength));
 			mActionBar.setTitle("폴더");
 			inRoot = false;
 		} else {
-			android.os.Process.killProcess(android.os.Process.myPid());
-			
 			finish();
 		}
 	}
@@ -340,9 +346,9 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		save_video.clear();
 		path = new ArrayList<String>(video.keySet());
 		getVideoLength(path);
-		videoFileDBAdapter.removeVideoFileDB();
+		dbAdapter.removeVideoFileDB();
 		for(int i=0; i<path.size(); i++)
-			videoFileDBAdapter.saveVideoFileDB(video.get(path.get(i)));
+			dbAdapter.saveVideoFileDB(video.get(path.get(i)));
 	}
 
 	/** 
@@ -365,9 +371,9 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			
 			initFinalize();
 			if(currentPath.equals(root) && !inRoot)
-				listView.setAdapter(new VideoListAdapter(MainActivity.this, path, videoLength));
+				listView.setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
 			else
-				listView.setAdapter(new VideoListAdapter(MainActivity.this, getVideoFileList(path.indexOf(currentPath))));
+				listView.setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 		}
 	}
 }

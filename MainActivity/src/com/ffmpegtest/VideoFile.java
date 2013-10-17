@@ -7,6 +7,7 @@ public class VideoFile implements Parcelable {
 	private String path;
 	private String name;
 	private int time;
+	private int new_video;
 	public String getName() {
 		return name;
 	}
@@ -20,18 +21,15 @@ public class VideoFile implements Parcelable {
 		this.time = time;
 	}
 	
-	public VideoFile(String path, String name, int time) {
+	public VideoFile(String path, String name, int time, int new_video) {
 		this.path = path;
 		this.name = name;
 		this.time = time;
-	}
-	
-	public VideoFile(String path, String name) {
-		this(path, name, 0);
+		this.new_video = new_video;
 	}
 	
 	public VideoFile(Parcel src) {
-		this(src.readString(), src.readString(), src.readInt());
+		this(src.readString(), src.readString(), src.readInt(), src.readInt());
 	}
 	
 	@Override
@@ -44,8 +42,15 @@ public class VideoFile implements Parcelable {
 		dest.writeString(path);
 		dest.writeString(name);
 		dest.writeInt(time);
+		dest.writeInt(new_video);
 	}
 	
+	public int getNew_video() {
+		return new_video;
+	}
+	public void setNew_video(int new_video) {
+		this.new_video = new_video;
+	}
 	public String getPath() {
 		return path;
 	}

@@ -3,6 +3,8 @@ package com.ffmpegtest;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.ffmpegtest.adapter.FolderListAdapter;
+import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.adapter.VideoListAdapter;
 
 import android.app.ActionBar;
@@ -22,6 +24,7 @@ public class FindActivity extends Activity implements OnItemClickListener {
 	
 	private ListView mVideoListView;
 	private ArrayList<VideoFile> mVideoList;
+	private VideoFileDBAdapter dbAdapter;
 	private ActionBar mActionBar;
 	private String find_str;
 	
@@ -39,22 +42,15 @@ public class FindActivity extends Activity implements OnItemClickListener {
 			mVideoListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, notData));
 		} else {
 			mVideoListView.setOnItemClickListener(this);
-			mVideoListView.setAdapter(new VideoListAdapter(this, getVideoPathStringList(mVideoList)));
+			mVideoListView.setAdapter(new VideoListAdapter(this, mVideoList));
 		}
 	}
 	
 	public void init() {
 		mVideoList = getIntent().getParcelableArrayListExtra("findList");
 		mVideoListView = (ListView)findViewById(R.id.video_list);
+		dbAdapter = new VideoFileDBAdapter(this);
 		find_str = getIntent().getStringExtra("findQuery");
-	}
-	
-	public ArrayList<String> getVideoPathStringList(ArrayList<VideoFile> videoList) {
-		ArrayList<String> adapterList = new ArrayList<String>();
-		for(int i=0; i<videoList.size(); i++) 
-			adapterList.add(videoList.get(i).getPath() + '/' + videoList.get(i).getName());
-		
-		return adapterList;
 	}
 	
 	@Override
@@ -71,7 +67,20 @@ public class FindActivity extends Activity implements OnItemClickListener {
 		Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
 		i.putParcelableArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, mVideoList);
 		i.putExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, position);
+		mVideoList.get(position).setNew_video(0);
+		
+		String path = mVideoList.get(position).getPath();
+		String name = mVideoList.get(position).getName();
+		int time = mVideoList.get(position).getTime();
+		dbAdapter.updateVideoFileDB(0, path, name, time);
 
 		startActivityForResult(i, 0);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		
 	}
 }
