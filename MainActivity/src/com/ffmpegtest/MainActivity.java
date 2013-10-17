@@ -329,6 +329,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			mActionBar.setTitle("폴더");
 			inRoot = false;
 		} else {
+			android.os.Process.killProcess(android.os.Process.myPid());
+			
 			finish();
 		}
 	}

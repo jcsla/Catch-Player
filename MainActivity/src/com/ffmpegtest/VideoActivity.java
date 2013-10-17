@@ -695,6 +695,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else {
 			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
+			android.os.Process.killProcess(android.os.Process.myPid());
 			finish();
 		}
 	}
