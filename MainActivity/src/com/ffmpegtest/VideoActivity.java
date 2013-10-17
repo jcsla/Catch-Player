@@ -63,6 +63,7 @@ import com.appunite.ffmpeg.FFmpegPlayer;
 import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
 import com.ffmpegtest.adapter.PPLListAdapter;
+import com.ffmpegtest.adapter.VideoFileDBAdapter;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
@@ -115,7 +116,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	String path;
 	private String fileName;
 	private int index;
-	private ArrayList<Integer> save_index, save_time;
+	private VideoFileDBAdapter dbAdapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -175,8 +176,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 		mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		
-		save_index = new ArrayList<Integer>();
-		save_time = new ArrayList<Integer>();
+		dbAdapter = new VideoFileDBAdapter(this);
 
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
@@ -664,6 +664,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void nextVideo() {
 		if(videoList != null && index < videoList.size() - 1) {
 			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
+			saveVideoTime();
 			fileName = videoList.get(++index).getName();
 			path = videoList.get(index).getPath();
 			setDataSource();
@@ -674,6 +675,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void prevVideo() {
 		if(index > 0) {
 			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
+			saveVideoTime();
 			fileName = videoList.get(--index).getName();
 			path = videoList.get(index).getPath();
 			setDataSource();
@@ -690,11 +692,21 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mVideoView.dispatchTouchEvent(event);
 		}
 		else if(mHold);
-		else 
+		else {
+			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
+			saveVideoTime();
 			finish();
-		
+		}
 	}
 
+	public void saveVideoTime() {
+		String videoPath = videoList.get(index).getPath();
+		String videoName = videoList.get(index).getName();
+		int videoTime = videoList.get(index).getTime();
+		dbAdapter.updateVideoFileDB(0, videoPath, videoName, videoTime);
+	}
+	
+	
 	private void doBrightnessTouch(float y_changed)
 	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
