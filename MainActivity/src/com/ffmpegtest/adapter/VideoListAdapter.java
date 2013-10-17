@@ -82,6 +82,8 @@ public class VideoListAdapter extends BaseAdapter {
 		
 		if(getItem(position).getNew_video() == 1)
 			viewHolder.iv_new_video.setBackgroundResource(R.drawable.play);
+		else if(getItem(position).getNew_video() == 0)
+			viewHolder.iv_new_video.setBackgroundResource(R.drawable.pause);
 		double size = file.length();
 		
 		if(file.canRead() && size > 0) {

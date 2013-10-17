@@ -55,14 +55,14 @@ public class VideoFileDBAdapter {
 	public void updateVideoFileDB(int newVideo, String path, String name, int playTime) {
 		ContentValues cv=new ContentValues(); 
 		cv.put("newVideo", newVideo);
-		cv.put("playTime", playTime);
+		cv.put("playTime",playTime);
 
-		String whereClause = "filePath=? and fileName=?"; 
+		String whereClause = "filePath="+  "\'" +path+"\'"+" and fileName="+"\'"+name+"\'"; 
 		String[] whereArgs = new String [] { path, name };
 		Log.e("newVideo = "+newVideo, "path = " + path);
 		Log.e("name = "+name, "time = " + playTime);
 
-		db.update( db_name, cv, whereClause , whereArgs);
+		db.update( db_name, cv, whereClause , null);
 	}
 	
 	public void removeVideoFileDB() {
