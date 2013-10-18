@@ -313,9 +313,11 @@ public class FFmpegPlayer {
 	}
 
 	public void stop() {
-		System.out.println("stop!!!");
-		stopTask = new StopTask(this);
-		stopTask.execute();
+		while(stopTask == null)
+		{
+			stopTask = new StopTask(this);
+			stopTask.execute();
+		}
 	}
 
 	private native void pauseNative() throws NotPlayingException;
@@ -325,18 +327,27 @@ public class FFmpegPlayer {
 	public native void changeRatioNative(int surfaceType);
 
 	public void pause() {
-		pauseTask = new PauseTask(this);
-		pauseTask.execute();
+		while(pauseTask == null)
+		{
+			pauseTask = new PauseTask(this);
+			pauseTask.execute();
+		}
 	}
 
 	public void seek(String positionUs) {
-		seekTask = new SeekTask(this);
-		seekTask.execute(positionUs);
+		while(seekTask == null)
+		{
+			seekTask = new SeekTask(this);
+			seekTask.execute(positionUs);
+		}
 	}
 
 	public void resume() {
-		resumeTask = new ResumeTask(this);
-		resumeTask.execute();
+		while(resumeTask == null)
+		{
+			resumeTask = new ResumeTask(this);
+			resumeTask.execute();
+		}
 	}
 
 	private Bitmap prepareFrame(int width, int height) {
@@ -412,8 +423,11 @@ public class FFmpegPlayer {
 
 	public void setDataSource(String url, Map<String, String> dictionary, int videoStream, int audioStream, int subtitlesStream)
 	{
-		setDataSourceTask = new SetDataSourceTask(this);
-		setDataSourceTask.execute(url, dictionary, Integer.valueOf(videoStream), Integer.valueOf(audioStream), Integer.valueOf(subtitlesStream));
+		while(setDataSourceTask == null)
+		{
+			setDataSourceTask = new SetDataSourceTask(this);
+			setDataSourceTask.execute(url, dictionary, Integer.valueOf(videoStream), Integer.valueOf(audioStream), Integer.valueOf(subtitlesStream));
+		}
 	}
 
 	public FFmpegListener getMpegListener() {

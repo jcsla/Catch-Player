@@ -696,6 +696,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else {
 			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
+			cancelAsyncTask();
 			finish();
 		}
 	}
@@ -766,6 +767,35 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		case SURFACE_16_9:
 			mMpegPlayer.changeRatioNative(SURFACE_16_9);
 			break;
+		}
+	}
+	
+	private void cancelAsyncTask()
+	{
+		if(FFmpegPlayer.stopTask != null)
+		{
+			FFmpegPlayer.stopTask.cancel(true);
+			FFmpegPlayer.stopTask = null;
+		}
+		if(FFmpegPlayer.setDataSourceTask != null)
+		{
+			FFmpegPlayer.setDataSourceTask.cancel(true);
+			FFmpegPlayer.setDataSourceTask = null;
+		}
+		if(FFmpegPlayer.seekTask != null)
+		{
+			FFmpegPlayer.seekTask.cancel(true);
+			FFmpegPlayer.seekTask = null;
+		}
+		if(FFmpegPlayer.pauseTask != null)
+		{
+			FFmpegPlayer.pauseTask.cancel(true);
+			FFmpegPlayer.pauseTask = null;
+		}
+		if(FFmpegPlayer.resumeTask != null)
+		{
+			FFmpegPlayer.resumeTask.cancel(true);
+			FFmpegPlayer.resumeTask = null;
 		}
 	}
 }

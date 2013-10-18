@@ -66,7 +66,7 @@
 #define FALSE 0
 #define TRUE (!(FALSE))
 
-#define SUBTITLES
+//#define SUBTITLES
 
 #ifdef SUBTITLES
 #include "blend.h"
@@ -1554,8 +1554,8 @@ int player_open_stream(struct Player *player, AVCodecContext * ctx,
 		*codec = NULL;
 		return -ERROR_COULD_NOT_OPEN_VIDEO_CODEC;
 	}
-	LOGI(3,
-			"player_open_stream opened: %d, name: %s, long_name: %s",
+	LOGI(1,
+			"player_open_stream opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: %d, name: %s, long_name: %s",
 			codec_id, (*codec)->name, (*codec)->long_name);
 	return 0;
 }
@@ -1601,23 +1601,26 @@ int player_find_stream(struct Player *player, enum AVMediaType codec_type,
 	int streams_no = player->caputre_streams_no;
 
 	int err = ERROR_NO_ERROR;
-	LOGI(3, "player_find_stream, type: %d", codec_type);
+	LOGI(1, "player_find_stream, type: %d", codec_type);
 
-	int bn_stream = player_try_open_stream(player, codec_type,
-			recommended_stream_no);
+	//int bn_stream = player_try_open_stream(player, codec_type,
+	//		recommended_stream_no);
+	LOGI(1, "recommended_stream_number : %d", recommended_stream_no);
 
-	if (bn_stream < 0) {
+	int bn_stream;
+	//if (bn_stream < 0) {
 		int i;
 		for (i = 0; i < player->input_format_ctx->nb_streams; i++) {
 			bn_stream = player_try_open_stream(player, codec_type, i);
 			if (bn_stream >= 0)
 				break;
 		}
-	}
+	//}
 
-	if (bn_stream < 0) {
-		return -1;
-	}
+	LOGI(1, "bn_stream : %d", bn_stream);
+	//if (bn_stream < 0) {
+	//	return -1;
+	//}
 
 	LOGI(3, "player_set_data_source 4");
 
@@ -2282,7 +2285,7 @@ void player_stop_without_lock(struct State * state) {
 		return;
 	player->playing = FALSE;
 
-	LOGI(7, "player_stop_without_lock stopping...");
+	LOGI(1, "player_stop_without_lock stopping...");
 
 	player_play_prepare_free(player);
 	player_start_decoding_threads_free(player);
@@ -2295,7 +2298,7 @@ void player_stop_without_lock(struct State * state) {
 	player_alloc_frames_free(player);
 	player_alloc_video_frames_free(player);
 #ifdef SUBTITLES
-	player_prepare_ass_decoder_free(player);
+	//player_prepare_ass_decoder_free(player);
 #endif // SUBTITLES
 	player_print_report_video_streams_free(state->env, player->thiz, player);
 	player_find_streams_free(player);
@@ -2328,7 +2331,7 @@ int player_set_data_source(struct State *state, const char *file_path,
 		goto end;
 
 	LOGI(1, "audio_stream_no: %d", player->audio_stream_no);
-	LOGI(1, "subtitle_stream_no: %d", player->subtitle_stream_no);
+	//LOGI(1, "subtitle_stream_no: %d", player->subtitle_stream_no);
 
 #ifdef SUBTITLES
 	char *font_path = NULL;
@@ -2377,24 +2380,24 @@ int player_set_data_source(struct State *state, const char *file_path,
 		goto error;
 	}
 #ifdef SUBTITLES
-	if (subtitle_stream_no == NO_STREAM) {
-		player->subtitle_stream_no = -1;
-	} else {
-		if ((player->subtitle_stream_no = player_find_stream(player,
-				AVMEDIA_TYPE_SUBTITLE, subtitle_stream_no)) < 0) {
+	//if (subtitle_stream_no == NO_STREAM) {
+	//	player->subtitle_stream_no = -1;
+	//} else {
+	//	if ((player->subtitle_stream_no = player_find_stream(player,
+	//			AVMEDIA_TYPE_SUBTITLE, subtitle_stream_no)) < 0) {
 			// if no subtitles - just go without it
-		}
-	}
+	//	}
+	//}
 
-	if ((player->subtitle_stream_no >= 0)) {
-		err = player_prepare_ass_decoder(player, font_path);
-		LOGI(1, "exist subtitle");
-		if (err < 0)
-			goto error;
-	}
+	//if ((player->subtitle_stream_no >= 0)) {
+	//	err = player_prepare_ass_decoder(player, font_path);
+	//	LOGI(1, "exist subtitle");
+	//	if (err < 0)
+	//		goto error;
+	//}
 #endif // SUBTITLES
 	LOGI(1, "audio_stream_no: %d", player->audio_stream_no);
-	LOGI(1, "subtitle_stream_no: %d", player->subtitle_stream_no);
+	//LOGI(1, "subtitle_stream_no: %d", player->subtitle_stream_no);
 	if ((err = player_alloc_video_frames(player)) < 0) {
 		goto error;
 	}

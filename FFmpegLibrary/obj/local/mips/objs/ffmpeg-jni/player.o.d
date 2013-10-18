@@ -106,10 +106,7 @@
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/libavutil/channel_layout.h \
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/jni-protocol.h \
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/aes-protocol.h \
- /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/sync.h \
- /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/blend.h \
- /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/ass/ass.h \
- /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/ass/ass_types.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/sync.h
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-mips/usr/include/stdlib.h:
 
@@ -324,9 +321,3 @@
 /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/aes-protocol.h:
 
 /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/sync.h:
-
-/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/blend.h:
-
-/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/ass/ass.h:
-
-/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/mips/include/ass/ass_types.h:
