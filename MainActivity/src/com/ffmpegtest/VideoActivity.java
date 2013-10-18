@@ -208,10 +208,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	protected void onPause()
 	{
+		Log.e("Flag", "beforeSuperPause");
 		super.onPause();
 		mPlay = false;
+		Log.e("Flag", "beforePause");
 		mMpegPlayer.pause();
-		Log.e("Flag", "onPause");
+		Log.e("Flag", "afterPause");
 	}
 
 	@Override
@@ -526,7 +528,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onFFStop()
 	{
-
 	}
 
 	@Override
@@ -695,7 +696,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else {
 			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
-			this.mMpegPlayer.stop();
 			finish();
 		}
 	}

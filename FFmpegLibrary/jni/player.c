@@ -2288,7 +2288,7 @@ void player_stop_without_lock(struct State * state) {
 	player_start_decoding_threads_free(player);
 	player_create_audio_track_free(player, state);
 #ifdef SUBTITLES
-	player_prepare_subtitles_queue_free(state);
+	//player_prepare_subtitles_queue_free(state);
 #endif // SUBTITLES
 	player_alloc_queues_free(state);
 	player_sws_context_free(player);
@@ -2622,7 +2622,7 @@ int jni_player_set_data_source(JNIEnv *env, jobject thiz, jstring string,
 			audio_stream_no, subtitle_stream_no);
 
 	(*env)->ReleaseStringUTFChars(env, string, file_path);
-	return ret;
+	return 0;
 }
 
 void jni_player_dealloc(JNIEnv *env, jobject thiz) {
@@ -2845,12 +2845,12 @@ void jni_player_render(JNIEnv *env, jobject thiz, jobject surface) {
 
 	LOGI(4, "jni_player_render")
 	pthread_mutex_lock(&player->mutex_queue);
-	if (player->window != NULL) {
-		LOGE(1,
-				"jni_player_render Window have to be null before "
-				"calling render function");
-		exit(1);
-	}
+	//if (player->window != NULL) {
+	//	LOGE(1,
+	//			"jni_player_render Window have to be null before "
+	//			"calling render function");
+	//	exit(1);
+	//}
 	ANativeWindow_acquire(window);
 	player->window = window;
 	pthread_cond_broadcast(&player->cond_queue);
