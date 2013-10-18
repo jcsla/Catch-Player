@@ -773,29 +773,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private void cancelAsyncTask()
 	{
 		if(FFmpegPlayer.stopTask != null)
-		{
 			FFmpegPlayer.stopTask.cancel(true);
-			FFmpegPlayer.stopTask = null;
-		}
 		if(FFmpegPlayer.setDataSourceTask != null)
-		{
 			FFmpegPlayer.setDataSourceTask.cancel(true);
-			FFmpegPlayer.setDataSourceTask = null;
-		}
 		if(FFmpegPlayer.seekTask != null)
-		{
 			FFmpegPlayer.seekTask.cancel(true);
-			FFmpegPlayer.seekTask = null;
-		}
 		if(FFmpegPlayer.pauseTask != null)
-		{
 			FFmpegPlayer.pauseTask.cancel(true);
-			FFmpegPlayer.pauseTask = null;
-		}
 		if(FFmpegPlayer.resumeTask != null)
-		{
 			FFmpegPlayer.resumeTask.cancel(true);
-			FFmpegPlayer.resumeTask = null;
-		}
 	}
 }

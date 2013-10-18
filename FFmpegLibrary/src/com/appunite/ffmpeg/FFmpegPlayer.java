@@ -35,13 +35,7 @@ public class FFmpegPlayer {
 	public static PauseTask pauseTask;
 	public static ResumeTask resumeTask;
 	
-	public static boolean stopTaskState = false;
-	public static boolean setDataSouceTaskState = false;
-	public static boolean seekTaskState = false;
-	public static boolean pauseTaskState = false;
-	public static boolean resumeTaskState = false;
-	
-	public static class StopTask extends AsyncTask<Void, Void, Void> {
+	public class StopTask extends AsyncTask<Void, Void, Void> {
 
 		private final FFmpegPlayer player;
 
@@ -52,7 +46,6 @@ public class FFmpegPlayer {
 		@Override
 		protected Void doInBackground(Void... params) {
 			System.out.println("stoptask execute!");
-			stopTaskState = true;
 			player.stopNative();
 			return null;
 		}
@@ -62,7 +55,12 @@ public class FFmpegPlayer {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFStop();
 		}
-
+		
+		@Override
+		protected void onCancelled() {
+			stopTask = null;
+			super.onCancelled();
+		}
 	}
 
 	private static class SetDataSourceTaskResult {
@@ -70,7 +68,7 @@ public class FFmpegPlayer {
 		FFmpegStreamInfo[] streams;
 	}
 
-	public static class SetDataSourceTask extends AsyncTask<Object, Void, SetDataSourceTaskResult>
+	public class SetDataSourceTask extends AsyncTask<Object, Void, SetDataSourceTaskResult>
 	{
 		private final FFmpegPlayer player;
 
@@ -83,7 +81,6 @@ public class FFmpegPlayer {
 		protected SetDataSourceTaskResult doInBackground(Object... params)
 		{
 			System.out.println("setdatasoucetask execute!");
-			setDataSouceTaskState = true;
 			String url = (String) params[0];
 			@SuppressWarnings("unchecked")
 			Map<String, String> map = (Map<String, String>) params[1];
@@ -113,10 +110,15 @@ public class FFmpegPlayer {
 				player.mpegListener.onFFDataSourceLoaded(result.error,
 						result.streams);
 		}
-
+		
+		@Override
+		protected void onCancelled() {
+			setDataSourceTask = null;
+			super.onCancelled();
+		}
 	}
 
-	public static class SeekTask extends
+	public class SeekTask extends
 			AsyncTask<String, Void, NotPlayingException> {
 
 		private final FFmpegPlayer player;
@@ -127,8 +129,7 @@ public class FFmpegPlayer {
 
 		@Override
 		protected NotPlayingException doInBackground(String... params) {
-			System.out.println("seektask execute!");
-			seekTaskState = true;
+			System.out.println("seektask execute!");;
 			try {
 				long value = Long.parseLong(params[0]) * 1000 * 1000;
 				player.seekNative(value);
@@ -143,10 +144,15 @@ public class FFmpegPlayer {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFSeeked(result);
 		}
-
+		
+		@Override
+		protected void onCancelled() {
+			seekTask = null;
+			super.onCancelled();
+		}
 	}
 
-	public static class PauseTask extends
+	public class PauseTask extends
 			AsyncTask<Void, Void, NotPlayingException> {
 
 		private final FFmpegPlayer player;
@@ -158,7 +164,6 @@ public class FFmpegPlayer {
 		@Override
 		protected NotPlayingException doInBackground(Void... params) {
 			System.out.println("pausetask execute!");
-			pauseTaskState = true;
 			try {
 				player.pauseNative();
 				return null;
@@ -172,10 +177,15 @@ public class FFmpegPlayer {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFPause(result);
 		}
-
+		
+		@Override
+		protected void onCancelled() {
+			pauseTask = null;
+			super.onCancelled();
+		}
 	}
 
-	public static class ResumeTask extends
+	public class ResumeTask extends
 			AsyncTask<Void, Void, NotPlayingException> {
 
 		private final FFmpegPlayer player;
@@ -187,7 +197,6 @@ public class FFmpegPlayer {
 		@Override
 		protected NotPlayingException doInBackground(Void... params) {
 			System.out.println("resumetask execute!");
-			resumeTaskState = true;
 			try {
 				player.resumeNative();
 				return null;
@@ -201,7 +210,12 @@ public class FFmpegPlayer {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFResume(result);
 		}
-
+		
+		@Override
+		protected void onCancelled() {
+			resumeTask = null;
+			super.onCancelled();
+		}
 	}
 
 	static {
@@ -313,11 +327,8 @@ public class FFmpegPlayer {
 	}
 
 	public void stop() {
-		while(stopTask == null)
-		{
-			stopTask = new StopTask(this);
-			stopTask.execute();
-		}
+		stopTask = new StopTask(this);
+		stopTask.execute();
 	}
 
 	private native void pauseNative() throws NotPlayingException;
@@ -327,27 +338,18 @@ public class FFmpegPlayer {
 	public native void changeRatioNative(int surfaceType);
 
 	public void pause() {
-		while(pauseTask == null)
-		{
-			pauseTask = new PauseTask(this);
-			pauseTask.execute();
-		}
+		pauseTask = new PauseTask(this);
+		pauseTask.execute();
 	}
 
 	public void seek(String positionUs) {
-		while(seekTask == null)
-		{
-			seekTask = new SeekTask(this);
-			seekTask.execute(positionUs);
-		}
+		seekTask = new SeekTask(this);
+		seekTask.execute(positionUs);
 	}
 
 	public void resume() {
-		while(resumeTask == null)
-		{
-			resumeTask = new ResumeTask(this);
-			resumeTask.execute();
-		}
+		resumeTask = new ResumeTask(this);
+		resumeTask.execute();
 	}
 
 	private Bitmap prepareFrame(int width, int height) {
@@ -423,11 +425,8 @@ public class FFmpegPlayer {
 
 	public void setDataSource(String url, Map<String, String> dictionary, int videoStream, int audioStream, int subtitlesStream)
 	{
-		while(setDataSourceTask == null)
-		{
-			setDataSourceTask = new SetDataSourceTask(this);
-			setDataSourceTask.execute(url, dictionary, Integer.valueOf(videoStream), Integer.valueOf(audioStream), Integer.valueOf(subtitlesStream));
-		}
+		setDataSourceTask = new SetDataSourceTask(this);
+		setDataSourceTask.execute(url, dictionary, Integer.valueOf(videoStream), Integer.valueOf(audioStream), Integer.valueOf(subtitlesStream));
 	}
 
 	public FFmpegListener getMpegListener() {

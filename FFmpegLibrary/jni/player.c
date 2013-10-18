@@ -2528,12 +2528,12 @@ void jni_player_resume(JNIEnv *env, jobject thiz) {
 	struct Player * player = player_get_player_field(env, thiz);
 	pthread_mutex_lock(&player->mutex_operation);
 
-	if (!player->playing) {
-		LOGI(1, "jni_player_resume could not pause while not playing");
-		throw_exception(env, not_playing_exception_class_path_name,
-				"Could not resume while not playing");
-		goto end;
-	}
+	//if (!player->playing) {
+	//	LOGI(1, "jni_player_resume could not pause while not playing");
+	//	throw_exception(env, not_playing_exception_class_path_name,
+	//			"Could not resume while not playing");
+	//	goto end;
+	//}
 
 	pthread_mutex_lock(&player->mutex_queue);
 
