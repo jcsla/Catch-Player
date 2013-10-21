@@ -74,6 +74,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		dbAdapter = new VideoFileDBAdapter(this);
 		videoLength = new ArrayList<Integer>();
 
+		System.out.println("hello file explorer!");
+		
 		initVideoMap();
 
 	}
@@ -235,8 +237,9 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		video = dbAdapter.getVideoFileDB();
-		listView.setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
+		System.gc();
+//		video = dbAdapter.getVideoFileDB();
+//		listView.setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 	}
 
 	@Override
