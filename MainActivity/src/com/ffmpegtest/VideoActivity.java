@@ -121,7 +121,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-
+		System.out.println("VideoActivity create!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFormat(PixelFormat.RGBA_8888);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -197,6 +197,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		PPLListAdapter adapter = new PPLListAdapter(this, list);
 		mPPLList.setAdapter(adapter);
 
+		System.gc();
+		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
 
@@ -696,7 +698,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else {
 			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
-			cancelAsyncTask();
 			finish();
 		}
 	}
@@ -771,7 +772,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	}
 	
 	private void cancelAsyncTask()
-	{
+	{	
 		if(FFmpegPlayer.stopTask != null)
 			FFmpegPlayer.stopTask.cancel(true);
 		if(FFmpegPlayer.setDataSourceTask != null)

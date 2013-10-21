@@ -54,11 +54,15 @@ public class FFmpegPlayer {
 		protected void onPostExecute(Void result) {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFStop();
+			
+			this.cancel(true);
+			stopTask = null;
 		}
 		
 		@Override
 		protected void onCancelled() {
 			stopTask = null;
+			this.cancel(true);
 			super.onCancelled();
 		}
 	}
@@ -109,11 +113,15 @@ public class FFmpegPlayer {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFDataSourceLoaded(result.error,
 						result.streams);
+			
+			this.cancel(true);
+			setDataSourceTask = null;
 		}
 		
 		@Override
 		protected void onCancelled() {
 			setDataSourceTask = null;
+			this.cancel(true);
 			super.onCancelled();
 		}
 	}
@@ -143,11 +151,15 @@ public class FFmpegPlayer {
 		protected void onPostExecute(NotPlayingException result) {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFSeeked(result);
+			
+			this.cancel(true);
+			seekTask = null;
 		}
 		
 		@Override
 		protected void onCancelled() {
 			seekTask = null;
+			this.cancel(true);
 			super.onCancelled();
 		}
 	}
@@ -176,11 +188,15 @@ public class FFmpegPlayer {
 		protected void onPostExecute(NotPlayingException result) {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFPause(result);
+			
+			this.cancel(true);
+			pauseTask = null;
 		}
 		
 		@Override
 		protected void onCancelled() {
 			pauseTask = null;
+			this.cancel(true);
 			super.onCancelled();
 		}
 	}
@@ -209,11 +225,15 @@ public class FFmpegPlayer {
 		protected void onPostExecute(NotPlayingException result) {
 			if (player.mpegListener != null)
 				player.mpegListener.onFFResume(result);
+			
+			this.cancel(true);
+			resumeTask = null;
 		}
 		
 		@Override
 		protected void onCancelled() {
 			resumeTask = null;
+			this.cancel(true);
 			super.onCancelled();
 		}
 	}
@@ -336,6 +356,8 @@ public class FFmpegPlayer {
 	private native void resumeNative() throws NotPlayingException;
 	
 	public native void changeRatioNative(int surfaceType);
+	
+	public native void closeStreamNative();
 
 	public void pause() {
 		pauseTask = new PauseTask(this);

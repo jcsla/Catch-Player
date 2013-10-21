@@ -897,7 +897,7 @@ int player_decode_video(struct DecoderData * decoder_data, JNIEnv * env,
 				ctx->width, ctx->height);
 	} else {
 		LOGI(3, "Using slow conversion: %d ", ctx->pix_fmt);
-		struct SwsContext *sws_context = player->sws_context;
+		struct SwsContext *sws_context;
 		sws_context = sws_getCachedContext(sws_context, ctx->width, ctx->height,
 				ctx->pix_fmt, ctx->width, ctx->height, out_format,
 				SWS_FAST_BILINEAR, NULL, NULL, NULL);
@@ -1603,27 +1603,27 @@ int player_find_stream(struct Player *player, enum AVMediaType codec_type,
 	int err = ERROR_NO_ERROR;
 	LOGI(1, "player_find_stream, type: %d", codec_type);
 
-	//int bn_stream = player_try_open_stream(player, codec_type,
-	//		recommended_stream_no);
+	int bn_stream = player_try_open_stream(player, codec_type,
+			recommended_stream_no);
 	LOGI(1, "recommended_stream_number : %d", recommended_stream_no);
 
-	int bn_stream;
-	//if (bn_stream < 0) {
+	//int bn_stream;
+	if (bn_stream < 0) {
 		int i;
 		for (i = 0; i < player->input_format_ctx->nb_streams; i++) {
 			bn_stream = player_try_open_stream(player, codec_type, i);
 			if (bn_stream >= 0)
 				break;
 		}
-	//}
+	}
 
 	LOGI(1, "bn_stream : %d", bn_stream);
-	//if (bn_stream < 0) {
-	//	return -1;
-	//}
+	if (bn_stream < 0) {
+		return -1;
+	}
 
 	LOGI(3, "player_set_data_source 4");
-
+	LOGI(1, "streams_no!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 : %d", streams_no);
 	AVStream *stream = player->input_format_ctx->streams[bn_stream];
 	player->input_streams[streams_no] = stream;
 	player->input_codec_ctxs[streams_no] = stream->codec;
@@ -1887,13 +1887,14 @@ void player_create_audio_track_free(struct Player *player, struct State *state) 
 		player->swr_context = NULL;
 	}
 
+	JNIEnv* env = state->env;
 	if (player->audio_track != NULL) {
 		LOGI(7, "player_create_audio_track_free stop audio_track");
-		(*state->env)->CallVoidMethod(state->env, player->audio_track,
+		(*env)->CallVoidMethod(state->env, player->audio_track,
 				player->audio_track_pause_method);
 
 		LOGI(7, "player_create_audio_track_free free audio_track");
-		(*state->env)->DeleteGlobalRef(state->env, player->audio_track);
+		(*env)->DeleteGlobalRef(state->env, player->audio_track);
 		player->audio_track = NULL;
 	}
 	if (player->audio_stream_no >= 0) {
@@ -2369,6 +2370,8 @@ int player_set_data_source(struct State *state, const char *file_path,
 	//if ((err = player_print_report_video_streams(state->env, player->thiz,
 	//		player)) < 0)
 	//	goto error;
+
+	player->caputre_streams_no = 0;
 
 	if ((player->video_stream_no = player_find_stream(player, AVMEDIA_TYPE_VIDEO, video_stream_no)) < 0) {
 		err = player->video_stream_no;
@@ -2892,4 +2895,24 @@ void jni_player_change_ratio(JNIEnv *env, jobject thiz, int surfaceType) {
 	struct Player *player = player_get_player_field(env, thiz);
 	float aspect_ratio;
 	int w, h, x, y;
+}
+
+void jni_player_close_stream_native(JNIEnv *env, jobject thiz)
+{
+	struct Player * player = player_get_player_field(env, thiz);
+	struct State state = {player: player, env: env};
+
+	player_play_prepare_free(player);
+	//player_start_decoding_threads_free(player);
+	//player_create_audio_track_free(player, &state);
+
+	//player_alloc_queues_free(&state);
+	//player_alloc_frames_free(player);
+	//player_alloc_video_frames_free(player);
+
+	//player_print_report_video_streams_free(state.env, player->thiz, player);
+	player_find_streams_free(player);
+	//player_find_stream_info_free(player);
+	//player_open_input_free(player);
+	//player_create_context_free(player);
 }
