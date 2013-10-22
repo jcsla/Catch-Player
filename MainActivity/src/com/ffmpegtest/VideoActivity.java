@@ -101,6 +101,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private boolean mHold = false;
 	private boolean mMove = false;
 	private boolean mSeek = false;
+	private boolean isLoad = false;
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
@@ -197,7 +198,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		PPLListAdapter adapter = new PPLListAdapter(this, list);
 		mPPLList.setAdapter(adapter);
 
-		System.gc();
 		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
@@ -688,17 +688,19 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	@Override
 	public void onBackPressed() {
-		if(onPPL) {
-			long downTime = SystemClock.uptimeMillis();
-			long eventTime = SystemClock.uptimeMillis();
-			MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, 100,100, 0);
-			mVideoView.dispatchTouchEvent(event);
-		}
-		else if(mHold);
-		else {
-			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
-			saveVideoTime();
-			finish();
+		if(isLoad) {
+			if(onPPL) {
+				long downTime = SystemClock.uptimeMillis();
+				long eventTime = SystemClock.uptimeMillis();
+				MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, 100,100, 0);
+				mVideoView.dispatchTouchEvent(event);
+			}
+			else if(mHold);
+			else {
+				videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
+				saveVideoTime();
+				finish();
+			}
 		}
 	}
 
