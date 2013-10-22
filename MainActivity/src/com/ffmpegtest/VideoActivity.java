@@ -18,7 +18,13 @@
 
 package com.ffmpegtest;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -96,11 +102,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int mAudioMax;
 	private float mVolume;
 
-	private boolean mTracking = false;
 	private boolean onPPL = false;
 	private boolean mHold = false;
 	private boolean mMove = false;
 	private boolean mSeek = false;
+	private boolean mUseSubtitle = false;
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
@@ -113,6 +119,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 
 	ArrayList<VideoFile> videoList;
+	ArrayList<SubtitleData> parsedSubtitleDataList;
 	String path;
 	private String fileName;
 	private int index;
@@ -202,6 +209,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
+		
+		setSubtitleSource();
 
 		mMpegPlayer.resume();
 	}
@@ -275,6 +284,52 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mMpegPlayer.seek(String.valueOf(time));
 		
 		Log.e("filePath : ", path + ('/' + fileName));
+	}
+	
+	public void setSubtitleSource()
+	{
+		String videofilePath = path + '/' + fileName;
+		String subtitlePath = videofilePath.substring(0, videofilePath.lastIndexOf(".")) + ".smi";
+		File subtitleFile = new File(subtitlePath);
+		
+		if(subtitleFile.isFile() && subtitleFile.canRead())
+		{
+			mUseSubtitle = true;
+			parsedSubtitleDataList = new ArrayList<SubtitleData>();
+			try {
+				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(subtitleFile.toString())), "MS949"));
+				String s;
+				long time = -1;
+				String text = null;
+				boolean startSubtitle = false;
+				
+				while((s = in.readLine()) != null)
+				{
+					if(s.contains("<SYNC"))
+					{
+						startSubtitle = true;
+						if(time != -1)
+							parsedSubtitleDataList.add(new SubtitleData(time, text));
+						
+						time = Integer.parseInt(s.substring(s.indexOf("=")+1, s.indexOf(">")));
+						text = s.substring(s.indexOf(">")+1, s.length());
+						text = text.substring(text.indexOf(">")+1, text.length());
+					}
+					else
+					{
+						if(startSubtitle == true)
+							text = text + s;
+					}
+				}
+				
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+			mUseSubtitle = false;
 	}
 
 	@Override
@@ -440,14 +495,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar)
 	{
-		mTracking = true;
+		
 	}
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar)
 	{
-		mTracking = false;
-
 		String value = String.valueOf(seekBar.getProgress());
 		Log.e("seekbar value : ", value);
 		//if (fromUser)
