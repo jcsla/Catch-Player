@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -69,7 +70,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		save_video = new HashMap<String, ArrayList<VideoFile>>();
 		dbAdapter = new VideoFileDBAdapter(this);
 		videoLength = new ArrayList<Integer>();
-		
+
 		initVideoMap();
 	}
 
@@ -114,7 +115,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		}
 	}
 
-	
+
 	public ArrayList<String> getVideoFileList(int position) {
 		ArrayList<String> fileList = new ArrayList<String>();
 		for(int i=0; i<videoLength.get(position); i++) {
@@ -159,14 +160,14 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 						playVideo(position);
 						break;
 					case 1:
-						new File(getfilePath(video.get(currentPath).get(position))).delete();
+						deleteDirectory(new File(getfilePath(video.get(currentPath).get(position))));
 						video.get(currentPath).remove(position);
 						getVideoLength(path);
 						setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
-						if(video.get(currentPath).size() == 0)
-							video.remove(currentPath);
 						break;
 					case 2:
+						renameFile(new File(getfilePath(video.get(currentPath).get(position))));
+						setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 						break;
 					case 3:
 						break;
@@ -189,6 +190,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 						setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
 						break;
 					case 1:
+						renameFile(new File(path.get(position)));
+						setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
 						break;
 					case 2:
 						break;
@@ -205,7 +208,25 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		ab.show();
 		return true;
 	}
-
+	
+	public void renameFile(final File file) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setTitle("파일명을 입력해 주세요.");
+		final EditText et_fileName = new EditText(this);
+		alert.setView(et_fileName);
+		alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String fileName = et_fileName.getText().toString();
+				if(!fileName.equals("")) 
+					Log.e(file.getParent() + '/' + fileName, "" + file.renameTo(new File(file.getParent() + '/' + fileName)));
+			}
+		});
+		
+		alert.show();
+	}
+	
 	/** 
 	 * 작성자 : 임창민
 	 * 메소드 이름 : getDir
@@ -280,12 +301,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
-//		do {
-//			video = dbAdapter.getVideoFileDB();
-//			Log.e("currentPath = " , currentPath);
-//		} while(video.get(currentPath) == null);
-//		Log.e("video", video.get(currentPath).get(0).getName());
-//		setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
+		video = dbAdapter.getVideoFileDB();
+		setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 	}
 
 	@Override
@@ -329,8 +346,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 			}
 		});
 
-		//		new RefreshTask().execute(root);
-		//		setRefreshActionButtonState(true);
+		new RefreshTask().execute(root);
+		setRefreshActionButtonState(true);
 		return true;
 	}
 
@@ -404,21 +421,27 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 	public String getfilePath(VideoFile videoFile) {
 		return videoFile.getPath() + '/' + videoFile.getName();
 	}
-	
+
 	public boolean deleteDirectory(File path) {
-        if(!path.exists()) {
-            return false;
-        }
-         
-        File[] files = path.listFiles();
-        for(int i=0; i<files.length; i++) {
-        	files[i].delete();
-        	
-        	Log.e(files[i].getName()+"삭제", files[i].getAbsolutePath());
-        }
-         
-        return path.delete();
-    }
+		if(!path.exists()) {
+			return false;
+		}
+
+		if(path.isDirectory()) {
+
+			File[] files = path.listFiles();
+			for(int i=0; i<files.length; i++) {
+				if(isVideoFile(files[i].getName())) {
+					files[i].delete();
+
+					Log.e(files[i].getName()+"삭제", files[i].getAbsolutePath());
+				}
+			}
+
+		}
+
+		return path.delete();
+	}
 
 	/** 
 	 * 작성자 : 임창민
@@ -439,6 +462,11 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 			setRefreshActionButtonState(false);
 
 			initFinalize();
+			if(!path.contains(currentPath)) {
+				currentPath = root;
+				mActionBar.setTitle("폴더");
+			}
+
 			if(!currentPath.equals(root) || inRoot)
 				setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 			else
