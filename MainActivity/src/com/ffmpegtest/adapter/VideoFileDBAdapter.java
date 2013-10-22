@@ -86,6 +86,7 @@ public class VideoFileDBAdapter {
 				int playTime = c.getInt(idxPlayTime);
 				if(!video.containsKey(filePath))
 					video.put(filePath, new ArrayList<VideoFile>());
+				
 				video.get(filePath).add(new VideoFile(filePath, fileName, playTime, newVideo));
 				
 			} while(c.moveToNext());
