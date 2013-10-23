@@ -43,7 +43,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -120,9 +123,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	ArrayList<VideoFile> videoList;
 	ArrayList<SubtitleData> parsedSubtitleDataList;
+	
 	String path;
 	private String fileName;
 	private int index;
+	private int indexSubtitle;
+	private long currentTime;
+	
 	private VideoFileDBAdapter dbAdapter;
 
 	@Override
@@ -213,6 +220,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		setSubtitleSource();
 
 		mMpegPlayer.resume();
+		
+		if(mUseSubtitle == true)
+			executeSubtitleThread();
 	}
 
 	@Override
@@ -330,6 +340,61 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 		else
 			mUseSubtitle = false;
+	}
+	
+	public void executeSubtitleThread()
+	{
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						Thread.sleep(200);
+						subtitleHandler.sendMessage(subtitleHandler.obtainMessage());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+	}
+	
+	Handler subtitleHandler = new Handler()
+	{
+		public void handleMessage(Message msg)
+		{
+			if(currentTime > 0)
+			{
+				indexSubtitle = getIndexSubtitle(currentTime);
+				
+				Log.e("currentTime : ", String.valueOf(currentTime));
+				Log.e("parsedTime : ", String.valueOf(parsedSubtitleDataList.get(indexSubtitle).getTime()));
+				Log.e("Subtitle : ", Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()).toString());
+				//여기서 ui 적용
+			}
+		}
+	};
+	
+	public int getIndexSubtitle(long currentTime)
+	{
+		int l = 0;
+		int m;
+		int h = parsedSubtitleDataList.size();
+		
+		while(l <= h)
+		{
+			m = (l + h) / 2;
+			if(parsedSubtitleDataList.get(m).getTime() <= currentTime && currentTime < parsedSubtitleDataList.get(m+1).getTime())
+				return m;
+			if(currentTime > parsedSubtitleDataList.get(m+1).getTime())
+				l = m + 1;
+			else
+				h = m - 1;
+		}
+		
+		return 0;
 	}
 
 	@Override
@@ -542,6 +607,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
+		
+		currentTime = currentTimeUs / 1000;
 
 		mSeekBar.setMax(videoDurationS);
 		mSeekBar.setProgress(currentTimeS);
