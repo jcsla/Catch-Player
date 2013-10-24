@@ -50,6 +50,8 @@ import android.os.SystemClock;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -234,6 +236,25 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		if(mUseSubtitle == true)
 			executeSubtitleThread();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(0, 0, Menu.NONE, "설정").setIcon(android.R.drawable.ic_menu_preferences);
+		menu.add(0, 1, Menu.NONE, "도움말").setIcon(android.R.drawable.ic_menu_help);
+		
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case 0:
+			break;
+		case 1:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
