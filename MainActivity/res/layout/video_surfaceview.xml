@@ -164,6 +164,46 @@
     </RelativeLayout>
     
     <RelativeLayout
+        android:id="@+id/volume_control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+		 android:layout_centerVertical="true"
+        android:background="#a8000000"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/volume_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="18.0dip"
+            android:paddingLeft="8.0dip"
+            android:paddingRight="8.0dip"
+            android:paddingTop="15.0dip" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/brightness_control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="#a8000000"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/brightness_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="18.0dip"
+            android:paddingLeft="8.0dip"
+            android:paddingRight="8.0dip"
+            android:paddingTop="15.0dip" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
         android:id="@+id/ll_ppl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -185,7 +225,7 @@
             android:text="PPL Information" />
         
     </RelativeLayout>
-
+    
     <TextView
         android:id="@+id/tv_smi"
         android:layout_width="wrap_content"
