@@ -42,6 +42,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -96,11 +97,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
 	
-	private View mVolumeControlView;
-	private TextView mVolumeControlSize;
-	private View mBrightnessControlView;
-	private TextView mBrightnessValue;
-
+	private View mVolumeBrightnessControlView;
+	private TextView mVolumeBrightnessValue;
+	
+	private Handler mControllerHandler;
+	
 	private ImageView mPPLButton;
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
@@ -165,10 +166,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mControlsView = this.findViewById(R.id.controls);
 		
-		mVolumeControlView = this.findViewById(R.id.volume_control);
-		mVolumeControlSize = (TextView)this.findViewById(R.id.volume_size);
-		mBrightnessControlView = this.findViewById(R.id.brightness_control);
-		mBrightnessValue = (TextView)this.findViewById(R.id.brightness_value);
+		mVolumeBrightnessControlView = this.findViewById(R.id.volume_brightness_control);
+		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
 
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
@@ -440,17 +439,31 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				{
 					Log.e("Brightness", "Brightness");
 					doBrightnessTouch(y_changed);
-					this.mBrightnessControlView.setVisibility(View.VISIBLE);
-					
-					
+					//this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mVolumeBrightnessControlView.setVisibility(View.GONE);
+						}
+					};
+					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
 				if(mTouchX > (getDeviceWidth() / 2))
 				{
 					Log.e("Volume", "Volume");
 					doVolumeTouch(y_changed);
-					this.mVolumeControlView.setVisibility(View.VISIBLE);
-					this.mVolumeControlSize.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-					
+					//this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					//this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+					mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mVolumeBrightnessControlView.setVisibility(View.GONE);
+						}
+					};
+					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
 
 				return true;
@@ -503,11 +516,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							
 							mSmiview.setLayoutParams(params);
 						}
+						//this.mTitleBar.setVisibility(View.VISIBLE);
+						//this.mControlsView.setVisibility(View.VISIBLE);
+						//this.mPPLButton.setVisibility(View.VISIBLE);
+						
+						mControllerHandler = new Handler(){
+							@Override
+							public void handleMessage(Message msg) {
+								mTitleBar.setVisibility(View.GONE);
+								mControlsView.setVisibility(View.GONE);
+								mPPLButton.setVisibility(View.GONE);
+								mTouchPressed = false;
+							}
+						};
 						this.mTitleBar.setVisibility(View.VISIBLE);
 						this.mControlsView.setVisibility(View.VISIBLE);
 						this.mPPLButton.setVisibility(View.VISIBLE);
-						this.mVolumeControlView.setVisibility(View.GONE);
-						this.mBrightnessControlView.setVisibility(View.GONE);
+						mControllerHandler.sendEmptyMessageDelayed(0, 10000);
+						
 					}
 					else
 					{
@@ -884,7 +910,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
 		float brightnessValue = lp.screenBrightness*100;
-		this.mBrightnessValue.setText(""+(int)brightnessValue);
+		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
 		getWindow().setAttributes(lp);
 	}
 
