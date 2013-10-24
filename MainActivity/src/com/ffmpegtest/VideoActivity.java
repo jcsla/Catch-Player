@@ -149,7 +149,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		getWindow().setBackgroundDrawable(null);
-
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.video_surfaceview);
 
 		mFullLayout = this.findViewById(R.id.full_layout);
