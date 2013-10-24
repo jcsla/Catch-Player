@@ -409,10 +409,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				try {
 					indexSubtitle = getIndexSubtitle(currentTime);
 
-					Log.e("currentTime : ", String.valueOf(currentTime));
-					Log.e("parsedTime : ", String.valueOf(parsedSubtitleDataList.get(indexSubtitle).getTime()));
-					Log.e("Subtitle : ", Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()).toString());
-					mSmiview.setText(parsedSubtitleDataList.get(indexSubtitle).getText().replace("</ br>", "\n"));
+					if(indexSubtitle == -1)
+						mSmiview.setText("");
+					else
+						mSmiview.setText(parsedSubtitleDataList.get(indexSubtitle).getText().replace("</ br>", "\n"));
 				} catch(Exception e) {}
 			}
 		}
@@ -435,7 +435,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				h = m - 1;
 		}
 
-		return 0;
+		return -1;
 	}
 
 	@Override
