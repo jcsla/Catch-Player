@@ -27,7 +27,6 @@ MODULE_ENCRYPT:=
 # add support for encryption
 MODULE_ENCRYPT:=yes
 
-
 #if armeabi-v7a
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 	# add neon optimization code (only armeabi-v7a)
@@ -42,8 +41,6 @@ ifeq ($(TARGET_ARCH_ABI),$(filter $(TARGET_ARCH_ABI),armeabi armeabi-v7a))
 	#LIBRARY_PROFILER:=yes
 
 endif
-
-
 
 
 include $(CLEAR_VARS)
@@ -151,7 +148,6 @@ LOCAL_STATIC_LIBRARIES := cpufeatures
 LOCAL_LDLIBS  := -llog
 include $(BUILD_SHARED_LIBRARY)
 
-
 #includes
 ifdef MODULE_ENCRYPT
 include $(LOCAL_PATH)/Android-tropicssl.mk
@@ -160,6 +156,8 @@ endif
 ifdef LIBRARY_PROFILER
 include $(LOCAL_PATH)/android-ndk-profiler-3.1/android-ndk-profiler.mk
 endif
+
+include $(LOCAL_PATH)/Android-codegen.mk
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
 $(call import-module,cpufeatures)
