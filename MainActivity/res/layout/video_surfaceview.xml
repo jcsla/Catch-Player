@@ -65,6 +65,7 @@
             android:src="@drawable/lock" />
         
     </LinearLayout>
+    
 
     <RelativeLayout
         android:id="@+id/controls"
@@ -161,7 +162,7 @@
         </LinearLayout>
         
     </RelativeLayout>
-
+    
     <RelativeLayout
         android:id="@+id/ll_ppl"
         android:layout_width="match_parent"
@@ -184,5 +185,14 @@
             android:text="PPL Information" />
         
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_smi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

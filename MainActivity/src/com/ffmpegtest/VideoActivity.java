@@ -59,6 +59,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -84,6 +85,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private View mTitleBar;
 	private TextView mTitle;
+	private TextView mSmiview;
 
 	private View mVideoView;
 
@@ -123,13 +125,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	ArrayList<VideoFile> videoList;
 	ArrayList<SubtitleData> parsedSubtitleDataList;
-	
+
 	String path;
 	private String fileName;
 	private int index;
 	private int indexSubtitle;
 	private long currentTime;
-	
+
 	private VideoFileDBAdapter dbAdapter;
 
 	@Override
@@ -189,7 +191,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 		mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		
+
 		dbAdapter = new VideoFileDBAdapter(this);
 
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
@@ -216,11 +218,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
-		
+
 		setSubtitleSource();
 
 		mMpegPlayer.resume();
-		
+
 		if(mUseSubtitle == true)
 			executeSubtitleThread();
 	}
@@ -286,25 +288,26 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPlay = true;
 		mTouchPressed = false;
 		mHold = false;
-		
+
 		int time = videoList.get(index).getTime();
 
 		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
 		if(time > 0)
 			mMpegPlayer.seek(String.valueOf(time));
-		
+
 		Log.e("filePath : ", path + ('/' + fileName));
 	}
-	
+
 	public void setSubtitleSource()
 	{
 		String videofilePath = path + '/' + fileName;
 		String subtitlePath = videofilePath.substring(0, videofilePath.lastIndexOf(".")) + ".smi";
 		File subtitleFile = new File(subtitlePath);
-		
+
 		if(subtitleFile.isFile() && subtitleFile.canRead())
 		{
 			mUseSubtitle = true;
+			mSmiview = (TextView)findViewById(R.id.tv_smi);
 			parsedSubtitleDataList = new ArrayList<SubtitleData>();
 			try {
 				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(subtitleFile.toString())), "MS949"));
@@ -312,15 +315,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				long time = -1;
 				String text = null;
 				boolean startSubtitle = false;
-				
+
 				while((s = in.readLine()) != null)
 				{
 					if(s.contains("<SYNC"))
 					{
 						startSubtitle = true;
-						if(time != -1)
+						if(time != -1) {
+							text = text.replace("<br>","\n");
+							text = text.replace("&nbsp;", "");
 							parsedSubtitleDataList.add(new SubtitleData(time, text));
-						
+						}
+
 						time = Integer.parseInt(s.substring(s.indexOf("=")+1, s.indexOf(">")));
 						text = s.substring(s.indexOf(">")+1, s.length());
 						text = text.substring(text.indexOf(">")+1, text.length());
@@ -331,7 +337,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							text = text + s;
 					}
 				}
-				
+
 				in.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -341,14 +347,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else
 			mUseSubtitle = false;
 	}
-	
+
 	public void executeSubtitleThread()
 	{
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				while(true) {
+				while(mUseSubtitle) {
 					try {
 						Thread.sleep(200);
 						subtitleHandler.sendMessage(subtitleHandler.obtainMessage());
@@ -357,32 +363,37 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						e.printStackTrace();
 					}
 				}
+
+				parsedSubtitleDataList.clear();
+				indexSubtitle = 0;
 			}
 		}).start();
 	}
-	
+
 	Handler subtitleHandler = new Handler()
 	{
 		public void handleMessage(Message msg)
 		{
 			if(currentTime > 0)
 			{
-				indexSubtitle = getIndexSubtitle(currentTime);
-				
-				Log.e("currentTime : ", String.valueOf(currentTime));
-				Log.e("parsedTime : ", String.valueOf(parsedSubtitleDataList.get(indexSubtitle).getTime()));
-				Log.e("Subtitle : ", Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()).toString());
-				//여기서 ui 적용
+				try {
+					indexSubtitle = getIndexSubtitle(currentTime);
+
+					Log.e("currentTime : ", String.valueOf(currentTime));
+					Log.e("parsedTime : ", String.valueOf(parsedSubtitleDataList.get(indexSubtitle).getTime()));
+					Log.e("Subtitle : ", Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()).toString());
+					mSmiview.setText(parsedSubtitleDataList.get(indexSubtitle).getText().replace("</ br>", "\n"));
+				} catch(Exception e) {}
 			}
 		}
 	};
-	
+
 	public int getIndexSubtitle(long currentTime)
 	{
 		int l = 0;
 		int m;
 		int h = parsedSubtitleDataList.size();
-		
+
 		while(l <= h)
 		{
 			m = (l + h) / 2;
@@ -393,7 +404,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			else
 				h = m - 1;
 		}
-		
+
 		return 0;
 	}
 
@@ -467,6 +478,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					if(mTouchPressed == false)
 					{
 						mTouchPressed = true;
+						if(mUseSubtitle) {
+							RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+							params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
+							params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+							params.setMargins(20, 20, 20, 20);
+							
+							mSmiview.setLayoutParams(params);
+						}
 						this.mTitleBar.setVisibility(View.VISIBLE);
 						this.mControlsView.setVisibility(View.VISIBLE);
 						this.mPPLButton.setVisibility(View.VISIBLE);
@@ -474,6 +493,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					else
 					{
 						mTouchPressed = false;
+						if(mUseSubtitle) {
+							RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+							params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+							params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+							params.setMargins(20, 20, 20, 20);
+							
+							mSmiview.setLayoutParams(params);
+						}
 						this.mTitleBar.setVisibility(View.GONE);
 						this.mControlsView.setVisibility(View.GONE);
 						this.mPPLButton.setVisibility(View.GONE);
@@ -560,7 +587,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar)
 	{
-		
+
 	}
 
 	@Override
@@ -607,7 +634,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
-		
+
 		currentTime = currentTimeUs / 1000;
 
 		mSeekBar.setMax(videoDurationS);
@@ -816,6 +843,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		} 
 		else if (mHold);
 		else {
+			mUseSubtitle = false;
 			videoList.get(index).setTime(
 					(int) (mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
@@ -829,8 +857,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		int videoTime = videoList.get(index).getTime();
 		dbAdapter.updateVideoFileDB(0, videoPath, videoName, videoTime);
 	}
-	
-	
+
+
 	private void doBrightnessTouch(float y_changed)
 	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
@@ -891,7 +919,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			break;
 		}
 	}
-	
+
 	private void cancelAsyncTask()
 	{	
 		if(FFmpegPlayer.stopTask != null)
