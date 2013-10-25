@@ -352,8 +352,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					{
 						startSubtitle = true;
 						if(time != -1) {
-							text = text.replace("<br>","\n");
-							text = text.replace("&nbsp;", "");
 							parsedSubtitleDataList.add(new SubtitleData(time, text));
 						}
 
@@ -412,7 +410,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					if(indexSubtitle == -1)
 						mSmiview.setText("");
 					else
-						mSmiview.setText(parsedSubtitleDataList.get(indexSubtitle).getText().replace("</ br>", "\n"));
+						mSmiview.setText(Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()));
+					
 				} catch(Exception e) {}
 			}
 		}
@@ -529,6 +528,27 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					if(mTouchPressed == false)
 					{
 						mTouchPressed = true;
+						
+						mControllerHandler = new Handler(){
+							@Override
+							public void handleMessage(Message msg) {
+								mTitleBar.setVisibility(View.GONE);
+								mControlsView.setVisibility(View.GONE);
+								mPPLButton.setVisibility(View.GONE);
+								if(mUseSubtitle) {
+									RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+									params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+									params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+									params.setMargins(20, 20, 20, 20);
+									
+									mSmiview.setLayoutParams(params);
+								}
+								mTouchPressed = false;
+							}
+						};
+						this.mTitleBar.setVisibility(View.VISIBLE);
+						this.mControlsView.setVisibility(View.VISIBLE);
+						this.mPPLButton.setVisibility(View.VISIBLE);
 						if(mUseSubtitle) {
 							RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 							params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
@@ -537,28 +557,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							
 							mSmiview.setLayoutParams(params);
 						}
-						//this.mTitleBar.setVisibility(View.VISIBLE);
-						//this.mControlsView.setVisibility(View.VISIBLE);
-						//this.mPPLButton.setVisibility(View.VISIBLE);
-						
-						mControllerHandler = new Handler(){
-							@Override
-							public void handleMessage(Message msg) {
-								mTitleBar.setVisibility(View.GONE);
-								mControlsView.setVisibility(View.GONE);
-								mPPLButton.setVisibility(View.GONE);
-								mTouchPressed = false;
-							}
-						};
-						this.mTitleBar.setVisibility(View.VISIBLE);
-						this.mControlsView.setVisibility(View.VISIBLE);
-						this.mPPLButton.setVisibility(View.VISIBLE);
 						mControllerHandler.sendEmptyMessageDelayed(0, 10000);
 						
 					}
 					else
 					{
 						mTouchPressed = false;
+						mControllerHandler.removeMessages(0);
+						this.mTitleBar.setVisibility(View.GONE);
+						this.mControlsView.setVisibility(View.GONE);
+						this.mPPLButton.setVisibility(View.GONE);
 						if(mUseSubtitle) {
 							RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 							params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -567,9 +575,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							
 							mSmiview.setLayoutParams(params);
 						}
-						this.mTitleBar.setVisibility(View.GONE);
-						this.mControlsView.setVisibility(View.GONE);
-						this.mPPLButton.setVisibility(View.GONE);
 					}
 				}
 				else
