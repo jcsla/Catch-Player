@@ -1,6 +1,7 @@
 package com.ffmpegtest;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -170,6 +171,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 						setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
 						break;
 					case 3:
+						showFileAttribute(new File(getfilePath(video.get(currentPath).get(position))), position);
 						break;
 					}
 				}
@@ -194,8 +196,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 						setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
 						break;
 					case 2:
-						break;
-					case 3:
+						showFileAttribute(new File(path.get(position)), position);
 						break;
 					}
 				}
@@ -208,14 +209,15 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		ab.show();
 		return true;
 	}
-	
+
 	public void renameFile(final File file) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("파일명을 입력해 주세요.");
 		final EditText et_fileName = new EditText(this);
+		et_fileName.setText(file.getName());
 		alert.setView(et_fileName);
 		alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String fileName = et_fileName.getText().toString();
@@ -223,10 +225,55 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 					Log.e(file.getParent() + '/' + fileName, "" + file.renameTo(new File(file.getParent() + '/' + fileName)));
 			}
 		});
-		
+
 		alert.show();
 	}
 	
+	public String getVideoSize(double size) {
+		final int KB = 1024;
+		final int MB = KB * KB;
+		final int GB = MB * KB;
+
+		String display_size;
+		
+		if (size > GB)
+			display_size = String.format("%.2f GB ", (double)size / GB);
+		else if (size < GB && size > MB)
+			display_size = String.format("%.2f MB ", (double)size / MB);
+		else if (size < MB && size > KB)
+			display_size = String.format("%.2f KB ", (double)size/ KB);
+		else
+			display_size = String.format("%.2f Bytes ", (double)size);
+		
+		return display_size;
+	}
+
+	public void showFileAttribute(File file, int position) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setTitle(file.getName());
+		if(file.isDirectory()) {
+			double videoSize = 0;
+			for(File f : file.listFiles()) 
+				videoSize += f.length();
+			
+			
+			alert.setMessage("폴더\n" + 
+					"\n위치 : " + file.getAbsolutePath() + 
+					"\n수정된 날짜 : " + new SimpleDateFormat("MM/dd/yyyy").format(file.lastModified()) + 
+					"\n비디오 개수 : " + videoLength.get(position) +
+					"\n비디오 크기 : " + getVideoSize(videoSize));
+		} else {
+			alert.setMessage("비디오파일\n" + 
+					"\n이름 : " + file.getName() +
+					"\n위치 : " + file.getParent() + 
+					"\n수정된 날짜 : " + new SimpleDateFormat("MM/dd/yyyy").format(file.lastModified()) + 
+					"\n비디오 크기 : " + getVideoSize(file.length()));
+		}
+		
+		alert.setPositiveButton("확인", null);
+		alert.show();
+	}
+
 	/** 
 	 * 작성자 : 임창민
 	 * 메소드 이름 : getDir

@@ -56,6 +56,7 @@ public class VideoFileDBAdapter {
 		ContentValues cv=new ContentValues(); 
 		cv.put("newVideo", newVideo);
 		cv.put("playTime",playTime);
+		cv.put("fileName", name);
 
 		String whereClause = "filePath="+  "\'" +path+"\'"+" and fileName="+"\'"+name+"\'"; 
 		String[] whereArgs = new String [] { path, name };

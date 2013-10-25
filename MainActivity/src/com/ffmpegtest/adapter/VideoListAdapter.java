@@ -17,10 +17,6 @@ import android.widget.TextView;
 
 public class VideoListAdapter extends BaseAdapter {
 
-	private static final int KB = 1024;
-	private static final int MB = KB * KB;
-	private static final int GB = MB * KB;
-
 	private LayoutInflater inflater = null;
 	private ArrayList<VideoFile> fileList = null;
 	private ArrayList<Integer> videoLength = null;
@@ -55,6 +51,25 @@ public class VideoListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return position;
 	}
+	
+	public String getVideoSize(double size) {
+		final int KB = 1024;
+		final int MB = KB * KB;
+		final int GB = MB * KB;
+
+		String display_size;
+		
+		if (size > GB)
+			display_size = String.format("%.2f GB ", (double)size / GB);
+		else if (size < GB && size > MB)
+			display_size = String.format("%.2f MB ", (double)size / MB);
+		else if (size < MB && size > KB)
+			display_size = String.format("%.2f KB ", (double)size/ KB);
+		else
+			display_size = String.format("%.2f Bytes ", (double)size);
+		
+		return display_size;
+	}
 
 	// ListView의 뿌려질 한줄의 Row를 설정 합니다.
 	@Override
@@ -87,17 +102,7 @@ public class VideoListAdapter extends BaseAdapter {
 		double size = file.length();
 		
 		if(file.canRead() && size > 0) {
-			String display_size;
-			
-			if (size > GB)
-				display_size = String.format("%.2f GB ", (double)size / GB);
-			else if (size < GB && size > MB)
-				display_size = String.format("%.2f MB ", (double)size / MB);
-			else if (size < MB && size > KB)
-				display_size = String.format("%.2f KB ", (double)size/ KB);
-			else
-				display_size = String.format("%.2f Bytes ", (double)size);
-			
+			String display_size = getVideoSize(size);
 			viewHolder.tv_size.setText(display_size);
 		}
 

@@ -906,11 +906,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onBackPressed() {
 		if (onPPL) {
-			long downTime = SystemClock.uptimeMillis();
-			long eventTime = SystemClock.uptimeMillis();
-			MotionEvent event = MotionEvent.obtain(downTime, eventTime,
-					MotionEvent.ACTION_DOWN, 100, 100, 0);
-			mVideoView.dispatchTouchEvent(event);
+			if(mPlay) {
+				mMpegPlayer.resume();
+				mTouchPressed = false;
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				this.mTitleBar.setVisibility(View.GONE);
+				this.mControlsView.setVisibility(View.GONE);
+				this.mPPLButton.setVisibility(View.GONE);
+			}
+
+			mPPLLayout.setVisibility(View.GONE);
+			mSeekBar.setEnabled(true);
+			onPPL = false;
 		} 
 		else if (mHold);
 		else {
