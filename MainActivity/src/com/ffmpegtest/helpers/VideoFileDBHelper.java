@@ -11,7 +11,9 @@ public class VideoFileDBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String sql = "CREATE TABLE videoFileDB (newVideo integer, filePath text, fileName text, playTime integer);";
+		String sql = "CREATE TABLE videoFileDB (filePath text, fileName text);";
+		db.execSQL(sql);
+		sql = "CREATE TABLE playTimeDB (file text, playTime integer);";
 		db.execSQL(sql);
 	}
 

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ffmpegtest.R;
-import com.ffmpegtest.VideoFile;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -18,17 +17,11 @@ import android.widget.TextView;
 public class VideoListAdapter extends BaseAdapter {
 
 	private LayoutInflater inflater = null;
-	private ArrayList<VideoFile> fileList = null;
-	private ArrayList<Integer> videoLength = null;
+	private ArrayList<File> fileList = null;
 	private ViewHolder viewHolder = null;
 	private Context mContext = null;
-
-	public VideoListAdapter(Context c , ArrayList<VideoFile> fileList , ArrayList<Integer> videoLength){
-		this(c, fileList);
-		this.videoLength = videoLength;
-	}
 	
-	public VideoListAdapter(Context c , ArrayList<VideoFile> fileList){
+	public VideoListAdapter(Context c , ArrayList<File> fileList){
 		this.mContext = c;
 		this.inflater = LayoutInflater.from(c);
 		this.fileList = fileList;
@@ -42,7 +35,7 @@ public class VideoListAdapter extends BaseAdapter {
 
 	// Adapter가 관리하는 List의 Item 의 Position을 <객체> 형태로 얻어 옵니다.
 	@Override
-	public VideoFile getItem(int position) {
+	public File getItem(int position) {
 		return fileList.get(position);
 	}
 
@@ -90,15 +83,10 @@ public class VideoListAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder)v.getTag();
 		}
 
-
-		File file = new File(getfilePath(getItem(position)));
+		File file = getItem(position);
 		String fileName = file.getName();
 		viewHolder.tv_title.setText(fileName);
 		
-		if(getItem(position).getNew_video() == 1)
-			viewHolder.iv_new_video.setBackgroundResource(R.drawable.play);
-		else if(getItem(position).getNew_video() == 0)
-			viewHolder.iv_new_video.setBackgroundResource(R.drawable.pause);
 		double size = file.length();
 		
 		if(file.canRead() && size > 0) {
@@ -108,11 +96,7 @@ public class VideoListAdapter extends BaseAdapter {
 
 		return v;
 	}
-
-	public String getfilePath(VideoFile videoFile) {
-		return videoFile.getPath() + '/' + videoFile.getName();
-	}
-
+	
 	/*
 	 * ViewHolder 
 	 * getView의 속도 향상을 위해 쓴다.

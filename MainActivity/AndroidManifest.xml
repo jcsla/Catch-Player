@@ -26,7 +26,6 @@
             android:name="com.ffmpegtest.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme"
-            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

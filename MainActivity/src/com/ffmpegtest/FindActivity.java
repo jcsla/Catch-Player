@@ -3,7 +3,6 @@ package com.ffmpegtest;
 import java.io.File;
 import java.util.ArrayList;
 
-import com.ffmpegtest.adapter.FolderListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.adapter.VideoListAdapter;
 
@@ -12,7 +11,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,7 +21,7 @@ import android.widget.ListView;
 public class FindActivity extends Activity implements OnItemClickListener {
 	
 	private ListView mVideoListView;
-	private ArrayList<VideoFile> mVideoList;
+	private ArrayList<String> mVideoList;
 	private VideoFileDBAdapter dbAdapter;
 	private ActionBar mActionBar;
 	private String find_str;
@@ -42,12 +40,20 @@ public class FindActivity extends Activity implements OnItemClickListener {
 			mVideoListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, notData));
 		} else {
 			mVideoListView.setOnItemClickListener(this);
-			mVideoListView.setAdapter(new VideoListAdapter(this, mVideoList));
+			mVideoListView.setAdapter(new VideoListAdapter(this, getFileList(mVideoList)));
 		}
 	}
 	
+	public ArrayList<File> getFileList(ArrayList<String> stringList) {
+		ArrayList<File> fileList = new ArrayList<File>();
+		for(int i=0; i<stringList.size(); i++) 
+			fileList.add(new File(stringList.get(i)));
+		
+		return fileList;
+	}
+	
 	public void init() {
-		mVideoList = getIntent().getParcelableArrayListExtra("findList");
+		mVideoList = getIntent().getStringArrayListExtra("findList");
 		mVideoListView = (ListView)findViewById(R.id.video_list);
 		dbAdapter = new VideoFileDBAdapter(this);
 		find_str = getIntent().getStringExtra("findQuery");
@@ -65,22 +71,9 @@ public class FindActivity extends Activity implements OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 		Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
-		i.putParcelableArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, mVideoList);
+		i.putStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, mVideoList);
 		i.putExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, position);
-		mVideoList.get(position).setNew_video(0);
-		
-		String path = mVideoList.get(position).getPath();
-		String name = mVideoList.get(position).getName();
-		int time = mVideoList.get(position).getTime();
-		dbAdapter.updateVideoFileDB(0, path, name, time);
 
-		startActivityForResult(i, 0);
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		
+		startActivity(i);
 	}
 }

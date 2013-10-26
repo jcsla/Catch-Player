@@ -2,14 +2,9 @@ package com.ffmpegtest.adapter;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.ffmpegtest.R;
-import com.ffmpegtest.VideoFile;
 
 import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +20,10 @@ public class FolderListAdapter extends BaseAdapter {
 	private Context mContext = null;
 
 	public FolderListAdapter(Context c , ArrayList<String> fileList , ArrayList<Integer> videoLength){
-		this(c, fileList);
-		this.videoLength = videoLength;
-	}
-	
-	public FolderListAdapter(Context c , ArrayList<String> fileList){
 		this.mContext = c;
 		this.inflater = LayoutInflater.from(c);
 		this.fileList = fileList;
+		this.videoLength = videoLength;
 	}
 
 	// Adapter가 관리할 List의 개수를 설정 합니다.

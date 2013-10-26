@@ -77,6 +77,7 @@ import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
 import com.ffmpegtest.adapter.PPLListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
+import com.ffmpegtest.helpers.RectEvaluator;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
@@ -131,11 +132,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 
-	ArrayList<VideoFile> videoList;
+	ArrayList<String> videoList;
 	ArrayList<SubtitleData> parsedSubtitleDataList;
 
-	String path;
-	private String fileName;
+	private File file;
+	private String path;
 	private int index;
 	private int indexSubtitle;
 	private long currentTime;
@@ -303,14 +304,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 			else
 			{
-				videoList = intent.getParcelableArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST);
+				videoList = intent.getStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST);
 				index = intent.getIntExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, 0);
-				path = videoList.get(index).getPath();
-				fileName = videoList.get(index).getName();
+				file = new File(videoList.get(index));
+				path = file.getAbsolutePath();
 			}
 		}
 
-		mTitle.setText(fileName);
+		mTitle.setText(file.getName());
 
 		this.mPlayPauseButton.setImageResource(R.drawable.pause);
 		this.mPlayPauseButton.setEnabled(true);
@@ -319,19 +320,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTouchPressed = false;
 		mHold = false;
 
-		int time = videoList.get(index).getTime();
+		int time = dbAdapter.getVideoTime(path);
 
-		mMpegPlayer.setDataSource(path + ('/' + fileName), params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
+		mMpegPlayer.setDataSource(path, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
 		if(time > 0)
 			mMpegPlayer.seek(String.valueOf(time));
 
-		Log.e("filePath : ", path + ('/' + fileName));
+		Log.e("filePath : ", path);
 	}
 
 	public void setSubtitleSource()
 	{
-		String videofilePath = path + '/' + fileName;
-		String subtitlePath = videofilePath.substring(0, videofilePath.lastIndexOf(".")) + ".smi";
+		String subtitlePath = path.substring(0, path.lastIndexOf(".")) + ".smi";
 		File subtitleFile = new File(subtitlePath);
 
 		if(subtitleFile.isFile() && subtitleFile.canRead())
@@ -883,10 +883,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void nextVideo() {
 		if(videoList != null && index < videoList.size() - 1) {
-			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
-			fileName = videoList.get(++index).getName();
-			path = videoList.get(index).getPath();
+			file = new File(videoList.get(++index));
+			path = file.getAbsolutePath();
 			setDataSource();
 			mMpegPlayer.resume();
 		}
@@ -894,10 +893,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void prevVideo() {
 		if(index > 0) {
-			videoList.get(index).setTime((int)(mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
-			fileName = videoList.get(--index).getName();
-			path = videoList.get(index).getPath();
+			file = new File(videoList.get(--index));
+			path = file.getAbsolutePath();
 			setDataSource();
 			mMpegPlayer.resume();
 		}
@@ -922,18 +920,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else if (mHold);
 		else {
 			mUseSubtitle = false;
-			videoList.get(index).setTime(
-					(int) (mMpegPlayer.getCurrentTime() / 1000 / 1000));
 			saveVideoTime();
 			finish();
 		}
 	}
 
 	public void saveVideoTime() {
-		String videoPath = videoList.get(index).getPath();
-		String videoName = videoList.get(index).getName();
-		int videoTime = videoList.get(index).getTime();
-		dbAdapter.updateVideoFileDB(0, videoPath, videoName, videoTime);
+		int now = (int) (mMpegPlayer.getCurrentTime() / 1000 / 1000);
+		dbAdapter.saveVideoTime(path, now);
 	}
 
 
