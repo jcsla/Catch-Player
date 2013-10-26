@@ -55,8 +55,7 @@
 #include "jni-protocol.h"
 #include "aes-protocol.h"
 #include "sync.h"
-
-
+#include "AndroidCodegen.h"
 
 #define FFMPEG_LOG_LEVEL AV_LOG_WARNING
 #define LOG_LEVEL 2
@@ -185,6 +184,7 @@ struct Player {
 	jmethodID player_on_update_time_method;
 	jmethodID player_prepare_audio_track_method;
 	jmethodID player_set_stream_info_method;
+	jmethodID player_get_audio_data_method;
 
 	pthread_mutex_t mutex_operation;
 
@@ -1472,6 +1472,8 @@ int player_write_audio(struct DecoderData *decoder_data, JNIEnv *env,
 	(*env)->ReleaseByteArrayElements(env, samples_byte_array, jni_samples, 0);
 
 	LOGI(10, "player_write_audio playing audio track");
+	//////////////////////////////////////////////////
+	(*env)->CallVoidMethod(env, player->thiz, player->player_get_audio_data_method, samples_byte_array);
 	ret = (*env)->CallIntMethod(env, player->audio_track,
 			player->audio_track_write_method, samples_byte_array, 0, data_size);
 	jthrowable exc = (*env)->ExceptionOccurred(env);
@@ -2718,6 +2720,12 @@ int jni_player_init(JNIEnv *env, jobject thiz) {
 				player_class, player_set_stream_info);
 		if (player->player_set_stream_info_method == NULL) {
 			err = ERROR_NOT_FOUND_SET_STREAM_INFO_METHOD;
+			goto free_player;
+		}
+
+		player->player_get_audio_data_method = java_get_method(env,
+				player_class, player_get_audio_data);
+		if(player->player_get_audio_data_method == NULL) {
 			goto free_player;
 		}
 

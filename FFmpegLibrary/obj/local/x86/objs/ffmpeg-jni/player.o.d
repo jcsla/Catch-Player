@@ -108,7 +108,8 @@
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/ffmpeg-build/x86/include/libavutil/channel_layout.h \
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/jni-protocol.h \
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/aes-protocol.h \
- /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/sync.h
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/sync.h \
+ /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/AndroidCodegen.h
 
 /home/jun-young/android-ndk-r9/platforms/android-9/arch-x86/usr/include/stdlib.h:
 
@@ -327,3 +328,5 @@
 /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/aes-protocol.h:
 
 /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/sync.h:
+
+/home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/AndroidCodegen.h:

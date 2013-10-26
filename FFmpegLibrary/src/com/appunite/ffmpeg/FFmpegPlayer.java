@@ -18,6 +18,7 @@
 
 package com.appunite.ffmpeg;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import android.app.Activity;
@@ -458,5 +459,10 @@ public class FFmpegPlayer {
 	public void setMpegListener(FFmpegListener mpegListener)
 	{
 		this.mpegListener = mpegListener;
+	}
+	
+	private void getAudioData(byte[] audioData)
+	{
+		System.out.println(Arrays.toString(audioData));
 	}
 }
