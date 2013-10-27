@@ -326,7 +326,7 @@ EOF
 	    --enable-zlib \
 	    --disable-doc \
 	    --disable-ffplay \
-	    --disable-ffmpeg \
+	    --enable-ffmpeg \
 	    --disable-ffplay \
 	    --disable-ffprobe \
 	    --disable-ffserver \

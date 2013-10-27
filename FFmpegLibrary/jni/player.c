@@ -1439,6 +1439,7 @@ int player_write_audio(struct DecoderData *decoder_data, JNIEnv *env,
 	AVStream *stream = player->input_streams[stream_no];
 	LOGI(10, "player_write_audio Writing audio frame")
 
+	////////////////////////////////////////////////// byte array to short array...
 	jbyteArray samples_byte_array = (*env)->NewByteArray(env, data_size);
 	if (samples_byte_array == NULL) {
 		err = -ERROR_NOT_CREATED_AUDIO_SAMPLE_BYTE_ARRAY;
@@ -1473,7 +1474,7 @@ int player_write_audio(struct DecoderData *decoder_data, JNIEnv *env,
 
 	LOGI(10, "player_write_audio playing audio track");
 	//////////////////////////////////////////////////
-	(*env)->CallVoidMethod(env, player->thiz, player->player_get_audio_data_method, samples_byte_array, data_size);
+	//(*env)->CallVoidMethod(env, player->thiz, player->player_get_audio_data_method, samples_byte_array, data_size);
 	ret = (*env)->CallIntMethod(env, player->audio_track,
 			player->audio_track_write_method, samples_byte_array, 0, data_size);
 	jthrowable exc = (*env)->ExceptionOccurred(env);

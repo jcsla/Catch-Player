@@ -465,15 +465,18 @@ public class FFmpegPlayer {
 		this.mpegListener = mpegListener;
 	}
 	
+	// not used
 	private void getAudioData(byte[] audioData, int numSamples)
-	{
-		float normalizingValue = Short.MAX_VALUE;
+	{	
+		float normalizingValue = Byte.MAX_VALUE;
 		float normalizeAudioData[] = new float[numSamples];
-		for (int i = 0; i < numSamples - 1; i++) 
+		for (int i = 0; i < numSamples; i++) 
             normalizeAudioData[i] = audioData[i] / normalizingValue;
 		
+		System.out.println(audioData.length);
+		
 		//System.out.println(Arrays.toString(normalizeAudioData));
-		String code = this.codegen(normalizeAudioData, numSamples);
+		//String code = this.codegen(normalizeAudioData, numSamples);
 		//System.out.println(code.length());
 	}
 }

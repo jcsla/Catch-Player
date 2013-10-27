@@ -5,7 +5,7 @@ LOCAL_CPPFLAGS += -fexceptions
 
 LOCAL_MODULE    :=echoprint-jni
 
-LOCAL_SRC_FILES :=AndroidCodegen.cpp\
+LOCAL_SRC_FILES :=AndroidCodegen.cpp \
 $(LOCAL_PATH)/codegen/src/Codegen.cpp \
 $(LOCAL_PATH)/codegen/src/Whitening.cpp \
 $(LOCAL_PATH)/codegen/src/SubbandAnalysis.cpp \
