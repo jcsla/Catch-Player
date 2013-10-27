@@ -245,10 +245,12 @@ public class FFmpegPlayer {
 			System.out.println("neon");
 			System.loadLibrary("ffmpeg-neon");
 			System.loadLibrary("ffmpeg-jni-neon");
+			System.loadLibrary("echoprint-jni");
 		} else {
 			System.out.println("default");
 			System.loadLibrary("ffmpeg");
 			System.loadLibrary("ffmpeg-jni");
+			System.loadLibrary("echoprint-jni");
 		}
 	}
 
@@ -359,6 +361,8 @@ public class FFmpegPlayer {
 	public native void changeRatioNative(int surfaceType);
 	
 	public native void closeStreamNative();
+	
+	public native String codegen(float data[], int numSamples);
 
 	public void pause() {
 		pauseTask = new PauseTask(this);
@@ -461,8 +465,15 @@ public class FFmpegPlayer {
 		this.mpegListener = mpegListener;
 	}
 	
-	private void getAudioData(byte[] audioData)
+	private void getAudioData(byte[] audioData, int numSamples)
 	{
-		System.out.println(Arrays.toString(audioData));
+		float normalizingValue = Short.MAX_VALUE;
+		float normalizeAudioData[] = new float[numSamples];
+		for (int i = 0; i < numSamples - 1; i++) 
+            normalizeAudioData[i] = audioData[i] / normalizingValue;
+		
+		//System.out.println(Arrays.toString(normalizeAudioData));
+		String code = this.codegen(normalizeAudioData, numSamples);
+		//System.out.println(code.length());
 	}
 }

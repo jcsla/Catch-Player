@@ -1473,7 +1473,7 @@ int player_write_audio(struct DecoderData *decoder_data, JNIEnv *env,
 
 	LOGI(10, "player_write_audio playing audio track");
 	//////////////////////////////////////////////////
-	(*env)->CallVoidMethod(env, player->thiz, player->player_get_audio_data_method, samples_byte_array);
+	(*env)->CallVoidMethod(env, player->thiz, player->player_get_audio_data_method, samples_byte_array, data_size);
 	ret = (*env)->CallIntMethod(env, player->audio_track,
 			player->audio_track_write_method, samples_byte_array, 0, data_size);
 	jthrowable exc = (*env)->ExceptionOccurred(env);

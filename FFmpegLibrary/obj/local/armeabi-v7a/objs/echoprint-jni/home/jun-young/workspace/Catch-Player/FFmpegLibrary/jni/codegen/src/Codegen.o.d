@@ -4,6 +4,7 @@
  /home/jun-young/android-ndk-r9/sources/cxx-stl/gnu-libstdc++/4.6/include/iostream \
  /home/jun-young/android-ndk-r9/sources/cxx-stl/gnu-libstdc++/4.6/include/iomanip \
  /home/jun-young/android-ndk-r9/sources/cxx-stl/gnu-libstdc++/4.6/include/memory \
+ /home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/android/log.h \
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/codegen/src/Codegen.h \
  /home/jun-young/android-ndk-r9/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
  /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/codegen/src/AudioBufferInput.h \
@@ -478,6 +479,8 @@
 /home/jun-young/android-ndk-r9/sources/cxx-stl/gnu-libstdc++/4.6/include/iomanip:
 
 /home/jun-young/android-ndk-r9/sources/cxx-stl/gnu-libstdc++/4.6/include/memory:
+
+/home/jun-young/android-ndk-r9/platforms/android-9/arch-arm/usr/include/android/log.h:
 
 /home/jun-young/workspace/Catch-Player/FFmpegLibrary/jni/codegen/src/Codegen.h:
 
