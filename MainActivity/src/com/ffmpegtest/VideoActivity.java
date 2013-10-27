@@ -455,7 +455,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		{
 			mMove = true;
 
-			if(coef > 2)
+			if(coef > 4)
 			{
 				if(mTouchX < (getDeviceWidth() / 2))
 				{
