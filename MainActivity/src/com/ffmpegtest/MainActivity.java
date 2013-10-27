@@ -1,6 +1,7 @@
 package com.ffmpegtest;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.adapter.VideoListAdapter;
 import com.ffmpegtest.adapter.FolderListAdapter;
+import com.ffmpegtest.helpers.FFmpegCreateHelper;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -32,36 +34,35 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-public class MainActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
+public class MainActivity extends Activity implements OnItemClickListener,
+		OnItemLongClickListener {
 
 	private ActionBar mActionBar;
 	private SearchView mSearchView;
 	private HashMap<String, ArrayList<File>> video, save_video;
 	private ListView listView;
 	private String currentPath;
-	private final String root = Environment.getExternalStorageDirectory().getPath();
+	private final String root = Environment.getExternalStorageDirectory()
+			.getPath();
 	private ArrayList<String> path;
 	private ArrayList<Integer> videoLength;
 	private VideoFileDBAdapter dbAdapter;
 	private boolean isRoot;
 	private Menu optionsMenu;
-	public static final String supportedVideoFileFormats[] = 
-		{   "mp4","wmv","avi","mkv","dv",
-		"rm","mpg","mpeg","flv","divx",
-		"swf","h264","h263","h261",
-		"3gp","3gpp","asf","mov","m4v", "ogv",
-		"vob", "vstream", "ts", "webm",
-		"vro", "tts", "tod", "rmvb", "rec", "ps", "ogx",
-		"ogm", "nuv", "nsv", "mxf", "mts", "mpv2", "mpeg1", "mpeg2", "mpeg4",
-		"mpe", "mp4v", "mp2v", "mp2", "m2ts",
-		"m2t", "m2v", "m1v", "amv", "3gp2"
-		};
+	public static String mFFmpegInstallPath;
+	public static final String supportedVideoFileFormats[] = { "mp4", "wmv",
+			"avi", "mkv", "dv", "rm", "mpg", "mpeg", "flv", "divx", "swf",
+			"h264", "h263", "h261", "3gp", "3gpp", "asf", "mov", "m4v", "ogv",
+			"vob", "vstream", "ts", "webm", "vro", "tts", "tod", "rmvb", "rec",
+			"ps", "ogx", "ogm", "nuv", "nsv", "mxf", "mts", "mpv2", "mpeg1",
+			"mpeg2", "mpeg4", "mpe", "mp4v", "mp2v", "mp2", "m2ts", "m2t",
+			"m2v", "m1v", "amv", "3gp2" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		listView = (ListView)findViewById(R.id.video_list);
+		listView = (ListView) findViewById(R.id.video_list);
 		listView.setOnItemClickListener(this);
 		listView.setOnItemLongClickListener(this);
 
@@ -71,19 +72,18 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		dbAdapter = new VideoFileDBAdapter(this);
 		videoLength = new ArrayList<Integer>();
 
+		installFFmpeg();
+
 		initVideoMap();
 	}
 
-	/** 
-	 * 작성자 : 임창민
-	 * 메소드 이름 : initVideoMap
-	 * 매개변수 : 없음
-	 * 반환값 : 없음
-	 * 메소드 설명 : HashMap에 비디오 파일Path와 리스트를 초기화한다.
-	 */ 
+	/**
+	 * 작성자 : 임창민 메소드 이름 : initVideoMap 매개변수 : 없음 반환값 : 없음 메소드 설명 : HashMap에 비디오
+	 * 파일Path와 리스트를 초기화한다.
+	 */
 	public void initVideoMap() {
 		video = dbAdapter.getVideoFileDB();
-		if(video.size() == 0) {
+		if (video.size() == 0) {
 			new RefreshTask().execute(root);
 			setRefreshActionButtonState(true);
 		} else {
@@ -94,12 +94,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 	}
 
 	public void setAdapter(ListAdapter adapter) {
-		if(adapter.getCount() == 0) {
+		if (adapter.getCount() == 0) {
 			listView.setSelector(new PaintDrawable(0xffffff));
 			listView.setDivider(null);
 			ArrayList<String> notData = new ArrayList<String>();
 			notData.add("비디오가 없습니다.");
-			listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, notData));
+			listView.setAdapter(new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_1, notData));
 			listView.setOnItemClickListener(null);
 			listView.setOnItemLongClickListener(null);
 		} else {
@@ -111,15 +112,15 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
 	public void getVideoLength(ArrayList<String> folder) {
 		videoLength.clear();
-		for(int i=0; i<folder.size(); i++) {
+		for (int i = 0; i < folder.size(); i++) {
 			videoLength.add(video.get(folder.get(i)).size());
 		}
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> listView, View view, int position, long id)
-	{
-		if(!currentPath.equals(root) || isRoot) {
+	public void onItemClick(AdapterView<?> listView, View view, int position,
+			long id) {
+		if (!currentPath.equals(root) || isRoot) {
 			playVideo(position);
 		} else {
 			currentPath = path.get(position);
@@ -127,7 +128,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 			String[] split = currentPath.split("/");
 			String title = split[split.length - 1];
 			mActionBar.setTitle(title);
-			if(currentPath.equals(root))
+			if (currentPath.equals(root))
 				isRoot = true;
 		}
 	}
@@ -138,8 +139,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		String items[];
 		String fileName;
 		DialogInterface.OnClickListener listener;
-		if(!currentPath.equals(root) || isRoot) {
-			items = new String[]{ "재생", "삭제", "이름 변경", "속성" };
+		if (!currentPath.equals(root) || isRoot) {
+			items = new String[] { "재생", "삭제", "이름 변경", "속성" };
 			fileName = video.get(currentPath).get(position).getName();
 			listener = new DialogInterface.OnClickListener() {
 
@@ -153,19 +154,22 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 						deleteDirectory(video.get(currentPath).get(position));
 						video.get(currentPath).remove(position);
 						getVideoLength(path);
-						setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
+						setAdapter(new VideoListAdapter(MainActivity.this,
+								video.get(currentPath)));
 						break;
 					case 2:
-						renameFile(video.get(currentPath).get(position), position);
+						renameFile(video.get(currentPath).get(position),
+								position);
 						break;
 					case 3:
-						showFileAttribute(video.get(currentPath).get(position), position);
+						showFileAttribute(video.get(currentPath).get(position),
+								position);
 						break;
 					}
 				}
 			};
 		} else {
-			items = new String[]{ "삭제", "이름 변경", "속성" };
+			items = new String[] { "삭제", "이름 변경", "속성" };
 			fileName = path.get(position);
 			listener = new DialogInterface.OnClickListener() {
 
@@ -177,13 +181,15 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 						video.remove(path.get(position));
 						path.remove(position);
 						getVideoLength(path);
-						setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
+						setAdapter(new FolderListAdapter(MainActivity.this,
+								path, videoLength));
 						break;
 					case 1:
 						renameFile(new File(path.get(position)), position);
 						break;
 					case 2:
-						showFileAttribute(new File(path.get(position)), position);
+						showFileAttribute(new File(path.get(position)),
+								position);
 						break;
 					}
 				}
@@ -208,18 +214,21 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String fileName = et_fileName.getText().toString();
-				if(!fileName.equals("")) {
+				if (!fileName.equals("")) {
 					File newFile = new File(file.getParent() + '/' + fileName);
-					if(file.renameTo(newFile)) {
-						if(!currentPath.equals(root) || isRoot) {
+					if (file.renameTo(newFile)) {
+						if (!currentPath.equals(root) || isRoot) {
 							video.get(currentPath).set(index, newFile);
-							setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
+							setAdapter(new VideoListAdapter(MainActivity.this,
+									video.get(currentPath)));
 						} else {
-							ArrayList<File> tmp_list = new ArrayList<File>(video.get(path.get(index)));
+							ArrayList<File> tmp_list = new ArrayList<File>(
+									video.get(path.get(index)));
 							video.remove(path.get(index));
 							video.put(newFile.getAbsolutePath(), tmp_list);
 							path = new ArrayList<String>(video.keySet());
-							setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
+							setAdapter(new FolderListAdapter(MainActivity.this,
+									path, videoLength));
 						}
 					}
 				}
@@ -237,13 +246,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		String display_size;
 
 		if (size > GB)
-			display_size = String.format("%.2f GB ", (double)size / GB);
+			display_size = String.format("%.2f GB ", (double) size / GB);
 		else if (size < GB && size > MB)
-			display_size = String.format("%.2f MB ", (double)size / MB);
+			display_size = String.format("%.2f MB ", (double) size / MB);
 		else if (size < MB && size > KB)
-			display_size = String.format("%.2f KB ", (double)size/ KB);
+			display_size = String.format("%.2f KB ", (double) size / KB);
 		else
-			display_size = String.format("%.2f Bytes ", (double)size);
+			display_size = String.format("%.2f Bytes ", (double) size);
 
 		return display_size;
 	}
@@ -251,48 +260,52 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 	public void showFileAttribute(File file, int position) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle(file.getName());
-		if(file.isDirectory()) {
+		if (file.isDirectory()) {
 			double videoSize = 0;
-			for(File f : file.listFiles()) 
+			for (File f : file.listFiles())
 				videoSize += f.length();
 
-
-			alert.setMessage("폴더\n" + 
-					"\n위치 : " + file.getAbsolutePath() + 
-					"\n수정된 날짜 : " + new SimpleDateFormat("MM/dd/yyyy").format(file.lastModified()) + 
-					"\n비디오 개수 : " + videoLength.get(position) +
-					"\n비디오 크기 : " + getVideoSize(videoSize));
+			alert.setMessage("폴더\n"
+					+ "\n위치 : "
+					+ file.getAbsolutePath()
+					+ "\n수정된 날짜 : "
+					+ new SimpleDateFormat("MM/dd/yyyy").format(file
+							.lastModified()) + "\n비디오 개수 : "
+					+ videoLength.get(position) + "\n비디오 크기 : "
+					+ getVideoSize(videoSize));
 		} else {
-			alert.setMessage("비디오파일\n" + 
-					"\n이름 : " + file.getName() +
-					"\n위치 : " + file.getParent() + 
-					"\n수정된 날짜 : " + new SimpleDateFormat("MM/dd/yyyy").format(file.lastModified()) + 
-					"\n비디오 크기 : " + getVideoSize(file.length()));
+			alert.setMessage("비디오파일\n"
+					+ "\n이름 : "
+					+ file.getName()
+					+ "\n위치 : "
+					+ file.getParent()
+					+ "\n수정된 날짜 : "
+					+ new SimpleDateFormat("MM/dd/yyyy").format(file
+							.lastModified()) + "\n비디오 크기 : "
+					+ getVideoSize(file.length()));
 		}
 
 		alert.setPositiveButton("확인", null);
 		alert.show();
 	}
 
-	/** 
-	 * 작성자 : 임창민
-	 * 메소드 이름 : getDir
-	 * 매개변수 : String
-	 * 반환값 : 없음
-	 * 메소드 설명 : root부터 모든 path를 재귀호출하면서 동영상 파일을 찾는다.
-	 */ 
+	/**
+	 * 작성자 : 임창민 메소드 이름 : getDir 매개변수 : String 반환값 : 없음 메소드 설명 : root부터 모든 path를
+	 * 재귀호출하면서 동영상 파일을 찾는다.
+	 */
 	public void getDir(String str_path) {
 		File f = new File(str_path);
 		File[] files = f.listFiles();
-		for(int i=0; i<files.length; i++) {
+		for (int i = 0; i < files.length; i++) {
 			File file = files[i];
-			if(file.isDirectory() && !file.isHidden() && !file.getPath().contains("/Android/data/"))
+			if (file.isDirectory() && !file.isHidden()
+					&& !file.getPath().contains("/Android/data/"))
 				getDir(file.getAbsolutePath());
 			else {
 				String fileName = file.getName();
 				String filePath = file.getParent();
-				if(isVideoFile(fileName)) {
-					if(!save_video.containsKey(filePath)) {
+				if (isVideoFile(fileName)) {
+					if (!save_video.containsKey(filePath)) {
 						save_video.put(filePath, new ArrayList<File>());
 						Log.e("newKey", filePath);
 					}
@@ -303,28 +316,27 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		}
 	}
 
-	/** 
-	 * 작성자 : 임창민
-	 * 메소드 이름 : isVideoFile
-	 * 매개변수 : String
-	 * 반환값 : boolean
-	 * 메소드 설명 : Video파일인지 검사한다.
-	 */ 
-	public static boolean isVideoFile(String file){
-		if(file==null || file ==""){
+	/**
+	 * 작성자 : 임창민 메소드 이름 : isVideoFile 매개변수 : String 반환값 : boolean 메소드 설명 :
+	 * Video파일인지 검사한다.
+	 */
+	public static boolean isVideoFile(String file) {
+		if (file == null || file == "") {
 			return false;
 		}
 		String ext = file.toString();
 		String sub_ext = ext.substring(ext.lastIndexOf(".") + 1);
-		if (Arrays.asList(supportedVideoFileFormats).contains(sub_ext.toLowerCase())){
-			return true; 
+		if (Arrays.asList(supportedVideoFileFormats).contains(
+				sub_ext.toLowerCase())) {
+			return true;
 		}
 		return false;
 	}
 
 	public void playVideo(int position) {
 		Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
-		i.putStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST, getStringFileList(video.get(currentPath)));
+		i.putStringArrayListExtra(AppConstants.VIDEO_PLAY_ACTION_LIST,
+				getStringFileList(video.get(currentPath)));
 		i.putExtra(AppConstants.VIDEO_PLAY_ACTION_INDEX, position);
 
 		startActivity(i);
@@ -332,7 +344,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 
 	public ArrayList<String> getStringFileList(ArrayList<File> videoList) {
 		ArrayList<String> stringList = new ArrayList<String>();
-		for(int i=0; i<videoList.size(); i++) 
+		for (int i = 0; i < videoList.size(); i++)
 			stringList.add(videoList.get(i).getAbsolutePath());
 
 		return stringList;
@@ -347,37 +359,39 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setTitle("폴더");
 
-		mSearchView = (SearchView)menu.findItem(R.id.menu_search).getActionView();
+		mSearchView = (SearchView) menu.findItem(R.id.menu_search)
+				.getActionView();
 		mSearchView.setQueryHint("비디오 검색");
-		mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+		mSearchView
+				.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
+					@Override
+					public boolean onQueryTextSubmit(String query) {
+						ArrayList<String> findList = new ArrayList<String>();
+						for (int i = 0; i < path.size(); i++) {
+							ArrayList<File> tmp_list = video.get(path.get(i));
+							for (int j = 0; j < tmp_list.size(); j++) {
+								if (tmp_list.get(j).getName().contains(query))
+									findList.add(tmp_list.get(j)
+											.getAbsolutePath());
+							}
+						}
 
+						Intent i = new Intent(MainActivity.this,
+								FindActivity.class);
+						i.putStringArrayListExtra("findList", findList);
+						i.putExtra("findQuery", query);
+						startActivity(i);
 
-			@Override
-			public boolean onQueryTextSubmit(String query) {
-				ArrayList<String> findList = new ArrayList<String>();
-				for(int i=0; i<path.size(); i++) {
-					ArrayList<File> tmp_list = video.get(path.get(i));
-					for(int j=0; j<tmp_list.size(); j++) {
-						if(tmp_list.get(j).getName().contains(query))
-							findList.add(tmp_list.get(j).getAbsolutePath());
+						return false;
 					}
-				}
 
-				Intent i = new Intent(MainActivity.this, FindActivity.class);
-				i.putStringArrayListExtra("findList", findList);
-				i.putExtra("findQuery", query);
-				startActivity(i);
-
-				return false;
-			}
-
-			@Override
-			public boolean onQueryTextChange(String newText) {
-				Log.e("체인지", newText);
-				return false;
-			}
-		});
+					@Override
+					public boolean onQueryTextChange(String newText) {
+						Log.e("체인지", newText);
+						return false;
+					}
+				});
 
 		new RefreshTask().execute(root);
 		setRefreshActionButtonState(true);
@@ -385,10 +399,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch(item.getItemId())
-		{
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 		case R.id.menu_refresh:
 			setRefreshActionButtonState(true);
 			new RefreshTask().execute(root);
@@ -398,21 +410,18 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		return true;
 	}
 
-
-	/** 
-	 * 작성자 : 임창민
-	 * 메소드 이름 : setRefreshActionButtonState
-	 * 매개변수 : boolean
-	 * 반환값 : 없음
+	/**
+	 * 작성자 : 임창민 메소드 이름 : setRefreshActionButtonState 매개변수 : boolean 반환값 : 없음
 	 * 메소드 설명 : ActionBar의 Refresh버튼을 Progress로 돌린다.
-	 */ 
+	 */
 	public void setRefreshActionButtonState(final boolean refreshing) {
 		if (optionsMenu != null) {
 			final MenuItem refreshItem = optionsMenu
 					.findItem(R.id.menu_refresh);
 			if (refreshItem != null) {
 				if (refreshing) {
-					refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+					refreshItem
+							.setActionView(R.layout.actionbar_indeterminate_progress);
 				} else {
 					refreshItem.setActionView(null);
 				}
@@ -421,17 +430,14 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		}
 	}
 
-	/** 
-	 * 작성자 : 임창민
-	 * 메소드 이름 : onBackPressed()
-	 * 매개변수 : 없음
-	 * 반환값 : 없음
-	 * 메소드 설명 : Android Back Key 리스너로 폴더에 있을때에는 루트경로로 오고 루트경로일때에는 앱을 종료시킨다.
-	 */ 
+	/**
+	 * 작성자 : 임창민 메소드 이름 : onBackPressed() 매개변수 : 없음 반환값 : 없음 메소드 설명 : Android
+	 * Back Key 리스너로 폴더에 있을때에는 루트경로로 오고 루트경로일때에는 앱을 종료시킨다.
+	 */
 	@Override
 	public void onBackPressed() {
-		if(!currentPath.equals(root) || isRoot) {
-			if(video.get(currentPath).size() == 0) {
+		if (!currentPath.equals(root) || isRoot) {
+			if (video.get(currentPath).size() == 0) {
 				video.remove(currentPath);
 				path = new ArrayList<String>(video.keySet());
 			}
@@ -452,23 +458,23 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		path = new ArrayList<String>(video.keySet());
 		getVideoLength(path);
 		dbAdapter.removeVideoFileDB();
-		for(int i=0; i<path.size(); i++)
+		for (int i = 0; i < path.size(); i++)
 			dbAdapter.saveVideoFileDB(video.get(path.get(i)));
 	}
 
 	public boolean deleteDirectory(File path) {
-		if(!path.exists()) {
+		if (!path.exists()) {
 			return false;
 		}
 
-		if(path.isDirectory()) {
+		if (path.isDirectory()) {
 
 			File[] files = path.listFiles();
-			for(int i=0; i<files.length; i++) {
-				if(isVideoFile(files[i].getName())) {
+			for (int i = 0; i < files.length; i++) {
+				if (isVideoFile(files[i].getName())) {
 					files[i].delete();
 
-					Log.e(files[i].getName()+"삭제", files[i].getAbsolutePath());
+					Log.e(files[i].getName() + "삭제", files[i].getAbsolutePath());
 				}
 			}
 
@@ -477,11 +483,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 		return path.delete();
 	}
 
-	/** 
-	 * 작성자 : 임창민
-	 * 클래스 이름 : RefreshTask
-	 * 클래스 설명 : 디바이스의 디렉터리를 모두 검사해서 Video파일을 찾아내서 캐시에 저장한다.
-	 */ 
+	/**
+	 * 작성자 : 임창민 클래스 이름 : RefreshTask 클래스 설명 : 디바이스의 디렉터리를 모두 검사해서 Video파일을 찾아내서
+	 * 캐시에 저장한다.
+	 */
 	private class RefreshTask extends AsyncTask<String, Void, Boolean> {
 
 		@Override
@@ -496,15 +501,41 @@ public class MainActivity extends Activity implements OnItemClickListener, OnIte
 			setRefreshActionButtonState(false);
 
 			initFinalize();
-//			if(!path.contains(currentPath)) {
-//				currentPath = root;
-//				mActionBar.setTitle("폴더");
-//			}
+			// if(!path.contains(currentPath)) {
+			// currentPath = root;
+			// mActionBar.setTitle("폴더");
+			// }
 
-			if(!currentPath.equals(root) || isRoot)
-				setAdapter(new VideoListAdapter(MainActivity.this, video.get(currentPath)));
+			if (!currentPath.equals(root) || isRoot)
+				setAdapter(new VideoListAdapter(MainActivity.this,
+						video.get(currentPath)));
 			else
-				setAdapter(new FolderListAdapter(MainActivity.this, path, videoLength));
+				setAdapter(new FolderListAdapter(MainActivity.this, path,
+						videoLength));
 		}
+	}
+
+	/**
+	 * 작성자 : 이준영 메소드 이름 : installFFmpeg 메소드 설명 : ffmpeg 실행파일을 로컬 디바이스에 설치한다.
+	 *
+	 */
+	public void installFFmpeg()
+	{
+		File ffmpegFile = new File(getCacheDir(), "ffmpeg");
+		mFFmpegInstallPath = ffmpegFile.toString();
+
+		System.out.println("path : " + mFFmpegInstallPath);
+
+		if (!ffmpegFile.exists()) {
+			try {
+				ffmpegFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			FFmpegCreateHelper.installBinaryFromRaw(this, R.raw.ffmpeg,
+					ffmpegFile);
+		}
+
+		ffmpegFile.setExecutable(true);
 	}
 }
