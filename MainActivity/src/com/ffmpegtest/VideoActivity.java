@@ -310,8 +310,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				path = file.getAbsolutePath();
 			}
 		}
-
-		mTitle.setText(file.getName());
+		
+		String[] split = path.split("/");
+		String title = split[split.length - 1];
+		mTitle.setText(title);
 
 		this.mPlayPauseButton.setImageResource(R.drawable.pause);
 		this.mPlayPauseButton.setEnabled(true);
