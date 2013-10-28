@@ -21,10 +21,8 @@ package com.ffmpegtest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -43,11 +41,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -63,7 +59,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -79,7 +74,6 @@ import com.appunite.ffmpeg.NotPlayingException;
 import com.ffmpegtest.adapter.PPLListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.helpers.AudioFingerPrintHelper;
-import com.ffmpegtest.helpers.RectEvaluator;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
