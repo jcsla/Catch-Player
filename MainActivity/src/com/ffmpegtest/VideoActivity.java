@@ -21,8 +21,11 @@ package com.ffmpegtest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -292,11 +295,46 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			@Override
 			protected Void doInBackground(Void... arg) {
+				System.out.println(MainActivity.mFFmpegInstallPath + " " + path);
+				System.out.println("doInBackground");
 				fingerprint.create().run();
+				System.out.println("complete run");
 				return null;
+			}
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				System.out.println("onPostExcute");
+				
+				//String path = Environment.getExternalStorageDirectory() + "/android/data";
+				//File listFile = new File(path);
+				//for(File f : listFile.listFiles()) {
+				//	String str = f.getName();
+				//	System.out.println(str);
+				//}
+				//readDevNullFile();
 			}
 
 		}.execute();
+	}
+	
+	public void readDevNullFile()
+	{
+		try {
+			File file = new File(Environment.getExternalStorageDirectory() + "/android/data/temp");
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			
+			String line = null;
+			
+			while((line = bufferedReader.readLine()) != null)
+				System.out.println(line);
+			
+			bufferedReader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void setDataSource()

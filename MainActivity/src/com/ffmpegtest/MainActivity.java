@@ -532,10 +532,9 @@ public class MainActivity extends Activity implements OnItemClickListener,
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			FFmpegCreateHelper.installBinaryFromRaw(this, R.raw.ffmpeg,
-					ffmpegFile);
 		}
-
+		
+		FFmpegCreateHelper.installBinaryFromRaw(this, R.raw.ffmpeg, ffmpegFile);
 		ffmpegFile.setExecutable(true);
 	}
 }
