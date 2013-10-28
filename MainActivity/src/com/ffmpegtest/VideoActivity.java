@@ -228,6 +228,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
+		
+		prepareAudioFingerPrint();
 
 		setDataSource();
 
@@ -284,6 +286,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mMpegPlayer.setMpegListener(null);
 		this.mMpegPlayer.stop();
 		stop();
+	}
+	
+	public void prepareAudioFingerPrint()
+	{
+		
 	}
 
 	private void setDataSource()
