@@ -292,7 +292,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				//fingerprint.create().run();
+				fingerprint.create().run();
 				return null;
 			}
 
