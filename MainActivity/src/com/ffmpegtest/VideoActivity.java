@@ -40,6 +40,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -77,6 +78,7 @@ import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
 import com.ffmpegtest.adapter.PPLListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
+import com.ffmpegtest.helpers.AudioFingerPrintHelper;
 import com.ffmpegtest.helpers.RectEvaluator;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
@@ -229,7 +231,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
 		
-		prepareAudioFingerPrint();
+		//startAudioFingerPrint();
 
 		setDataSource();
 
@@ -288,9 +290,19 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		stop();
 	}
 	
-	public void prepareAudioFingerPrint()
+	public void startAudioFingerPrint()
 	{
+		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath);
 		
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... arg) {
+				//fingerprint.create().run();
+				return null;
+			}
+
+		}.execute();
 	}
 
 	private void setDataSource()
