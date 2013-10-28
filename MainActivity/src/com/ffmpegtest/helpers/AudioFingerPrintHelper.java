@@ -11,19 +11,20 @@ public class AudioFingerPrintHelper
 	private String ffmpegPath;
 	private String videoFilePath;
 	
-	// need parameter of video file path
 	public AudioFingerPrintHelper(String ffmpegPath, String videoFilePath)
 	{
 		this.ffmpegPath = ffmpegPath;
 		this.videoFilePath = videoFilePath;
 	}
 	
-	// temp 삭제 확
 	public ProcessRunnableHelper create()
 	{
 		final List<String> cmd = new LinkedList<String>();
 		String path = Environment.getExternalStorageDirectory() + "/android/data/";
-		File dataFile = new File(path, "temp");
+		File dataFile = new File(path, "audioData");
+		if(dataFile.exists())
+			dataFile.delete();
+		
 		FFmpegCreateHelper.doChmod(dataFile, 777);
 		cmd.add(ffmpegPath);
 		cmd.add("-i");
@@ -36,8 +37,7 @@ public class AudioFingerPrintHelper
 		cmd.add("2000");
 		cmd.add("-acodec");
 		cmd.add("pcm_s16le");
-		cmd.add(path + "/aaa.raw");
-		//cmd.add(path + "/temp");
+		cmd.add(path + "/audioData");
 		
 		final ProcessBuilder pb = new ProcessBuilder(cmd);
 		

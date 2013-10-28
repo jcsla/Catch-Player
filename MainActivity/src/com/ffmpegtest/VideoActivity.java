@@ -306,6 +306,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			protected void onPostExecute(Void result) {
 				System.out.println("onPostExcute");
 				
+				// param.h main.cxx
+				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전!!!
 				//String path = Environment.getExternalStorageDirectory() + "/android/data";
 				//File listFile = new File(path);
 				//for(File f : listFile.listFiles()) {
