@@ -224,10 +224,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
-		
-		//startAudioFingerPrint();
 
 		setDataSource();
+		
+		startAudioFingerPrint();
 
 		setSubtitleSource();
 
@@ -286,7 +286,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 	public void startAudioFingerPrint()
 	{
-		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath);
+		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path);
 		
 		new AsyncTask<Void, Void, Void>() {
 
