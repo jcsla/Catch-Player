@@ -214,8 +214,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		
 		//홀드버튼
 		holdCheck = true;
-		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-		registerReceiver(screenoff, offFilter);
+//		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+//		registerReceiver(screenoff, offFilter);
 		
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
