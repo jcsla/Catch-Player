@@ -82,7 +82,7 @@ import com.ffmpegtest.helpers.AudioFingerPrintHelper;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
-	private FFmpegPlayer mMpegPlayer;
+	public static FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
 
 	private View mFullLayout;
@@ -137,7 +137,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	ArrayList<SubtitleData> parsedSubtitleDataList;
 
 	private File file;
-	private String path;
+	public static String path;
 	private int index;
 	private int indexSubtitle;
 	private long currentTime;
@@ -232,7 +232,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		setDataSource();
 		
-		startAudioFingerPrint();
+		AudioFingerPrintHelper.startAudioFingerPrint();
 
 		setSubtitleSource();
 
@@ -287,78 +287,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mMpegPlayer.setMpegListener(null);
 		this.mMpegPlayer.stop();
 		stop();
-	}
-	
-	public void startAudioFingerPrint()
-	{
-		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path);
-		
-		new AsyncTask<Void, Void, Void>() {
-
-			@Override
-			protected Void doInBackground(Void... arg) {
-				//fingerprint.create().run();
-				//readAudioDataFile();
-				return null;
-			}
-			
-			@Override
-			protected void onPostExecute(Void result) {
-				System.out.println("onPostExcute");
-				
-				// param.h main.cxx
-				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전송!!!
-				//String path = Environment.getExternalStorageDirectory() + "/android/data";
-				//File listFile = new File(path);
-				//for(File f : listFile.listFiles()) {
-				//	String str = f.getName();
-				//	System.out.println(str);
-				//}
-				//readAudioDataFile();
-				//System.out.println(data[0]);
-				//String s = mMpegPlayer.codegen(data, data.length);
-				//System.out.println(s);
-			}
-
-		}.execute();
-	}
-	
-	public float[] readAudioDataFile()
-	{
-		File file = new File(Environment.getExternalStorageDirectory() + "/android/data/audioData");
-		InputStream in = null;
-
-		if (file.isFile())
-		{
-			long size = file.length();
-			System.out.println(size);
-			try {
-				in = new FileInputStream(file);
-				return readStreamAsDoubleArray(in, size);
-			} catch (Exception e) {
-
-			}
-		}
-		return null;
-	}
-	
-	public float[] readStreamAsDoubleArray(InputStream in, long size)
-	{
-		int bufferSize = (int) (size / 2);
-		float[] result = new float[bufferSize];
-		DataInputStream is = new DataInputStream(in);
-		
-		for (int i = 0; i < bufferSize; i++) {
-			try {
-				result[i] = is.readShort() / Short.MAX_VALUE;
-				//System.out.println(result[i]);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		String s = mMpegPlayer.codegen(result, bufferSize);
-		System.out.println(s);
-		return result;
 	}
 
 	private void setDataSource()

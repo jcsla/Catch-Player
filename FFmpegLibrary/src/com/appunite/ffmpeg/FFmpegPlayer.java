@@ -18,6 +18,11 @@
 
 package com.appunite.ffmpeg;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -27,6 +32,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.view.Surface;
 
 public class FFmpegPlayer {
@@ -464,8 +470,6 @@ public class FFmpegPlayer {
 	{
 		this.mpegListener = mpegListener;
 	}
-	
-	
 	
 	// not used
 	private void getAudioData(byte[] audioData, int numSamples)
