@@ -42,6 +42,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
+import android.media.audiofx.BassBoost.Settings;
 import android.net.Uri;
 import android.net.rtp.AudioStream;
 import android.os.AsyncTask;
@@ -50,6 +51,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings.SettingNotFoundException;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -965,7 +967,19 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
+		//Log.e("Brightness", ""+lp.screenBrightness+" "+delta);
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
+		if(lp.screenBrightness < 0){
+			try {
+				lp.screenBrightness = (android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS)/100f);
+				//Log.e("Brightness", "                                               "+lp.screenBrightness);
+			} catch (SettingNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(lp.screenBrightness >= 0.01){
+			lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
+		}
 		float brightnessValue = (lp.screenBrightness*14)+1;
 		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
 		getWindow().setAttributes(lp);
@@ -1013,6 +1027,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	                return true;
+	        case KeyEvent.KEYCODE_HOME:
+//				홈키 이벤트라는데 모르겠음	       
+	        	/*	this.mMpegPlayer.setMpegListener(null);
+	    		this.mMpegPlayer.stop();
+	    		stop();
+	    		saveVideoTime();
+	    		finish();*/
+	        	return true;
 	        case KeyEvent.KEYCODE_BACK:
 	    		if (onPPL) {
 	    			if(mPlay) {
