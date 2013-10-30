@@ -1,6 +1,7 @@
 package com.ffmpegtest.helpers;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class AudioFingerPrintHelper
 			@Override
 			protected Void doInBackground(Void... arg) {
 				//fingerprint.create().run();
-				//readAudioDataFile();
+				readAudioDataFile();
 				return null;
 			}
 			
@@ -89,7 +90,7 @@ public class AudioFingerPrintHelper
 		}.execute();
 	}
 	
-	public float[] readAudioDataFile()
+	public static float[] readAudioDataFile()
 	{
 		File file = new File(Environment.getExternalStorageDirectory() + "/android/data/audioData");
 		InputStream in = null;
@@ -100,7 +101,7 @@ public class AudioFingerPrintHelper
 			System.out.println(size);
 			try {
 				in = new FileInputStream(file);
-				return readStreamAsDoubleArray(in, size);
+				return readStreamAsFloatArray(in, size);
 			} catch (Exception e) {
 
 			}
@@ -108,22 +109,30 @@ public class AudioFingerPrintHelper
 		return null;
 	}
 	
-	public float[] readStreamAsDoubleArray(InputStream in, long size)
+	public static float[] readStreamAsFloatArray(InputStream in, long size)
 	{
-		int bufferSize = (int) (size / 2);
+		int bufferSize = (int) (size);
 		float[] result = new float[bufferSize];
 		DataInputStream is = new DataInputStream(in);
-		
-		for (int i = 0; i < bufferSize; i++) {
-			try {
-				result[i] = is.readShort() / Short.MAX_VALUE;
-				//System.out.println(result[i]);
-			} catch (IOException e) {
-				e.printStackTrace();
+		try
+		{
+			int i = 0;
+			while(is.available() > 0) {
+				result[i] = (float) (swap(is.readShort()) / 32768.0);
+				i = i + 1;
 			}
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
 		}
 		String s = VideoActivity.mMpegPlayer.codegen(result, bufferSize);
 		System.out.println(s);
 		return result;
 	}
+	
+	public static short swap(short x)
+	{
+		return (short)((x << 8) | ((x >> 8) & 0xff));
+    }
 }
