@@ -31,10 +31,10 @@ public class AudioFingerPrintHelper
 		cmd.add(videoFilePath);
 		cmd.add("-ac");
 		cmd.add("1");
-		cmd.add("-ar");
-		cmd.add("2000");
 		cmd.add("-f");
 		cmd.add("s16le");
+		cmd.add("-ar");
+		cmd.add("2000");
 		cmd.add("-t");
 		cmd.add("0");
 		cmd.add("-ss");
