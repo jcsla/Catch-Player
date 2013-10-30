@@ -33,8 +33,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -210,7 +212,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		dbAdapter = new VideoFileDBAdapter(this);
 		
+		//홀드버튼
 		holdCheck = true;
+		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+		registerReceiver(screenoff, offFilter);
 		
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
@@ -249,10 +254,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 0, Menu.NONE, "설정").setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, 1, Menu.NONE, "도움말").setIcon(android.R.drawable.ic_menu_help);
-		
-		return true;
+		if(holdCheck == true){
+			menu.add(0, 0, Menu.NONE, "설정").setIcon(android.R.drawable.ic_menu_preferences);
+			menu.add(0, 1, Menu.NONE, "도움말").setIcon(android.R.drawable.ic_menu_help);
+			
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -265,7 +273,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
 	@Override
 	protected void onPause()
 	{
@@ -287,12 +295,37 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	protected void onDestroy()
 	{
-		super.onDestroy();
 		Log.e("Flag", "onDestroy");
 		this.mMpegPlayer.setMpegListener(null);
 		this.mMpegPlayer.stop();
 		stop();
+		super.onDestroy();
+		//unregisterBroadcast();
 	}
+	
+/*	private void unregisterBroadcast()
+	{
+		unregisterReceiver(screenoff);
+	}
+	
+	BroadcastReceiver screenoff = new BroadcastReceiver(){
+		public static final String Screenoff = "android.intent.action.SCREEN_OFF";
+		
+		public void onReceive(android.content.Context context, Intent intent) {
+			if(!intent.getAction().equals(Screenoff))return;
+			
+			if(holdCheck == true){
+				Intent holdIntent = new Intent(Intent.ACTION_SCREEN_ON);
+				startActivity(holdIntent);
+			}else if(holdCheck == false){
+				mMpegPlayer.setMpegListener(null);
+				mMpegPlayer.stop();
+				stop();
+			}
+			
+		}
+		
+	};*/
 
 	private void setDataSource()
 	{
