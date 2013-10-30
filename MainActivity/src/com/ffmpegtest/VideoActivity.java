@@ -19,13 +19,13 @@
 package com.ffmpegtest;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,6 +41,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.net.rtp.AudioStream;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -295,10 +296,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				System.out.println(MainActivity.mFFmpegInstallPath + " " + path);
-				System.out.println("doInBackground");
-				fingerprint.create().run();
-				System.out.println("complete run");
+				//fingerprint.create().run();
+				readAudioDataFile();
 				return null;
 			}
 			
@@ -307,36 +306,57 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				System.out.println("onPostExcute");
 				
 				// param.h main.cxx
-				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전!!!
+				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전송!!!
 				//String path = Environment.getExternalStorageDirectory() + "/android/data";
 				//File listFile = new File(path);
 				//for(File f : listFile.listFiles()) {
 				//	String str = f.getName();
 				//	System.out.println(str);
 				//}
-				//readDevNullFile();
+				readAudioDataFile();
+				//System.out.println(data[0]);
+				//String s = mMpegPlayer.codegen(data, data.length);
+				//System.out.println(s);
 			}
 
 		}.execute();
 	}
 	
-	public void readDevNullFile()
+	public float[] readAudioDataFile()
 	{
-		try {
-			File file = new File(Environment.getExternalStorageDirectory() + "/android/data/temp");
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			
-			String line = null;
-			
-			while((line = bufferedReader.readLine()) != null)
-				System.out.println(line);
-			
-			bufferedReader.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		File file = new File(Environment.getExternalStorageDirectory() + "/android/data/audioData");
+		InputStream in = null;
+
+		if (file.isFile())
+		{
+			long size = file.length();
+			try {
+				in = new FileInputStream(file);
+				return readStreamAsDoubleArray(in, size);
+			} catch (Exception e) {
+
+			}
 		}
+		return null;
+	}
+	
+	public float[] readStreamAsDoubleArray(InputStream in, long size)
+	{
+		int bufferSize = (int) (size / 2);
+		float[] result = new float[bufferSize];
+		DataInputStream is = new DataInputStream(in);
+		
+		for (int i = 0; i < bufferSize; i++) {
+			try {
+				result[i] = is.readShort() / Short.MAX_VALUE;
+				//System.out.println(result[i]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		String s = mMpegPlayer.codegen(result, bufferSize);
+		System.out.println(s);
+		return result;
 	}
 
 	private void setDataSource()
