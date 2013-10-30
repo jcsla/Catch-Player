@@ -296,7 +296,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				fingerprint.create().run();
+				//fingerprint.create().run();
 				//readAudioDataFile();
 				return null;
 			}
@@ -313,7 +313,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//	String str = f.getName();
 				//	System.out.println(str);
 				//}
-				readAudioDataFile();
+				//readAudioDataFile();
 				//System.out.println(data[0]);
 				//String s = mMpegPlayer.codegen(data, data.length);
 				//System.out.println(s);
