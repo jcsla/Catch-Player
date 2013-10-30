@@ -121,6 +121,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private boolean mHold = false;
 	private boolean mMove = false;
 	private boolean mSeek = false;
+	private boolean isFinish = false;
 	private boolean mUseSubtitle = false;
 	private int seekValue;
 	private float mTouchX;
@@ -719,17 +720,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mCurrentTime.setText(parseTime(currentTimeS));
 		mTotalTime.setText(parseTime(videoDurationS));
 
-		if (isFinished)
-		{
-			mSeekBar.setProgress(0);
-
-			// 다음 동영상 재생 여부 확인
-			// ok이면 다음 동영상으로 넘어감.
-
-			//new AlertDialog.Builder(this)
-			//		.setTitle(R.string.dialog_end_of_video_title)
-			//		.setMessage(R.string.dialog_end_of_video_message)
-			//		.setCancelable(true).show();
+		if (isFinished) {
+			isFinish = true;
+			nextVideo();
+			isFinish = false;
 		}
 	}
 
@@ -906,33 +900,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		if (onPPL) {
-			if(mPlay) {
-				mMpegPlayer.resume();
-				mTouchPressed = false;
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				this.mTitleBar.setVisibility(View.GONE);
-				this.mControlsView.setVisibility(View.GONE);
-				this.mPPLButton.setVisibility(View.GONE);
-			}
-
-			mPPLLayout.setVisibility(View.GONE);
-			mSeekBar.setEnabled(true);
-			onPPL = false;
-		} 
-		else if (mHold);
-		else {
-			mUseSubtitle = false;
-			saveVideoTime();
-			finish();
-		}
-	}
-
 	public void saveVideoTime() {
 		int now = (int) (mMpegPlayer.getCurrentTime() / 1000 / 1000);
-		dbAdapter.saveVideoTime(path, now);
+		if(isFinish)
+			dbAdapter.saveVideoTime(path, 1);
+		else
+			dbAdapter.saveVideoTime(path, now);
+
 	}
 
 
@@ -988,50 +962,30 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	                return true;
 	        case KeyEvent.KEYCODE_BACK:
-	        	this.finish();
+	    		if (onPPL) {
+	    			if(mPlay) {
+	    				mMpegPlayer.resume();
+	    				mTouchPressed = false;
+	    				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	    				this.mTitleBar.setVisibility(View.GONE);
+	    				this.mControlsView.setVisibility(View.GONE);
+	    				this.mPPLButton.setVisibility(View.GONE);
+	    			}
+
+	    			mPPLLayout.setVisibility(View.GONE);
+	    			mSeekBar.setEnabled(true);
+	    			onPPL = false;
+	    		} 
+	    		else if (mHold);
+	    		else {
+	    			mUseSubtitle = false;
+	    			saveVideoTime();
+	    			finish();
+	    		}
 	            return true;
 	        }
 	 
 	        return false;
-	}
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		AudioManager mAudioManager = 
-		           (AudioManager)getSystemService(AUDIO_SERVICE);
-		        switch (keyCode) {
-		        case KeyEvent.KEYCODE_VOLUME_UP :
-		            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
-		                                             AudioManager.ADJUST_SAME, 
-		                                             AudioManager.FLAG_SHOW_UI);
-		            mControllerHandler = new Handler(){
-						@Override
-						public void handleMessage(Message msg) {
-							mVolumeBrightnessControlView.setVisibility(View.GONE);
-						}
-					};
-					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
-		                return true;
-		        case KeyEvent.KEYCODE_VOLUME_DOWN:
-		            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
-		                                             AudioManager.ADJUST_SAME, 
-		                                             AudioManager.FLAG_SHOW_UI);
-		            mControllerHandler = new Handler(){
-						@Override
-						public void handleMessage(Message msg) {
-							mVolumeBrightnessControlView.setVisibility(View.GONE);
-						}
-					};
-					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
-		                return true;
-		        case KeyEvent.KEYCODE_BACK:
-		            this.finish();
-		            return true;
-		        }
-		        return false;
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)

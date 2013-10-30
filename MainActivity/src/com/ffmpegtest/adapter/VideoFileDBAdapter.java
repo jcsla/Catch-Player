@@ -50,8 +50,9 @@ public class VideoFileDBAdapter {
 		cv.put("file", AbsoulteFilePath);
 		cv.put("playTime", playTime);
 
-		if(getVideoTime(AbsoulteFilePath) == 0)
+		if(getVideoTime(AbsoulteFilePath) == 0) {
 			db.insert(play_time_db_name, null, cv);
+		}
 		else {
 			String whereClause = "file = ?";
 			String[] whereArgs = new String[] { AbsoulteFilePath };

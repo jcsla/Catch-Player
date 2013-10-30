@@ -11,6 +11,7 @@ import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.adapter.VideoListAdapter;
 import com.ffmpegtest.adapter.FolderListAdapter;
 import com.ffmpegtest.helpers.FFmpegCreateHelper;
+import com.ffmpegtest.helpers.Util;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -50,13 +51,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 	private boolean isRoot;
 	private Menu optionsMenu;
 	public static String mFFmpegInstallPath;
-	public static final String supportedVideoFileFormats[] = { "mp4", "wmv",
-			"avi", "mkv", "dv", "rm", "mpg", "mpeg", "flv", "divx", "swf",
-			"h264", "h263", "h261", "3gp", "3gpp", "asf", "mov", "m4v", "ogv",
-			"vob", "vstream", "ts", "webm", "vro", "tts", "tod", "rmvb", "rec",
-			"ps", "ogx", "ogm", "nuv", "nsv", "mxf", "mts", "mpv2", "mpeg1",
-			"mpeg2", "mpeg4", "mpe", "mp4v", "mp2v", "mp2", "m2ts", "m2t",
-			"m2v", "m1v", "amv", "3gp2" };
+	private Util util;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +66,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 		save_video = new HashMap<String, ArrayList<File>>();
 		dbAdapter = new VideoFileDBAdapter(this);
 		videoLength = new ArrayList<Integer>();
+		util = Util.getInstance();
 
 		installFFmpeg();
 
@@ -141,7 +137,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 		DialogInterface.OnClickListener listener;
 		if (!currentPath.equals(root) || isRoot) {
 			items = new String[] { "재생", "삭제", "이름 변경", "속성" };
-			fileName = video.get(currentPath).get(position).getName();
+			fileName = util.removeExtension(video.get(currentPath).get(position).getName());
 			listener = new DialogInterface.OnClickListener() {
 
 				@Override
@@ -207,15 +203,29 @@ public class MainActivity extends Activity implements OnItemClickListener,
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("파일명을 입력해 주세요.");
 		final EditText et_fileName = new EditText(this);
-		et_fileName.setText(file.getName());
+		
+		String fileName;
+		if(file.isDirectory())
+			fileName = file.getName();
+		else
+			fileName = util.removeExtension(file.getName());
+		
+		et_fileName.setText(fileName);
 		alert.setView(et_fileName);
+		
 		alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String fileName = et_fileName.getText().toString();
 				if (!fileName.equals("")) {
-					File newFile = new File(file.getParent() + '/' + fileName);
+					File newFile;
+					
+					if(file.isDirectory())
+						newFile = new File(file.getParent() + '/' + fileName);
+					else
+						newFile = new File(file.getParent() + '/' + fileName + file.getName().substring(file.getName().lastIndexOf(".")));
+					
 					if (file.renameTo(newFile)) {
 						if (!currentPath.equals(root) || isRoot) {
 							video.get(currentPath).set(index, newFile);
@@ -304,7 +314,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 			else {
 				String fileName = file.getName();
 				String filePath = file.getParent();
-				if (isVideoFile(fileName)) {
+				if (util.isVideoFile(fileName)) {
 					if (!save_video.containsKey(filePath)) {
 						save_video.put(filePath, new ArrayList<File>());
 						Log.e("newKey", filePath);
@@ -320,18 +330,6 @@ public class MainActivity extends Activity implements OnItemClickListener,
 	 * 작성자 : 임창민 메소드 이름 : isVideoFile 매개변수 : String 반환값 : boolean 메소드 설명 :
 	 * Video파일인지 검사한다.
 	 */
-	public static boolean isVideoFile(String file) {
-		if (file == null || file == "") {
-			return false;
-		}
-		String ext = file.toString();
-		String sub_ext = ext.substring(ext.lastIndexOf(".") + 1);
-		if (Arrays.asList(supportedVideoFileFormats).contains(
-				sub_ext.toLowerCase())) {
-			return true;
-		}
-		return false;
-	}
 
 	public void playVideo(int position) {
 		Intent i = new Intent(AppConstants.VIDEO_PLAY_ACTION);
@@ -471,7 +469,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 
 			File[] files = path.listFiles();
 			for (int i = 0; i < files.length; i++) {
-				if (isVideoFile(files[i].getName())) {
+				if (util.isVideoFile(files[i].getName())) {
 					files[i].delete();
 
 					Log.e(files[i].getName() + "삭제", files[i].getAbsolutePath());

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ffmpegtest.R;
+import com.ffmpegtest.helpers.Util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,11 +24,13 @@ public class VideoListAdapter extends BaseAdapter {
 	private ArrayList<File> fileList = null;
 	private ViewHolder viewHolder = null;
 	private Context mContext = null;
+	private Util util = null;
 
 	public VideoListAdapter(Context c , ArrayList<File> fileList){
 		this.mContext = c;
 		this.inflater = LayoutInflater.from(c);
 		this.fileList = fileList;
+		this.util = Util.getInstance();
 	}
 
 	// Adapter가 관리할 List의 개수를 설정 합니다.
@@ -94,7 +97,7 @@ public class VideoListAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder)v.getTag();
 		}
 
-		String fileName = file.getName();
+		String fileName = util.removeExtension(file.getName());
 		viewHolder.tv_title.setText(fileName);
 
 		double size = file.length();
