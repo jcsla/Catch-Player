@@ -105,6 +105,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mVolumeBrightnessValue;
 	
 	private Handler mControllerHandler;
+	private Handler mHoldHandler;
 	
 	private ImageView mPPLButton;
 	private ListView mPPLList;
@@ -613,6 +614,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 	
 			return true;
+			}else if(holdCheck == false){
+				holdVideo();
+				return true;
 			}
 		return true;
 	}
@@ -869,7 +873,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void holdVideo() {
 		mHold = true;
 		holdCheck = false;
+
+		mHoldHandler = new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				mUnHoldButtonView.setVisibility(View.GONE);
+			}
+		};
 		mUnHoldButtonView.setVisibility(View.VISIBLE);
+		mHoldHandler.sendEmptyMessageDelayed(0, 4000);
 
 		this.mTitleBar.setVisibility(View.GONE);
 		this.mControlsView.setVisibility(View.GONE);
@@ -938,7 +950,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		AudioManager mAudioManager = 
 	            (AudioManager)getSystemService(AUDIO_SERVICE);
-	        switch (keyCode) {
+		if(holdCheck==true){
+			switch (keyCode) {
 	        case KeyEvent.KEYCODE_VOLUME_UP :
 	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
 	                                             AudioManager.ADJUST_RAISE, 
@@ -992,6 +1005,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	        }
 	 
 	        return false;
+		}else if(holdCheck==false){
+			switch (keyCode) {
+	        case KeyEvent.KEYCODE_VOLUME_UP :
+	            return true;
+	        case KeyEvent.KEYCODE_VOLUME_DOWN:
+	            return true;
+	        case KeyEvent.KEYCODE_BACK:
+	    		return true;
+	        }
+	       return false;
+		}
+		return false;
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
