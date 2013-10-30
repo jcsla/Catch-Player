@@ -33,8 +33,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -105,6 +107,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mVolumeBrightnessValue;
 	
 	private Handler mControllerHandler;
+	private Handler mHoldHandler;
 	
 	private ImageView mPPLButton;
 	private ListView mPPLList;
@@ -209,7 +212,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		dbAdapter = new VideoFileDBAdapter(this);
 		
+		//홀드버튼
 		holdCheck = true;
+//		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+//		registerReceiver(screenoff, offFilter);
 		
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
@@ -248,10 +254,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 0, Menu.NONE, "설정").setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, 1, Menu.NONE, "도움말").setIcon(android.R.drawable.ic_menu_help);
-		
-		return true;
+		if(holdCheck == true){
+			menu.add(0, 0, Menu.NONE, "설정").setIcon(android.R.drawable.ic_menu_preferences);
+			menu.add(0, 1, Menu.NONE, "도움말").setIcon(android.R.drawable.ic_menu_help);
+			
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -264,7 +273,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
 	@Override
 	protected void onPause()
 	{
@@ -286,12 +295,37 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	protected void onDestroy()
 	{
-		super.onDestroy();
 		Log.e("Flag", "onDestroy");
 		this.mMpegPlayer.setMpegListener(null);
 		this.mMpegPlayer.stop();
 		stop();
+		super.onDestroy();
+		//unregisterBroadcast();
 	}
+	
+/*	private void unregisterBroadcast()
+	{
+		unregisterReceiver(screenoff);
+	}
+	
+	BroadcastReceiver screenoff = new BroadcastReceiver(){
+		public static final String Screenoff = "android.intent.action.SCREEN_OFF";
+		
+		public void onReceive(android.content.Context context, Intent intent) {
+			if(!intent.getAction().equals(Screenoff))return;
+			
+			if(holdCheck == true){
+				Intent holdIntent = new Intent(Intent.ACTION_SCREEN_ON);
+				startActivity(holdIntent);
+			}else if(holdCheck == false){
+				mMpegPlayer.setMpegListener(null);
+				mMpegPlayer.stop();
+				stop();
+			}
+			
+		}
+		
+	};*/
 
 	private void setDataSource()
 	{
@@ -613,6 +647,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 	
 			return true;
+			}else if(holdCheck == false){
+				holdVideo();
+				return true;
 			}
 		return true;
 	}
@@ -869,7 +906,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void holdVideo() {
 		mHold = true;
 		holdCheck = false;
+
+		mHoldHandler = new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				mUnHoldButtonView.setVisibility(View.GONE);
+			}
+		};
 		mUnHoldButtonView.setVisibility(View.VISIBLE);
+		mHoldHandler.sendEmptyMessageDelayed(0, 4000);
 
 		this.mTitleBar.setVisibility(View.GONE);
 		this.mControlsView.setVisibility(View.GONE);
@@ -938,7 +983,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		AudioManager mAudioManager = 
 	            (AudioManager)getSystemService(AUDIO_SERVICE);
-	        switch (keyCode) {
+		if(holdCheck==true){
+			switch (keyCode) {
 	        case KeyEvent.KEYCODE_VOLUME_UP :
 	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
 	                                             AudioManager.ADJUST_RAISE, 
@@ -992,6 +1038,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	        }
 	 
 	        return false;
+		}else if(holdCheck==false){
+			switch (keyCode) {
+	        case KeyEvent.KEYCODE_VOLUME_UP :
+	            return true;
+	        case KeyEvent.KEYCODE_VOLUME_DOWN:
+	            return true;
+	        case KeyEvent.KEYCODE_BACK:
+	    		return true;
+	        }
+	       return false;
+		}
+		return false;
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
