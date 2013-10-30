@@ -51,6 +51,7 @@ import android.os.Message;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -296,7 +297,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				fingerprint.create().run();
+				//fingerprint.create().run();
 				//readAudioDataFile();
 				return null;
 			}
@@ -1012,7 +1013,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
-		float brightnessValue = lp.screenBrightness*100;
+		float brightnessValue = (lp.screenBrightness*14)+1;
 		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
 		getWindow().setAttributes(lp);
 	}
@@ -1023,6 +1024,86 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
 
 		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		AudioManager mAudioManager = 
+	            (AudioManager)getSystemService(AUDIO_SERVICE);
+	        switch (keyCode) {
+	        case KeyEvent.KEYCODE_VOLUME_UP :
+	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+	                                             AudioManager.ADJUST_RAISE, 
+	                                             AudioManager.FLAG_SHOW_UI);
+	            mControllerHandler = new Handler(){
+					@Override
+					public void handleMessage(Message msg) {
+						mVolumeBrightnessControlView.setVisibility(View.GONE);
+					}
+				};
+				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+	                return true;
+	        case KeyEvent.KEYCODE_VOLUME_DOWN:
+	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+	                                             AudioManager.ADJUST_LOWER, 
+	                                             AudioManager.FLAG_SHOW_UI);
+	            mControllerHandler = new Handler(){
+					@Override
+					public void handleMessage(Message msg) {
+						mVolumeBrightnessControlView.setVisibility(View.GONE);
+					}
+				};
+				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+	                return true;
+	        case KeyEvent.KEYCODE_BACK:
+	        	this.finish();
+	            return true;
+	        }
+	 
+	        return false;
+	}
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		AudioManager mAudioManager = 
+		           (AudioManager)getSystemService(AUDIO_SERVICE);
+		        switch (keyCode) {
+		        case KeyEvent.KEYCODE_VOLUME_UP :
+		            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+		                                             AudioManager.ADJUST_SAME, 
+		                                             AudioManager.FLAG_SHOW_UI);
+		            mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mVolumeBrightnessControlView.setVisibility(View.GONE);
+						}
+					};
+					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+		                return true;
+		        case KeyEvent.KEYCODE_VOLUME_DOWN:
+		            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+		                                             AudioManager.ADJUST_SAME, 
+		                                             AudioManager.FLAG_SHOW_UI);
+		            mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mVolumeBrightnessControlView.setVisibility(View.GONE);
+						}
+					};
+					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+		                return true;
+		        case KeyEvent.KEYCODE_BACK:
+		            this.finish();
+		            return true;
+		        }
+		        return false;
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
