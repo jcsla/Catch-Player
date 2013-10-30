@@ -7,6 +7,9 @@ import java.util.HashMap;
 import com.ffmpegtest.R;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +23,7 @@ public class VideoListAdapter extends BaseAdapter {
 	private ArrayList<File> fileList = null;
 	private ViewHolder viewHolder = null;
 	private Context mContext = null;
-	
+
 	public VideoListAdapter(Context c , ArrayList<File> fileList){
 		this.mContext = c;
 		this.inflater = LayoutInflater.from(c);
@@ -44,14 +47,14 @@ public class VideoListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return position;
 	}
-	
+
 	public String getVideoSize(double size) {
 		final int KB = 1024;
 		final int MB = KB * KB;
 		final int GB = MB * KB;
 
 		String display_size;
-		
+
 		if (size > GB)
 			display_size = String.format("%.2f GB ", (double)size / GB);
 		else if (size < GB && size > MB)
@@ -60,7 +63,7 @@ public class VideoListAdapter extends BaseAdapter {
 			display_size = String.format("%.2f KB ", (double)size/ KB);
 		else
 			display_size = String.format("%.2f Bytes ", (double)size);
-		
+
 		return display_size;
 	}
 
@@ -70,12 +73,20 @@ public class VideoListAdapter extends BaseAdapter {
 
 		View v = convertview;
 
+		File file = getItem(position);
+
 		if(v == null){
 			viewHolder = new ViewHolder();
 			v = inflater.inflate(R.layout.video_list, null);
 			viewHolder.tv_title = (TextView)v.findViewById(R.id.tv_video_title);
 			viewHolder.tv_size = (TextView)v.findViewById(R.id.tv_video_size);
 			viewHolder.iv_new_video = (ImageView)v.findViewById(R.id.iv_new_video);
+			viewHolder.iv_video = (ImageView)v.findViewById(R.id.iv_folder);
+
+			Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+			thumbnail = ResizeBitmap(thumbnail, 250, 150);
+			
+			viewHolder.iv_video.setImageBitmap(thumbnail);
 
 			v.setTag(viewHolder);
 
@@ -83,12 +94,10 @@ public class VideoListAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder)v.getTag();
 		}
 
-		File file = getItem(position);
 		String fileName = file.getName();
 		viewHolder.tv_title.setText(fileName);
-		
+
 		double size = file.length();
-		
 		if(file.canRead() && size > 0) {
 			String display_size = getVideoSize(size);
 			viewHolder.tv_size.setText(display_size);
@@ -96,7 +105,13 @@ public class VideoListAdapter extends BaseAdapter {
 
 		return v;
 	}
-	
+
+	public Bitmap ResizeBitmap(Bitmap bitmap, int width, int height) {
+		Bitmap sizingBmp = Bitmap.createScaledBitmap(bitmap, width, height, true);
+		
+		return sizingBmp;
+	}
+
 	/*
 	 * ViewHolder 
 	 * getView의 속도 향상을 위해 쓴다.
@@ -105,6 +120,7 @@ public class VideoListAdapter extends BaseAdapter {
 	class ViewHolder{
 		public TextView tv_title = null;
 		public TextView tv_size = null;
+		public ImageView iv_video = null;
 		public ImageView iv_new_video = null;
 	}
 

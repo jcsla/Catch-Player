@@ -2,6 +2,7 @@ package com.ffmpegtest.adapter;
 
 import java.io.File;
 import java.util.ArrayList;
+
 import com.ffmpegtest.R;
 
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FolderListAdapter extends BaseAdapter {
@@ -55,6 +57,8 @@ public class FolderListAdapter extends BaseAdapter {
 			v = inflater.inflate(R.layout.video_list, null);
 			viewHolder.tv_title = (TextView)v.findViewById(R.id.tv_video_title);
 			viewHolder.tv_size = (TextView)v.findViewById(R.id.tv_video_size);
+			viewHolder.iv_folder = (ImageView)v.findViewById(R.id.iv_folder);
+			viewHolder.iv_folder.setBackgroundResource(R.drawable.ic_launcher);
 
 			v.setTag(viewHolder);
 
@@ -79,6 +83,7 @@ public class FolderListAdapter extends BaseAdapter {
 	 * 한번의 findViewByID 로 재사용 하기 위해 viewHolder를 사용 한다.
 	 */
 	class ViewHolder{
+		public ImageView iv_folder = null;
 		public TextView tv_title = null;
 		public TextView tv_size = null;
 	}
