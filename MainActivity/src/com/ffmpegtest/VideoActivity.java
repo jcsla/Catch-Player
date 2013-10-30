@@ -112,6 +112,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
+	private Boolean holdCheck;
 
 	private AudioManager mAudioManager;
 	private int mAudioMax;
@@ -207,7 +208,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
 		dbAdapter = new VideoFileDBAdapter(this);
-
+		
+		holdCheck = true;
+		
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
 		params.height = LayoutParams.MATCH_PARENT;
@@ -446,168 +449,171 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		DisplayMetrics screen = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(screen);
-
-		float x_changed = event.getRawX() - mTouchX;
-		float y_changed = event.getRawY() - mTouchY;
-
-		float coef = Math.abs (y_changed / x_changed);
-		float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
-
-		if(event.getAction() == MotionEvent.ACTION_MOVE)
-		{
-			mMove = true;
-
-			if(coef > 4)
+		if(holdCheck==true){
+			DisplayMetrics screen = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(screen);
+	
+			float x_changed = event.getRawX() - mTouchX;
+			float y_changed = event.getRawY() - mTouchY;
+	
+			float coef = Math.abs (y_changed / x_changed);
+			float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
+	
+			if(event.getAction() == MotionEvent.ACTION_MOVE)
 			{
-				if(mTouchX < (getDeviceWidth() / 2))
+				mMove = true;
+	
+				if(coef > 4)
 				{
-					Log.e("Brightness", "Brightness");
-					doBrightnessTouch(y_changed);
-					//this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-					mControllerHandler = new Handler(){
-						@Override
-						public void handleMessage(Message msg) {
-							mVolumeBrightnessControlView.setVisibility(View.GONE);
-						}
-					};
-					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
-				}
-				if(mTouchX > (getDeviceWidth() / 2))
-				{
-					Log.e("Volume", "Volume");
-					doVolumeTouch(y_changed);
-					//this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-					//this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-					mControllerHandler = new Handler(){
-						@Override
-						public void handleMessage(Message msg) {
-							mVolumeBrightnessControlView.setVisibility(View.GONE);
-						}
-					};
-					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
-				}
-
-				return true;
-			}
-			//Log.e("Seek", "Seek");
-			doSeekTouch(coef, xgesturesize, false);
-
-			return true;
-		}
-		else if(event.getAction() == MotionEvent.ACTION_DOWN)
-		{
-			mTouchX = event.getRawX();
-			mTouchY = event.getRawY();
-
-			mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-			
-		}
-		else if(event.getAction() == MotionEvent.ACTION_UP)
-		{
-			if(mMove==true && mSeek==true)
-			{
-				mMove = false;
-				mSeek = false;
-
-				Log.e("SeekValue : ", String.valueOf(seekValue));
-
-				mMpegPlayer.seek(String.valueOf(seekValue));
-
-				return true;
-			}
-
-			if(mMove == true)
-			{
-				mMove = false;
-				return true;
-			}
-
-			if(mHold == false)
-			{
-				if(mPPLLayout.getVisibility() == View.GONE)
-				{
-					if(mTouchPressed == false)
+					if(mTouchX < (getDeviceWidth() / 2))
 					{
-						mTouchPressed = true;
-						
+						Log.e("Brightness", "Brightness");
+						doBrightnessTouch(y_changed);
+						//this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
 						mControllerHandler = new Handler(){
 							@Override
 							public void handleMessage(Message msg) {
-								mTitleBar.setVisibility(View.GONE);
-								mControlsView.setVisibility(View.GONE);
-								mPPLButton.setVisibility(View.GONE);
-								if(mUseSubtitle) {
-									RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-									params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-									params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-									params.setMargins(20, 20, 20, 20);
-									
-									mSmiview.setLayoutParams(params);
-								}
-								mTouchPressed = false;
+								mVolumeBrightnessControlView.setVisibility(View.GONE);
 							}
 						};
-						this.mTitleBar.setVisibility(View.VISIBLE);
-						this.mControlsView.setVisibility(View.VISIBLE);
-						this.mPPLButton.setVisibility(View.VISIBLE);
-						if(mUseSubtitle) {
-							RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-							params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
-							params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-							params.setMargins(20, 20, 20, 20);
+						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+						mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+					}
+					if(mTouchX > (getDeviceWidth() / 2))
+					{
+						Log.e("Volume", "Volume");
+						doVolumeTouch(y_changed);
+						//this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+						//this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+						mControllerHandler = new Handler(){
+							@Override
+							public void handleMessage(Message msg) {
+								mVolumeBrightnessControlView.setVisibility(View.GONE);
+							}
+						};
+						this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+						mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+					}
+	
+					return true;
+				}
+				//Log.e("Seek", "Seek");
+				doSeekTouch(coef, xgesturesize, false);
+	
+				return true;
+			}
+			else if(event.getAction() == MotionEvent.ACTION_DOWN)
+			{
+				mTouchX = event.getRawX();
+				mTouchY = event.getRawY();
+	
+				mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+				
+			}
+			else if(event.getAction() == MotionEvent.ACTION_UP)
+			{
+				if(mMove==true && mSeek==true)
+				{
+					mMove = false;
+					mSeek = false;
+	
+					Log.e("SeekValue : ", String.valueOf(seekValue));
+	
+					mMpegPlayer.seek(String.valueOf(seekValue));
+	
+					return true;
+				}
+	
+				if(mMove == true)
+				{
+					mMove = false;
+					return true;
+				}
+	
+				if(mHold == false)
+				{
+					if(mPPLLayout.getVisibility() == View.GONE)
+					{
+						if(mTouchPressed == false)
+						{
+							mTouchPressed = true;
 							
-							mSmiview.setLayoutParams(params);
+							mControllerHandler = new Handler(){
+								@Override
+								public void handleMessage(Message msg) {
+									mTitleBar.setVisibility(View.GONE);
+									mControlsView.setVisibility(View.GONE);
+									mPPLButton.setVisibility(View.GONE);
+									if(mUseSubtitle) {
+										RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+										params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+										params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+										params.setMargins(20, 20, 20, 20);
+										
+										mSmiview.setLayoutParams(params);
+									}
+									mTouchPressed = false;
+								}
+							};
+							this.mTitleBar.setVisibility(View.VISIBLE);
+							this.mControlsView.setVisibility(View.VISIBLE);
+							this.mPPLButton.setVisibility(View.VISIBLE);
+							if(mUseSubtitle) {
+								RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+								params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
+								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+								params.setMargins(20, 20, 20, 20);
+								
+								mSmiview.setLayoutParams(params);
+							}
+							mControllerHandler.sendEmptyMessageDelayed(0, 10000);
+							
 						}
-						mControllerHandler.sendEmptyMessageDelayed(0, 10000);
-						
+						else
+						{
+							mTouchPressed = false;
+							mControllerHandler.removeMessages(0);
+							this.mTitleBar.setVisibility(View.GONE);
+							this.mControlsView.setVisibility(View.GONE);
+							this.mPPLButton.setVisibility(View.GONE);
+							if(mUseSubtitle) {
+								RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+								params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+								params.setMargins(20, 20, 20, 20);
+								
+								mSmiview.setLayoutParams(params);
+							}
+						}
 					}
 					else
 					{
-						mTouchPressed = false;
-						mControllerHandler.removeMessages(0);
-						this.mTitleBar.setVisibility(View.GONE);
-						this.mControlsView.setVisibility(View.GONE);
-						this.mPPLButton.setVisibility(View.GONE);
-						if(mUseSubtitle) {
-							RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-							params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-							params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-							params.setMargins(20, 20, 20, 20);
-							
-							mSmiview.setLayoutParams(params);
+						if(mPlay) {
+							mMpegPlayer.resume();
+							mTouchPressed = false;
+							getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+							this.mTitleBar.setVisibility(View.GONE);
+							this.mControlsView.setVisibility(View.GONE);
+							this.mPPLButton.setVisibility(View.GONE);
 						}
+	
+						mPPLLayout.setVisibility(View.GONE);
+						mSeekBar.setEnabled(true);
+						onPPL = false;
 					}
 				}
+				// hold 상태일 때,
 				else
 				{
-					if(mPlay) {
-						mMpegPlayer.resume();
-						mTouchPressed = false;
-						getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-						this.mTitleBar.setVisibility(View.GONE);
-						this.mControlsView.setVisibility(View.GONE);
-						this.mPPLButton.setVisibility(View.GONE);
-					}
-
-					mPPLLayout.setVisibility(View.GONE);
-					mSeekBar.setEnabled(true);
-					onPPL = false;
+					mUnHoldButtonView.setVisibility(View.VISIBLE);
 				}
+	
+				return true;
 			}
-			// hold 상태일 때,
-			else
-			{
-				mUnHoldButtonView.setVisibility(View.VISIBLE);
-			}
-
+	
 			return true;
-		}
-
+			}
 		return true;
 	}
 
@@ -862,7 +868,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	// 홀드 처리
 	public void holdVideo() {
 		mHold = true;
-
+		holdCheck = false;
 		mUnHoldButtonView.setVisibility(View.VISIBLE);
 
 		this.mTitleBar.setVisibility(View.GONE);
@@ -872,7 +878,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void unholdVideo() {
 		mHold = false;
-
+		holdCheck = true;
 		mUnHoldButtonView.setVisibility(View.GONE);
 
 		this.mTitleBar.setVisibility(View.VISIBLE);
