@@ -35,6 +35,10 @@ public class AudioFingerPrintHelper
 		cmd.add("s16le");
 		cmd.add("-ar");
 		cmd.add("2000");
+		cmd.add("-t");
+		cmd.add("0");
+		cmd.add("-ss");
+		cmd.add("120");
 		cmd.add("-acodec");
 		cmd.add("pcm_s16le");
 		cmd.add(path + "/audioData");

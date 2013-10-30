@@ -19,13 +19,13 @@
 package com.ffmpegtest;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,6 +41,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.net.rtp.AudioStream;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ import android.os.Message;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -295,10 +297,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				System.out.println(MainActivity.mFFmpegInstallPath + " " + path);
-				System.out.println("doInBackground");
-				fingerprint.create().run();
-				System.out.println("complete run");
+				//fingerprint.create().run();
+				//readAudioDataFile();
 				return null;
 			}
 			
@@ -307,36 +307,58 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				System.out.println("onPostExcute");
 				
 				// param.h main.cxx
-				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전!!!
+				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전송!!!
 				//String path = Environment.getExternalStorageDirectory() + "/android/data";
 				//File listFile = new File(path);
 				//for(File f : listFile.listFiles()) {
 				//	String str = f.getName();
 				//	System.out.println(str);
 				//}
-				//readDevNullFile();
+				//readAudioDataFile();
+				//System.out.println(data[0]);
+				//String s = mMpegPlayer.codegen(data, data.length);
+				//System.out.println(s);
 			}
 
 		}.execute();
 	}
 	
-	public void readDevNullFile()
+	public float[] readAudioDataFile()
 	{
-		try {
-			File file = new File(Environment.getExternalStorageDirectory() + "/android/data/temp");
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			
-			String line = null;
-			
-			while((line = bufferedReader.readLine()) != null)
-				System.out.println(line);
-			
-			bufferedReader.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		File file = new File(Environment.getExternalStorageDirectory() + "/android/data/audioData");
+		InputStream in = null;
+
+		if (file.isFile())
+		{
+			long size = file.length();
+			System.out.println(size);
+			try {
+				in = new FileInputStream(file);
+				return readStreamAsDoubleArray(in, size);
+			} catch (Exception e) {
+
+			}
 		}
+		return null;
+	}
+	
+	public float[] readStreamAsDoubleArray(InputStream in, long size)
+	{
+		int bufferSize = (int) (size / 2);
+		float[] result = new float[bufferSize];
+		DataInputStream is = new DataInputStream(in);
+		
+		for (int i = 0; i < bufferSize; i++) {
+			try {
+				result[i] = is.readShort() / Short.MAX_VALUE;
+				//System.out.println(result[i]);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		String s = mMpegPlayer.codegen(result, bufferSize);
+		System.out.println(s);
+		return result;
 	}
 
 	private void setDataSource()
@@ -991,7 +1013,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
-		float brightnessValue = lp.screenBrightness*100;
+		float brightnessValue = (lp.screenBrightness*14)+1;
 		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
 		getWindow().setAttributes(lp);
 	}
@@ -1002,6 +1024,86 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
 
 		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		AudioManager mAudioManager = 
+	            (AudioManager)getSystemService(AUDIO_SERVICE);
+	        switch (keyCode) {
+	        case KeyEvent.KEYCODE_VOLUME_UP :
+	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+	                                             AudioManager.ADJUST_RAISE, 
+	                                             AudioManager.FLAG_SHOW_UI);
+	            mControllerHandler = new Handler(){
+					@Override
+					public void handleMessage(Message msg) {
+						mVolumeBrightnessControlView.setVisibility(View.GONE);
+					}
+				};
+				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+	                return true;
+	        case KeyEvent.KEYCODE_VOLUME_DOWN:
+	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+	                                             AudioManager.ADJUST_LOWER, 
+	                                             AudioManager.FLAG_SHOW_UI);
+	            mControllerHandler = new Handler(){
+					@Override
+					public void handleMessage(Message msg) {
+						mVolumeBrightnessControlView.setVisibility(View.GONE);
+					}
+				};
+				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+	                return true;
+	        case KeyEvent.KEYCODE_BACK:
+	        	this.finish();
+	            return true;
+	        }
+	 
+	        return false;
+	}
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		AudioManager mAudioManager = 
+		           (AudioManager)getSystemService(AUDIO_SERVICE);
+		        switch (keyCode) {
+		        case KeyEvent.KEYCODE_VOLUME_UP :
+		            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+		                                             AudioManager.ADJUST_SAME, 
+		                                             AudioManager.FLAG_SHOW_UI);
+		            mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mVolumeBrightnessControlView.setVisibility(View.GONE);
+						}
+					};
+					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+		                return true;
+		        case KeyEvent.KEYCODE_VOLUME_DOWN:
+		            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+		                                             AudioManager.ADJUST_SAME, 
+		                                             AudioManager.FLAG_SHOW_UI);
+		            mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mVolumeBrightnessControlView.setVisibility(View.GONE);
+						}
+					};
+					this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+					this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+		                return true;
+		        case KeyEvent.KEYCODE_BACK:
+		            this.finish();
+		            return true;
+		        }
+		        return false;
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
