@@ -18,11 +18,7 @@ public class ProcessRunnableHelper implements Runnable
 		
 		try {
 			proc = process.start();
-			proc.waitFor();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

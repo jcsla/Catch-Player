@@ -59,32 +59,19 @@ public class AudioFingerPrintHelper
 	{
 		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, VideoActivity.path);
 		
-		
 		new AsyncTask<Void, Void, Void>() {
 
 			@Override
 			protected Void doInBackground(Void... arg) {
 				//fingerprint.create().run();
-				readAudioDataFile();
+				//readAudioDataFile();
+				
 				return null;
 			}
 			
 			@Override
 			protected void onPostExecute(Void result) {
 				System.out.println("onPostExcute");
-				
-				// param.h main.cxx
-				// 여기서 데이터 읽어서 코드젠으로 변환 후 json 형태로 서버에 전송!!!
-				//String path = Environment.getExternalStorageDirectory() + "/android/data";
-				//File listFile = new File(path);
-				//for(File f : listFile.listFiles()) {
-				//	String str = f.getName();
-				//	System.out.println(str);
-				//}
-				//readAudioDataFile();
-				//System.out.println(data[0]);
-				//String s = mMpegPlayer.codegen(data, data.length);
-				//System.out.println(s);
 			}
 
 		}.execute();
@@ -98,7 +85,6 @@ public class AudioFingerPrintHelper
 		if (file.isFile())
 		{
 			long size = file.length();
-			System.out.println(size);
 			try {
 				in = new FileInputStream(file);
 				return readStreamAsFloatArray(in, size);
@@ -106,6 +92,7 @@ public class AudioFingerPrintHelper
 
 			}
 		}
+		
 		return null;
 	}
 	
