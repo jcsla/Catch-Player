@@ -21,7 +21,7 @@ public class AudioFingerPrintHelper
 	private String videoFilePath;
 	
 	private static String fp;
-	private String codever;
+	private final static String codever = "4.12";
 	
 	private static int bufferSize;
 	
@@ -69,14 +69,16 @@ public class AudioFingerPrintHelper
 			@Override
 			protected Void doInBackground(Void... arg) {
 				fingerprint.create().run();
+				float data[] = readAudioDataFile();
+				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
+				System.out.println(fp);
 				return null;
 			}
 			
 			@Override
 			protected void onPostExecute(Void result) {
-				float data[] = readAudioDataFile();
-				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
-				System.out.println(fp);
+				// json request & response
+				// android json parser needs asynctask class...
 			}
 
 		}.execute();
