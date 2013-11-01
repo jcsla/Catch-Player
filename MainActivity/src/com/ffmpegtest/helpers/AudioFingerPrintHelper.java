@@ -20,6 +20,11 @@ public class AudioFingerPrintHelper
 	private String ffmpegPath;
 	private String videoFilePath;
 	
+	private static String fp;
+	private String codever;
+	
+	private static int bufferSize;
+	
 	public AudioFingerPrintHelper(String ffmpegPath, String videoFilePath)
 	{
 		this.ffmpegPath = ffmpegPath;
@@ -63,15 +68,15 @@ public class AudioFingerPrintHelper
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				//fingerprint.create().run();
-				//readAudioDataFile();
-				
+				fingerprint.create().run();
 				return null;
 			}
 			
 			@Override
 			protected void onPostExecute(Void result) {
-				System.out.println("onPostExcute");
+				float data[] = readAudioDataFile();
+				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
+				System.out.println(fp);
 			}
 
 		}.execute();
@@ -98,7 +103,7 @@ public class AudioFingerPrintHelper
 	
 	public static float[] readStreamAsFloatArray(InputStream in, long size)
 	{
-		int bufferSize = (int) (size);
+		bufferSize = (int) (size);
 		float[] result = new float[bufferSize];
 		DataInputStream is = new DataInputStream(in);
 		try
@@ -113,8 +118,7 @@ public class AudioFingerPrintHelper
 		{
 			e.printStackTrace();
 		}
-		String s = VideoActivity.mMpegPlayer.codegen(result, bufferSize);
-		System.out.println(s);
+		
 		return result;
 	}
 	
