@@ -21,7 +21,6 @@ public class AudioFingerPrintHelper
 	private String videoFilePath;
 	
 	private static String fp;
-	private final static String codever = "4.12";
 	
 	private static int bufferSize;
 	
@@ -29,6 +28,31 @@ public class AudioFingerPrintHelper
 	{
 		this.ffmpegPath = ffmpegPath;
 		this.videoFilePath = videoFilePath;
+	}
+	
+	public static void startAudioFingerPrint()
+	{
+		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, VideoActivity.path);
+		
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... arg) {
+				fingerprint.create().run();
+				float data[] = readAudioDataFile();
+				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
+				System.out.println(fp);
+				return null;
+			}
+			
+			// json request & response
+			// android json parser needs asynctask class...
+			@Override
+			protected void onPostExecute(Void result) {
+				JSONHelper.postAFPServer(fp);
+			}
+
+		}.execute();
 	}
 	
 	public ProcessRunnableHelper create()
@@ -58,30 +82,6 @@ public class AudioFingerPrintHelper
 		final ProcessBuilder pb = new ProcessBuilder(cmd);
 		
 		return new ProcessRunnableHelper(pb);
-	}
-	
-	public static void startAudioFingerPrint()
-	{
-		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, VideoActivity.path);
-		
-		new AsyncTask<Void, Void, Void>() {
-
-			@Override
-			protected Void doInBackground(Void... arg) {
-				fingerprint.create().run();
-				float data[] = readAudioDataFile();
-				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
-				System.out.println(fp);
-				return null;
-			}
-			
-			@Override
-			protected void onPostExecute(Void result) {
-				// json request & response
-				// android json parser needs asynctask class...
-			}
-
-		}.execute();
 	}
 	
 	public static float[] readAudioDataFile()
