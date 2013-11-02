@@ -40,9 +40,7 @@ public class JSONHelper
 	public static void postData2AFPServer(String fp)
 	{
 		InputStream inputStream = null;
-		String result = "";
 		try {
-
 			// 1. create HttpClient
 			HttpClient httpclient = new DefaultHttpClient();
 
@@ -82,37 +80,30 @@ public class JSONHelper
 			inputStream = httpResponse.getEntity().getContent();
 
 			// 10. convert inputstream to string
-			if (inputStream != null)
-				result = convertInputStreamToString(inputStream);
-			else
-				result = "Did not work!";
-
+			convertInputStreamToString(inputStream);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// 11. return result
-		//return result;
 	}
 	
-	private static String convertInputStreamToString(InputStream inputStream)
+	private static void convertInputStreamToString(InputStream inputStream)
 	{
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 		String line = "";
-		String result = "";
 		
 		try {
+			
 			while ((line = bufferedReader.readLine()) != null)
-				result += line;
+			{
+				JSONObject jsonObject = new JSONObject(line);
+				System.out.println(new String(jsonObject.getString("program_name")));
+			}
 
 			inputStream.close();
 		}
-		catch(IOException e) {
+		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println(result);
-		
-		return result;
 	}
 }
