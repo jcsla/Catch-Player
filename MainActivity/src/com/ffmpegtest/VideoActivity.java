@@ -38,6 +38,7 @@ import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -111,6 +112,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 	private View mVolumeBrightnessControlView;
 	private TextView mVolumeBrightnessValue;
+	private float brightnessValue;
+	private Boolean brightnessCheck;
 	
 	private Handler mControllerHandler;
 	private Handler mHoldHandler;
@@ -122,7 +125,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
 	private Boolean holdCheck;
-
+	
 	private AudioManager mAudioManager;
 	private int mAudioMax;
 	private float mVolume;
@@ -223,6 +226,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		holdCheck = true;
 //		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
 //		registerReceiver(screenoff, offFilter);
+		brightnessCheck = false;
+		
+		doBrightnessTouch(0.0f);
 		
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
@@ -502,6 +508,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 			if(event.getAction() == MotionEvent.ACTION_MOVE)
 			{
+				Log.e("GestureSize Move", ""+xgesturesize);
 				mMove = true;
 	
 				if(coef > 4)
@@ -539,6 +546,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 					return true;
 				}
+				
 				//Log.e("Seek", "Seek");
 				doSeekTouch(coef, xgesturesize, false);
 	
@@ -554,6 +562,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 			else if(event.getAction() == MotionEvent.ACTION_UP)
 			{
+				Log.e("GestureSize Up", ""+xgesturesize);
 				if(mMove==true && mSeek==true)
 				{
 					mMove = false;
@@ -652,7 +661,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 				return true;
 			}
-	
+			
 			return true;
 			}else if(holdCheck == false){
 				holdVideo();
@@ -972,19 +981,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
-		//Log.e("Brightness", ""+lp.screenBrightness+" "+delta);
-		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
-		if(lp.screenBrightness < 0){
-			try {
-				lp.screenBrightness = (android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS)/100f);
-				//Log.e("Brightness", "                                               "+lp.screenBrightness);
-			} catch (SettingNotFoundException e) {
-				e.printStackTrace();
-			}
-		}else if(lp.screenBrightness >= 0.01){
-			lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
+		
+		if(brightnessCheck == false){
+			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+			lp.screenBrightness = pref.getFloat("brightness", 0.01f);
+			lp.screenBrightness = (lp.screenBrightness-1)/14;
+			getWindow().setAttributes(lp);
+			brightnessCheck = true;
 		}
-		float brightnessValue = (lp.screenBrightness*14)+1;
+		
+		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
+		
+		brightnessValue = (lp.screenBrightness*14)+1;
 		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
 		getWindow().setAttributes(lp);
 	}
@@ -1050,6 +1058,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	    		else {
 	    			mUseSubtitle = false;
 	    			saveVideoTime();
+	    			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+	    			SharedPreferences.Editor editor = pref.edit();
+	    			editor.putFloat("brightness", this.brightnessValue);
+	    			editor.commit();
 	    			finish();
 	    		}
 	            return true;
@@ -1091,6 +1103,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else {
 			mUseSubtitle = false;
 			saveVideoTime();
+			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+			SharedPreferences.Editor editor = pref.edit();
+			editor.putFloat("brightness", this.brightnessValue);
+			editor.commit();
 			finish();
 		}
 	}
