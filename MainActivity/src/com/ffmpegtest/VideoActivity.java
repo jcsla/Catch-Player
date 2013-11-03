@@ -74,6 +74,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appunite.ffmpeg.FFmpegDisplay;
 import com.appunite.ffmpeg.FFmpegError;
@@ -1031,12 +1032,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	                return true;
 	        case KeyEvent.KEYCODE_HOME:
-//				홈키 이벤트라는데 모르겠음	       
-	        	/*	this.mMpegPlayer.setMpegListener(null);
-	    		this.mMpegPlayer.stop();
-	    		stop();
-	    		saveVideoTime();
-	    		finish();*/
+	        	Log.e("HOMEKEY!!!!!!!!!!", "HOMEKEY");
 	        	return true;
 	        case KeyEvent.KEYCODE_BACK:
 	    		if (onPPL) {
@@ -1075,6 +1071,29 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	       return false;
 		}
 		return false;
+	}
+	
+	public void onUserLeaveHint(){
+		if (onPPL) {
+			if(mPlay) {
+				mMpegPlayer.resume();
+				mTouchPressed = false;
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				this.mTitleBar.setVisibility(View.GONE);
+				this.mControlsView.setVisibility(View.GONE);
+				this.mPPLButton.setVisibility(View.GONE);
+			}
+
+			mPPLLayout.setVisibility(View.GONE);
+			mSeekBar.setEnabled(true);
+			onPPL = false;
+		} 
+		else if (mHold);
+		else {
+			mUseSubtitle = false;
+			saveVideoTime();
+			finish();
+		}
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
