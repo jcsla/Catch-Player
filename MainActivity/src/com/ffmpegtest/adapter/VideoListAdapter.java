@@ -9,6 +9,7 @@ import com.ffmpegtest.helpers.Util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -83,13 +84,14 @@ public class VideoListAdapter extends BaseAdapter {
 			v = inflater.inflate(R.layout.video_list, null);
 			viewHolder.tv_title = (TextView)v.findViewById(R.id.tv_video_title);
 			viewHolder.tv_size = (TextView)v.findViewById(R.id.tv_video_size);
-			viewHolder.iv_new_video = (ImageView)v.findViewById(R.id.iv_new_video);
 			viewHolder.iv_video = (ImageView)v.findViewById(R.id.iv_folder);
 
 			Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
-			thumbnail = ResizeBitmap(thumbnail, 250, 150);
-			
-			viewHolder.iv_video.setImageBitmap(thumbnail);
+			if(thumbnail != null) {
+				thumbnail = ResizeBitmap(thumbnail, 250, 150);
+
+				viewHolder.iv_video.setImageBitmap(thumbnail);
+			}
 
 			v.setTag(viewHolder);
 
@@ -109,11 +111,11 @@ public class VideoListAdapter extends BaseAdapter {
 		return v;
 	}
 
-	public Bitmap ResizeBitmap(Bitmap bitmap, int width, int height) {
-		Bitmap sizingBmp = Bitmap.createScaledBitmap(bitmap, width, height, true);
-		
-		return sizingBmp;
-	}
+		public Bitmap ResizeBitmap(Bitmap bitmap, int width, int height) {
+			Bitmap sizingBmp = Bitmap.createScaledBitmap(bitmap, width, height, true);
+			
+			return sizingBmp;
+		}
 
 	/*
 	 * ViewHolder 
@@ -124,7 +126,6 @@ public class VideoListAdapter extends BaseAdapter {
 		public TextView tv_title = null;
 		public TextView tv_size = null;
 		public ImageView iv_video = null;
-		public ImageView iv_new_video = null;
 	}
 
 	@Override

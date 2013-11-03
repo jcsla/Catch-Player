@@ -12,6 +12,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import com.ffmpegtest.VideoActivity;
+
 import android.os.AsyncTask;
 
 public class JSONHelper
@@ -31,7 +33,7 @@ public class JSONHelper
 
 			@Override
 			protected void onPostExecute(Void result) {
-				
+				VideoActivity.progess.dismiss();
 			}
 
 		}.execute();

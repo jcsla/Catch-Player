@@ -33,6 +33,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -83,6 +84,7 @@ import com.appunite.ffmpeg.NotPlayingException;
 import com.ffmpegtest.adapter.PPLListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.helpers.AudioFingerPrintHelper;
+import com.ffmpegtest.helpers.Util;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
 {
@@ -91,6 +93,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private View mFullLayout;
 	private boolean mTouchPressed = false;
+	private Util util = Util.getInstance();
 
 	private View mTitleBar;
 	private TextView mTitle;
@@ -150,6 +153,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private long currentTime;
 
 	private VideoFileDBAdapter dbAdapter;
+	public static ProgressDialog progess;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -243,6 +247,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
+		
+		progess = util.getProgress(this);
 		
 		AudioFingerPrintHelper.startAudioFingerPrint();
 
@@ -413,7 +419,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 				in.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -432,7 +437,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						Thread.sleep(200);
 						subtitleHandler.sendMessage(subtitleHandler.obtainMessage());
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -974,7 +978,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				lp.screenBrightness = (android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS)/100f);
 				//Log.e("Brightness", "                                               "+lp.screenBrightness);
 			} catch (SettingNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else if(lp.screenBrightness >= 0.01){

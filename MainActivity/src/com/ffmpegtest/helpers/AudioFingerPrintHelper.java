@@ -35,7 +35,11 @@ public class AudioFingerPrintHelper
 		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, VideoActivity.path);
 		
 		new AsyncTask<Void, Void, Void>() {
-
+			
+			protected void onPreExecute() {
+				VideoActivity.progess.show();
+			};
+			
 			@Override
 			protected Void doInBackground(Void... arg) {
 				fingerprint.create().run();

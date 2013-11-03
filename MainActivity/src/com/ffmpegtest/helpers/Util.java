@@ -2,6 +2,9 @@ package com.ffmpegtest.helpers;
 
 import java.util.Arrays;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+
 public class Util {
 	private Util() {}
 	
@@ -32,5 +35,13 @@ public class Util {
 			return true;
 		}
 		return false;
+	}
+	
+	public ProgressDialog getProgress(Context c) {
+		ProgressDialog pDialog = new ProgressDialog(c);
+		pDialog.setTitle("잠시만 기다려주세요.");
+		pDialog.setMessage("데이터를 불러오는 중입니다.");
+		
+		return pDialog;
 	}
 }
