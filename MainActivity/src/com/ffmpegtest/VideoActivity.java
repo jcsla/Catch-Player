@@ -1031,9 +1031,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	                return true;
-	        case KeyEvent.KEYCODE_HOME:
-	        	Log.e("HOMEKEY!!!!!!!!!!", "HOMEKEY");
-	        	return true;
 	        case KeyEvent.KEYCODE_BACK:
 	    		if (onPPL) {
 	    			if(mPlay) {
@@ -1073,7 +1070,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		return false;
 	}
 	
+	////////////////////////////////////////////////////////////////////////
 	public void onUserLeaveHint(){
+		Log.e("HOMEKEY!!!!!!!!!!", "HOMEKEY");
 		if (onPPL) {
 			if(mPlay) {
 				mMpegPlayer.resume();
@@ -1095,6 +1094,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			finish();
 		}
 	}
+	///////////////////////////////////////////////////////////////////////
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
 	{
