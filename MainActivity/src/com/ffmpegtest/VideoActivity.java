@@ -496,7 +496,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		if(holdCheck==true || onPPL == false){
+		if(holdCheck==true){
 			DisplayMetrics screen = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(screen);
 	
@@ -506,7 +506,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			float coef = Math.abs (y_changed / x_changed);
 			float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
 	
-			if(event.getAction() == MotionEvent.ACTION_MOVE)
+			if(event.getAction() == MotionEvent.ACTION_MOVE && onPPL == false)
 			{
 				Log.e("GestureSize Move", ""+xgesturesize);
 				mMove = true;
