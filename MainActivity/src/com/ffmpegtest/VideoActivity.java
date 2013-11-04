@@ -1121,13 +1121,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
 	{
+		
 		if(coef > 0.5 || Math.abs(xgesturesize) < 1)
-			return;
+		return;
 
 		long mCurrentTimeUs = mMpegPlayer.getCurrentTime();
 		long mVideoDurationUs = mMpegPlayer.getVideoDuration();
 		long value;
-
+		
+		Log.e("Seek Motion", ""+mCurrentTimeUs+"             "+mVideoDurationUs);
+		
 		int jump = (int) (Math.signum(xgesturesize) * ((600000 * Math.pow((xgesturesize), 4)) + 3000));
 
 		if((jump > 0) && ((mCurrentTimeUs + jump) > mVideoDurationUs))
@@ -1138,7 +1141,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		value = mCurrentTimeUs + jump;
 
 		seekValue = (int)(value / 1000 / 1000);
-
+	/*	
+		mControllerHandler = new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				mVolumeBrightnessValue.setVisibility(View.GONE);
+			}
+		};
+		Log.e("Seek Motion", "                                                         "+seekValue);
+		this.mVolumeBrightnessValue.setText(""+seekValue);
+		this.mVolumeBrightnessValue.setVisibility(View.VISIBLE);
+		mControllerHandler.sendEmptyMessageDelayed(0, 2000);
+	*/			
 		mSeek = true;
 	}
 
