@@ -496,7 +496,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		if(holdCheck==true){
+		if(holdCheck==true || onPPL == false){
 			DisplayMetrics screen = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(screen);
 	
@@ -698,6 +698,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//	changeRatio();
 				//	break;
 			case R.id.btn_ppl:
+				
+				this.mTitleBar.setVisibility(View.GONE);
+				this.mControlsView.setVisibility(View.GONE);
+				this.mPPLButton.setVisibility(View.GONE);
+				
 				mPPLLayout.setVisibility(View.VISIBLE);
 				onPPL = true;
 				mSeekBar.setEnabled(false);
