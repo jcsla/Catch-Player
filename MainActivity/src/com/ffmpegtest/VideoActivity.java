@@ -545,6 +545,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					}
 	
 					return true;
+				}else if(xgesturesize < 0.015 && xgesturesize > -0.015){
+					mMove = false;
 				}
 				
 				//Log.e("Seek", "Seek");
