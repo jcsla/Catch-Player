@@ -511,7 +511,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				Log.e("GestureSize Move", ""+xgesturesize);
 				mMove = true;
 	
-				if(coef > 4)
+				if(coef > 5)
 				{
 					if(mTouchX < (getDeviceWidth() / 2))
 					{
@@ -545,7 +545,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					}
 	
 					return true;
-				}else if(xgesturesize < 0.015 && xgesturesize > -0.015){
+				}else if(xgesturesize < 0.02 && xgesturesize > -0.02 && coef < 4){
 					mMove = false;
 				}
 				
