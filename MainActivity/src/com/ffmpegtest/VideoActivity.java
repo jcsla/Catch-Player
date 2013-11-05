@@ -103,6 +103,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private View mVideoView;
 
+	private View mSeekControlView;
+	private TextView mSeekControlValue;
+	private TextView mSeekControlSmallValue;
 	private View mControlsView;
 	private SeekBar mSeekBar;
 	private ImageButton mPlayPauseButton;
@@ -116,6 +119,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private float brightnessValue;
 	private Boolean brightnessCheck;
 	
+	private Handler mSeekControlHandler;
 	private Handler mControllerHandler;
 	private Handler mHoldHandler;
 	
@@ -188,6 +192,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		
 		mVolumeBrightnessControlView = this.findViewById(R.id.volume_brightness_control);
 		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
+		
+		mSeekControlView = this.findViewById(R.id.seek_control);
+		mSeekControlValue = (TextView)this.findViewById(R.id.seek_value);
+		mSeekControlSmallValue = (TextView)this.findViewById(R.id.seek_small_value);
 
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
@@ -513,7 +521,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			{
 				mMove = true;
 	
-				if(coef > 5)
+				if(coef > 3 || mVolumeBrightnessControlView.getVisibility() == View.VISIBLE)
 				{
 					if(mTouchX < (getDeviceWidth() / 2))
 					{
@@ -547,13 +555,32 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					}
 	
 					return true;
-				}else if(xgesturesize < 0.02 && xgesturesize > -0.02 && coef < 4){
-					mMove = false;
+				}else if(coef < 3 || mSeekControlView.getVisibility() == View.VISIBLE)
+				{
+					if(xgesturesize < 0.02 && xgesturesize > -0.02)
+					{
+						mMove = false;
+					}else if(coef < 0.5 && Math.abs(xgesturesize) > 1)
+					{
+						if(mVolumeBrightnessControlView.getVisibility() == View.GONE){
+								
+							Log.e("SeekBartest",	"                                               seekbar");
+							mSeekControlHandler = new Handler(){
+								@Override
+								public void handleMessage(Message msg) {
+									mSeekControlView.setVisibility(View.GONE);
+								}
+							};
+							this.mSeekControlSmallValue.setText("[ "+((currentTimeS>seekValue)?"-":"")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
+							this.mSeekControlValue.setText(parseTime(currentTimeS));
+							this.mSeekControlView.setVisibility(View.VISIBLE);
+							mSeekControlHandler.sendEmptyMessageDelayed(0, 2000);
+							
+							doSeekTouch(coef, xgesturesize, false);	
+						}
+					}
 				}
-				
-				//Log.e("Seek", "Seek");
-				doSeekTouch(coef, xgesturesize, false);
-	
+						
 				return true;
 			}
 			else if(event.getAction() == MotionEvent.ACTION_DOWN)
@@ -726,8 +753,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			long timeUs = Long.parseLong(value) * 1000 * 1000;
 			int currentTimeS = (int)(timeUs / 1000 / 1000);
 			mCurrentTime.setText(parseTime(currentTimeS));
-			Log.e("Seek Motion", "                                                         "+currentTimeS);
 			/////////////////////////////////////////////////////////////////////////////////////////////////SeekBar
+					
 		}
 	}
 
@@ -793,7 +820,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			
 		}
 		
-		Log.e("Seek Motion", "currentTimeS                  "+currentTimeS);
+		//Log.e("Seek Motion", "currentTimeS                  "+currentTimeS);
 		
 		if (isFinished) {
 			isFinish = true;
@@ -900,18 +927,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		spare = spare % (60);
 		int sec = spare;
 
-		if (min < 10)
+		if (min < 10 && min > -10)
 			minS = "0" + min;
 		else
 			minS = min + "";
-		if (sec < 10)
+		if (sec < 10 && sec > -10)
 			secS = "0" + sec;
 		else
 			secS = sec + "";
-
-		String result = hour + " : " + minS + " : " + secS;
-
-		return result;
+		
+		if(hour > 0){
+			String result = hour + " : " + minS + " : " + secS;
+			return result;
+		}else{
+			String result = minS + " : " + secS;
+			return result;
+		}
+		
+		
 	}
 
 	private int getDeviceWidth() {
@@ -1149,19 +1182,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		seekValue = (int)(value / 1000 / 1000);
 		
-		//Log.e("Seek Motion", "                                                         "+currentTimeS);
-	/*	
-		mControllerHandler = new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				mVolumeBrightnessValue.setVisibility(View.GONE);
-			}
-		};
-		
-		this.mVolumeBrightnessValue.setText(""+seekValue);
-		this.mVolumeBrightnessValue.setVisibility(View.VISIBLE);
-		mControllerHandler.sendEmptyMessageDelayed(0, 2000);
-	*/			
 		mSeek = true;
 	}
 

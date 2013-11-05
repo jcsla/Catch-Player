@@ -183,6 +183,34 @@
     </RelativeLayout>
     
     <RelativeLayout
+        android:id="@+id/seek_control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+		 android:layout_centerVertical="true"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/seek_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+     	     android:layout_centerVertical="true"
+     	     android:textColor="#FFFFFFFF"
+            android:textSize="60sp" />
+        
+        <TextView
+            android:id="@+id/seek_small_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+     	     android:layout_below="@+id/seek_value"
+     	     android:textColor="#FFFFFFFF"
+            android:textSize="30sp" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
         android:id="@+id/ll_ppl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
