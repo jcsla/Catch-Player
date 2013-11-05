@@ -257,7 +257,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		
 		progess = util.getProgress(this);
 		
-		AudioFingerPrintHelper.startAudioFingerPrint();
+		//AudioFingerPrintHelper.startAudioFingerPrint();
 
 		setSubtitleSource();
 

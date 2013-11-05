@@ -248,25 +248,6 @@ public class MainActivity extends Activity implements OnItemClickListener,
 		alert.show();
 	}
 
-	public String getVideoSize(double size) {
-		final int KB = 1024;
-		final int MB = KB * KB;
-		final int GB = MB * KB;
-
-		String display_size;
-
-		if (size > GB)
-			display_size = String.format("%.2f GB ", (double) size / GB);
-		else if (size < GB && size > MB)
-			display_size = String.format("%.2f MB ", (double) size / MB);
-		else if (size < MB && size > KB)
-			display_size = String.format("%.2f KB ", (double) size / KB);
-		else
-			display_size = String.format("%.2f Bytes ", (double) size);
-
-		return display_size;
-	}
-
 	public void showFileAttribute(File file, int position) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle(file.getName());
@@ -282,7 +263,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 					+ new SimpleDateFormat("MM/dd/yyyy").format(file
 							.lastModified()) + "\n비디오 개수 : "
 					+ videoLength.get(position) + "\n비디오 크기 : "
-					+ getVideoSize(videoSize));
+					+ util.getVideoSize(videoSize));
 		} else {
 			alert.setMessage("비디오파일\n"
 					+ "\n이름 : "
@@ -292,7 +273,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 					+ "\n수정된 날짜 : "
 					+ new SimpleDateFormat("MM/dd/yyyy").format(file
 							.lastModified()) + "\n비디오 크기 : "
-					+ getVideoSize(file.length()));
+					+ util.getVideoSize(file.length()));
 		}
 
 		alert.setPositiveButton("확인", null);

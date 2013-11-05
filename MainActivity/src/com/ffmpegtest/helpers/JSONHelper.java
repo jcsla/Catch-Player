@@ -18,7 +18,7 @@ import android.os.AsyncTask;
 
 public class JSONHelper
 {
-	private static final String AFPServerURL = "http://14.63.165.205:6080/query";
+	private static final String AFPServerURL = "http://211.110.33.122/query";
 	private static final String codever = "4.12";
 	
 	public static void postAFPServer(final String fp)
