@@ -16,6 +16,7 @@ import com.ffmpegtest.helpers.Util;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.PaintDrawable;
@@ -40,7 +41,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 
 	private ActionBar mActionBar;
 	private SearchView mSearchView;
-	private HashMap<String, ArrayList<File>> video, save_video;
+	private HashMap<String, ArrayList<File>> video;
 	private ListView listView;
 	private String currentPath;
 	private final String root = Environment.getExternalStorageDirectory()
@@ -63,7 +64,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 
 		currentPath = Environment.getExternalStorageDirectory().getPath();
 		video = new HashMap<String, ArrayList<File>>();
-		save_video = new HashMap<String, ArrayList<File>>();
+		//save_video = new HashMap<String, ArrayList<File>>();
 		dbAdapter = new VideoFileDBAdapter(this);
 		videoLength = new ArrayList<Integer>();
 		util = Util.getInstance();
@@ -296,12 +297,12 @@ public class MainActivity extends Activity implements OnItemClickListener,
 				String fileName = file.getName();
 				String filePath = file.getParent();
 				if (util.isVideoFile(fileName)) {
-					if (!save_video.containsKey(filePath)) {
-						save_video.put(filePath, new ArrayList<File>());
+					if (!video.containsKey(filePath)) {
+						video.put(filePath, new ArrayList<File>());
 						Log.e("newKey", filePath);
 					}
 
-					save_video.get(filePath).add(file);
+					video.get(filePath).add(file);
 				}
 			}
 		}
@@ -432,8 +433,8 @@ public class MainActivity extends Activity implements OnItemClickListener,
 	}
 
 	public void initFinalize() {
-		video = new HashMap<String, ArrayList<File>>(save_video);
-		save_video.clear();
+//		video = new HashMap<String, ArrayList<File>>(save_video);
+//		save_video.clear();
 		path = new ArrayList<String>(video.keySet());
 		getVideoLength(path);
 		dbAdapter.removeVideoFileDB();
@@ -467,9 +468,18 @@ public class MainActivity extends Activity implements OnItemClickListener,
 	 * 캐시에 저장한다.
 	 */
 	private class RefreshTask extends AsyncTask<String, Void, Boolean> {
-
+		
+		ProgressDialog pDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			pDialog = util.getProgress(MainActivity.this);
+			pDialog.show();
+		}
+		
 		@Override
 		protected Boolean doInBackground(String... params) {
+			video.clear();
 			getDir(params[0]);
 
 			return true;
@@ -480,6 +490,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 			setRefreshActionButtonState(false);
 
 			initFinalize();
+			pDialog.dismiss();
 			// if(!path.contains(currentPath)) {
 			// currentPath = root;
 			// mActionBar.setTitle("폴더");

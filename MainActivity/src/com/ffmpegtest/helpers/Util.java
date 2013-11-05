@@ -78,6 +78,7 @@ public class Util {
 		ProgressDialog pDialog = new ProgressDialog(c);
 		pDialog.setTitle("잠시만 기다려주세요.");
 		pDialog.setMessage("데이터를 불러오는 중입니다.");
+		pDialog.setCancelable(false);
 
 		return pDialog;
 	}

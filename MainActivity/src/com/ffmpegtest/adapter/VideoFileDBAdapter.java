@@ -47,7 +47,7 @@ public class VideoFileDBAdapter {
 
 	public void saveVideoTime(String AbsoulteFilePath, int playTime) {
 		if(playTime == 0)
-			return;
+			playTime = 1;
 		
 		ContentValues cv = new ContentValues();
 		cv.put("file", AbsoulteFilePath);
