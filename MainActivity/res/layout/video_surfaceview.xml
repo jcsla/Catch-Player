@@ -5,7 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <com.appunite.ffmpeg.FFmpegSurfaceView
+    <view class = "com.appunite.ffmpeg.FFmpegSurfaceView"
         android:id="@+id/video_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
