@@ -113,16 +113,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
 	private int currentTimeS;
-	
+
 	private View mVolumeBrightnessControlView;
 	private TextView mVolumeBrightnessValue;
 	private float brightnessValue;
 	private Boolean brightnessCheck;
-	
+
 	private Handler mSeekControlHandler;
 	private Handler mControllerHandler;
 	private Handler mHoldHandler;
-	
+
 	private ImageView mPPLButton;
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
@@ -130,7 +130,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
 	private Boolean holdCheck;
-	
+
 	private AudioManager mAudioManager;
 	private int mAudioMax;
 	private float mVolume;
@@ -189,10 +189,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
-		
+
 		mVolumeBrightnessControlView = this.findViewById(R.id.volume_brightness_control);
 		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
-		
+
 		mSeekControlView = this.findViewById(R.id.seek_control);
 		mSeekControlValue = (TextView)this.findViewById(R.id.seek_value);
 		mSeekControlSmallValue = (TextView)this.findViewById(R.id.seek_small_value);
@@ -230,17 +230,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
 		dbAdapter = new VideoFileDBAdapter(this);
-		
+
 		//currentTimeS =0;
-		
+
 		//홀드버튼
 		holdCheck = true;
-//		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-//		registerReceiver(screenoff, offFilter);
+		//                IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+		//                registerReceiver(screenoff, offFilter);
 		brightnessCheck = false;
-		
+
 		doBrightnessTouch(0.0f);
-		
+
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
 		params.width = (getDeviceWidth() / 2);
 		params.height = LayoutParams.MATCH_PARENT;
@@ -265,26 +265,26 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer.setMpegListener(this);
 
 		setDataSource();
-		
+
 		progess = util.getProgress(this);
-		
+
 		//AudioFingerPrintHelper.startAudioFingerPrint();
 
-		
+
 		mMpegPlayer.resume();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if(holdCheck == true){
 			menu.add(0, 0, Menu.NONE, "설정").setIcon(android.R.drawable.ic_menu_preferences);
 			menu.add(0, 1, Menu.NONE, "도움말").setIcon(android.R.drawable.ic_menu_help);
-			
+
 			return true;
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
@@ -295,7 +295,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	protected void onPause()
 	{
@@ -324,30 +324,30 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		super.onDestroy();
 		//unregisterBroadcast();
 	}
-	
-/*	private void unregisterBroadcast()
-	{
-		unregisterReceiver(screenoff);
-	}
-	
-	BroadcastReceiver screenoff = new BroadcastReceiver(){
-		public static final String Screenoff = "android.intent.action.SCREEN_OFF";
-		
-		public void onReceive(android.content.Context context, Intent intent) {
-			if(!intent.getAction().equals(Screenoff))return;
-			
-			if(holdCheck == true){
-				Intent holdIntent = new Intent(Intent.ACTION_SCREEN_ON);
-				startActivity(holdIntent);
-			}else if(holdCheck == false){
-				mMpegPlayer.setMpegListener(null);
-				mMpegPlayer.stop();
-				stop();
-			}
-			
-		}
-		
-	};*/
+
+	/*        private void unregisterBroadcast()
+        {
+                unregisterReceiver(screenoff);
+        }
+
+        BroadcastReceiver screenoff = new BroadcastReceiver(){
+                public static final String Screenoff = "android.intent.action.SCREEN_OFF";
+
+                public void onReceive(android.content.Context context, Intent intent) {
+                        if(!intent.getAction().equals(Screenoff))return;
+
+                        if(holdCheck == true){
+                                Intent holdIntent = new Intent(Intent.ACTION_SCREEN_ON);
+                                startActivity(holdIntent);
+                        }else if(holdCheck == false){
+                                mMpegPlayer.setMpegListener(null);
+                                mMpegPlayer.stop();
+                                stop();
+                        }
+
+                }
+
+        };*/
 
 	private void setDataSource()
 	{
@@ -373,7 +373,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				path = file.getAbsolutePath();
 			}
 		}
-		
+
 		String[] split = path.split("/");
 		String title = split[split.length - 1];
 		mTitle.setText(title);
@@ -478,7 +478,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						mSmiview.setText("");
 					else
 						mSmiview.setText(Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()));
-					
+
 				} catch(Exception e) {}
 			}
 		}
@@ -510,19 +510,20 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if(holdCheck==true){
 			DisplayMetrics screen = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(screen);
-	
+
 			float x_changed = event.getRawX() - mTouchX;
 			float y_changed = event.getRawY() - mTouchY;
-	
+
 			float coef = Math.abs (y_changed / x_changed);
 			float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
-	
+
 			if(event.getAction() == MotionEvent.ACTION_MOVE && onPPL == false)
 			{
 				mMove = true;
-	
-				if(coef > 3 || mVolumeBrightnessControlView.getVisibility() == View.VISIBLE)
+
+				if(coef > 3)
 				{
+					mSeekControlView.setVisibility(View.GONE);
 					if(mTouchX < (getDeviceWidth() / 2))
 					{
 						Log.e("Brightness", "Brightness");
@@ -553,43 +554,43 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
 						mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 					}
-	
+
 					return true;
-				}else if(coef < 3 || mSeekControlView.getVisibility() == View.VISIBLE)
+				}else if(coef < 3)
 				{
 					if(xgesturesize < 0.02 && xgesturesize > -0.02)
 					{
 						mMove = false;
 					}else if(coef < 0.5 && Math.abs(xgesturesize) > 1)
 					{
-						if(mVolumeBrightnessControlView.getVisibility() == View.GONE){
-								
-							Log.e("SeekBartest",	"                                               seekbar");
-							mSeekControlHandler = new Handler(){
-								@Override
-								public void handleMessage(Message msg) {
-									mSeekControlView.setVisibility(View.GONE);
-								}
-							};
-							this.mSeekControlSmallValue.setText("[ "+((currentTimeS>seekValue)?"-":"")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
-							this.mSeekControlValue.setText(parseTime(currentTimeS));
-							this.mSeekControlView.setVisibility(View.VISIBLE);
-							mSeekControlHandler.sendEmptyMessageDelayed(0, 2000);
-							
-							doSeekTouch(coef, xgesturesize, false);	
-						}
+						mVolumeBrightnessControlView.setVisibility(View.GONE);
+
+						Log.e("SeekBartest",        "                                               seekbar");
+						mSeekControlHandler = new Handler(){
+							@Override
+							public void handleMessage(Message msg) {
+								mSeekControlView.setVisibility(View.GONE);
+							}
+						};
+						this.mSeekControlSmallValue.setText("[ "+((currentTimeS>seekValue)?"-":"")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
+						this.mSeekControlValue.setText(parseTime(currentTimeS));
+						this.mSeekControlView.setVisibility(View.VISIBLE);
+						mSeekControlHandler.sendEmptyMessageDelayed(0, 2000);
+
+						doSeekTouch(coef, xgesturesize, false);        
+					
 					}
 				}
-						
+
 				return true;
 			}
 			else if(event.getAction() == MotionEvent.ACTION_DOWN)
 			{
 				mTouchX = event.getRawX();
 				mTouchY = event.getRawY();
-	
+
 				mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-				
+
 			}
 			else if(event.getAction() == MotionEvent.ACTION_UP)
 			{
@@ -598,20 +599,20 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				{
 					mMove = false;
 					mSeek = false;
-	
+
 					Log.e("SeekValue : ", String.valueOf(seekValue));
-	
+
 					mMpegPlayer.seek(String.valueOf(seekValue));
-	
+
 					return true;
 				}
-	
+
 				if(mMove == true)
 				{
 					mMove = false;
 					return true;
 				}
-	
+
 				if(mHold == false)
 				{
 					if(mPPLLayout.getVisibility() == View.GONE)
@@ -619,7 +620,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						if(mTouchPressed == false)
 						{
 							mTouchPressed = true;
-							
+
 							mControllerHandler = new Handler(){
 								@Override
 								public void handleMessage(Message msg) {
@@ -631,7 +632,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 										params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 										params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 										params.setMargins(20, 20, 20, 20);
-										
+
 										mSmiview.setLayoutParams(params);
 									}
 									mTouchPressed = false;
@@ -645,11 +646,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
 								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 								params.setMargins(20, 20, 20, 20);
-								
+
 								mSmiview.setLayoutParams(params);
 							}
 							mControllerHandler.sendEmptyMessageDelayed(0, 10000);
-							
+
 						}
 						else
 						{
@@ -663,7 +664,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 								params.setMargins(20, 20, 20, 20);
-								
+
 								mSmiview.setLayoutParams(params);
 							}
 						}
@@ -678,7 +679,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							this.mControlsView.setVisibility(View.GONE);
 							this.mPPLButton.setVisibility(View.GONE);
 						}
-	
+
 						mPPLLayout.setVisibility(View.GONE);
 						mSeekBar.setEnabled(true);
 						onPPL = false;
@@ -689,15 +690,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				{
 					mUnHoldButtonView.setVisibility(View.VISIBLE);
 				}
-	
+
 				return true;
 			}
-			
+
 			return true;
-			}else if(holdCheck == false){
-				holdVideo();
-				return true;
-			}
+		}else if(holdCheck == false){
+			holdVideo();
+			return true;
+		}
 		return true;
 	}
 
@@ -724,22 +725,22 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				prevVideo();
 				break;
 				//case R.id.ratio_video:
-				//	changeRatio();
-				//	break;
-			case R.id.btn_ppl:
-				
-				this.mTitleBar.setVisibility(View.GONE);
-				this.mControlsView.setVisibility(View.GONE);
-				this.mPPLButton.setVisibility(View.GONE);
-				
-				mPPLLayout.setVisibility(View.VISIBLE);
-				onPPL = true;
-				mSeekBar.setEnabled(false);
-				if(mPlay) 
-					mMpegPlayer.pause();
-				break;
-			default:
-				throw new RuntimeException();
+					//        changeRatio();
+					//        break;
+				case R.id.btn_ppl:
+
+					this.mTitleBar.setVisibility(View.GONE);
+					this.mControlsView.setVisibility(View.GONE);
+					this.mPPLButton.setVisibility(View.GONE);
+
+					mPPLLayout.setVisibility(View.VISIBLE);
+					onPPL = true;
+					mSeekBar.setEnabled(false);
+					if(mPlay) 
+						mMpegPlayer.pause();
+					break;
+				default:
+					throw new RuntimeException();
 			}
 		}
 	}
@@ -754,7 +755,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			int currentTimeS = (int)(timeUs / 1000 / 1000);
 			mCurrentTime.setText(parseTime(currentTimeS));
 			/////////////////////////////////////////////////////////////////////////////////////////////////SeekBar
-					
+
 		}
 	}
 
@@ -805,23 +806,23 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	@Override
 	public void onFFUpdateTime(long currentTimeUs, long videoDurationUs, boolean isFinished)
-	{	
+	{        
 		currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
 
 		currentTime = currentTimeUs / 1000;
-		
+
 		if(currentTimeS >= 0){
 			mSeekBar.setMax(videoDurationS);
 			mSeekBar.setProgress(currentTimeS);
-		
+
 			mCurrentTime.setText(parseTime(currentTimeS));
 			mTotalTime.setText(parseTime(videoDurationS));
-			
+
 		}
-		
+
 		//Log.e("Seek Motion", "currentTimeS                  "+currentTimeS);
-		
+
 		if (isFinished) {
 			isFinish = true;
 			nextVideo();
@@ -854,7 +855,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void onFFSeeked(NotPlayingException result)
 	{
 		//if (result != null)
-		//	throw new RuntimeException(result);
+			//        throw new RuntimeException(result);
 	}
 
 	private void displaySystemMenu(boolean visible) {
@@ -914,7 +915,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	 * 반환값 : 가공된 시간
 	 * 메소드 설명 : 시간을 매개변수로 받아 처리해서 반환해준다(TextView에 적절하게 뿌리기 위해)
 	 */
-	private String parseTime(int time)
+	 private String parseTime(int time)
 	{
 		String minS = null;
 		String secS = null;
@@ -935,7 +936,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			secS = "0" + sec;
 		else
 			secS = sec + "";
-		
+
 		if(hour > 0){
 			String result = hour + " : " + minS + " : " + secS;
 			return result;
@@ -943,280 +944,283 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			String result = minS + " : " + secS;
 			return result;
 		}
-		
-		
-	}
 
-	private int getDeviceWidth() {
-		if (12 < Build.VERSION.SDK_INT) {
-			Point p = new Point();
-			getWindowManager().getDefaultDisplay().getSize(p);
-			return p.x;
-		} else {
-			return getWindowManager().getDefaultDisplay().getWidth();
-		}
-	}
-
-	private int getDeviceHeight() {
-		if (12 < Build.VERSION.SDK_INT) {
-			Point p = new Point();
-			getWindowManager().getDefaultDisplay().getSize(p);
-			return p.y;
-		} else {
-			return getWindowManager().getDefaultDisplay().getHeight();
-		}
-	}
-
-	// 홀드 처리
-	public void holdVideo() {
-		mHold = true;
-		holdCheck = false;
-
-		mHoldHandler = new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				mUnHoldButtonView.setVisibility(View.GONE);
-			}
-		};
-		mUnHoldButtonView.setVisibility(View.VISIBLE);
-		mHoldHandler.sendEmptyMessageDelayed(0, 4000);
-
-		this.mTitleBar.setVisibility(View.GONE);
-		this.mControlsView.setVisibility(View.GONE);
-		this.mPPLButton.setVisibility(View.GONE);
-	}
-
-	public void unholdVideo() {
-		mHold = false;
-		holdCheck = true;
-		mUnHoldButtonView.setVisibility(View.GONE);
-
-		this.mTitleBar.setVisibility(View.VISIBLE);
-		this.mControlsView.setVisibility(View.VISIBLE);
-		this.mPPLButton.setVisibility(View.VISIBLE);
-	}
-
-	public void nextVideo() {
-		if(videoList != null && index < videoList.size() - 1) {
-			saveVideoTime();
-			file = new File(videoList.get(++index));
-			path = file.getAbsolutePath();
-			setDataSource();
-			mMpegPlayer.resume();
-		}
-	}
-
-	public void prevVideo() {
-		if(index > 0) {
-			saveVideoTime();
-			file = new File(videoList.get(--index));
-			path = file.getAbsolutePath();
-			setDataSource();
-			mMpegPlayer.resume();
-		}
-	}
-
-	public void saveVideoTime() {
-		int now = (int) (mMpegPlayer.getCurrentTime() / 1000 / 1000);
-		if(isFinish)
-			dbAdapter.saveVideoTime(path, 1);
-		else
-			dbAdapter.saveVideoTime(path, now);
 
 	}
 
+	 private int getDeviceWidth() {
+		 if (12 < Build.VERSION.SDK_INT) {
+			 Point p = new Point();
+			 getWindowManager().getDefaultDisplay().getSize(p);
+			 return p.x;
+		 } else {
+			 return getWindowManager().getDefaultDisplay().getWidth();
+		 }
+	 }
 
-	private void doBrightnessTouch(float y_changed)
-	{
-		float delta = -y_changed / getDeviceHeight() * 0.07f;
-		WindowManager.LayoutParams lp = getWindow().getAttributes();
-		
-		if(brightnessCheck == false){
-			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-			lp.screenBrightness = pref.getFloat("brightness", 0.01f);
-			lp.screenBrightness = (lp.screenBrightness-1)/14;
-			getWindow().setAttributes(lp);
-			brightnessCheck = true;
-		}
-		
-		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
-		
-		brightnessValue = (lp.screenBrightness*14)+1;
-		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
-		getWindow().setAttributes(lp);
-	}
+	 private int getDeviceHeight() {
+		 if (12 < Build.VERSION.SDK_INT) {
+			 Point p = new Point();
+			 getWindowManager().getDefaultDisplay().getSize(p);
+			 return p.y;
+		 } else {
+			 return getWindowManager().getDefaultDisplay().getHeight();
+		 }
+	 }
 
-	private void doVolumeTouch(float y_changed)
-	{
-		int delta = -(int) ((y_changed / getDeviceHeight()) * mAudioMax);
-		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
+	 // 홀드 처리
+	 public void holdVideo() {
+		 mHold = true;
+		 holdCheck = false;
 
-		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
-	}
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		AudioManager mAudioManager = 
-	            (AudioManager)getSystemService(AUDIO_SERVICE);
-		if(holdCheck==true){
-			switch (keyCode) {
-	        case KeyEvent.KEYCODE_VOLUME_UP :
-	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-	                                             AudioManager.ADJUST_RAISE, 
-	                                             AudioManager.FLAG_SHOW_UI);
-	            mControllerHandler = new Handler(){
-					@Override
-					public void handleMessage(Message msg) {
-						mVolumeBrightnessControlView.setVisibility(View.GONE);
-					}
-				};
-				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
-	                return true;
-	        case KeyEvent.KEYCODE_VOLUME_DOWN:
-	            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
-	                                             AudioManager.ADJUST_LOWER, 
-	                                             AudioManager.FLAG_SHOW_UI);
-	            mControllerHandler = new Handler(){
-					@Override
-					public void handleMessage(Message msg) {
-						mVolumeBrightnessControlView.setVisibility(View.GONE);
-					}
-				};
-				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
-	                return true;
-	        case KeyEvent.KEYCODE_BACK:
-	    		if (onPPL) {
-	    			if(mPlay) {
-	    				mMpegPlayer.resume();
-	    				mTouchPressed = false;
-	    				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    				this.mTitleBar.setVisibility(View.GONE);
-	    				this.mControlsView.setVisibility(View.GONE);
-	    				this.mPPLButton.setVisibility(View.GONE);
-	    			}
+		 mHoldHandler = new Handler(){
+			 @Override
+			 public void handleMessage(Message msg) {
+				 mUnHoldButtonView.setVisibility(View.GONE);
+			 }
+		 };
+		 mUnHoldButtonView.setVisibility(View.VISIBLE);
+		 mHoldHandler.sendEmptyMessageDelayed(0, 4000);
 
-	    			mPPLLayout.setVisibility(View.GONE);
-	    			mSeekBar.setEnabled(true);
-	    			onPPL = false;
-	    		} 
-	    		else if (mHold);
-	    		else {
-	    			mUseSubtitle = false;
-	    			saveVideoTime();
-	    			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-	    			SharedPreferences.Editor editor = pref.edit();
-	    			editor.putFloat("brightness", this.brightnessValue);
-	    			editor.commit();
-	    			finish();
-	    		}
-	            return true;
-	        }
+		 this.mTitleBar.setVisibility(View.GONE);
+		 this.mControlsView.setVisibility(View.GONE);
+		 this.mPPLButton.setVisibility(View.GONE);
+	 }
+
+	 public void unholdVideo() {
+		 mHold = false;
+		 holdCheck = true;
+		 mUnHoldButtonView.setVisibility(View.GONE);
+
+		 this.mTitleBar.setVisibility(View.VISIBLE);
+		 this.mControlsView.setVisibility(View.VISIBLE);
+		 this.mPPLButton.setVisibility(View.VISIBLE);
+	 }
+
+	 public void nextVideo() {
+		 if(videoList != null && index < videoList.size() - 1) {
+			 saveVideoTime();
+			 file = new File(videoList.get(++index));
+			 path = file.getAbsolutePath();
+			 setDataSource();
+			 mMpegPlayer.resume();
+		 }
+	 }
+
+	 public void prevVideo() {
+		 if(index > 0) {
+			 saveVideoTime();
+			 file = new File(videoList.get(--index));
+			 path = file.getAbsolutePath();
+			 setDataSource();
+			 mMpegPlayer.resume();
+		 }
+	 }
+
+	 public void saveVideoTime() {
+		 int now = (int) (mMpegPlayer.getCurrentTime() / 1000 / 1000);
+		 if(isFinish)
+			 dbAdapter.saveVideoTime(path, 1);
+		 else
+			 dbAdapter.saveVideoTime(path, now);
+
+	 }
+
+
+	 private void doBrightnessTouch(float y_changed)
+	 {
+		 float delta = -y_changed / getDeviceHeight() * 0.07f;
+		 WindowManager.LayoutParams lp = getWindow().getAttributes();
+
+		 if(brightnessCheck == false){
+			 SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+			 lp.screenBrightness = pref.getFloat("brightness", 0.01f);
+			 lp.screenBrightness = (lp.screenBrightness-1)/14;
+			 getWindow().setAttributes(lp);
+			 brightnessCheck = true;
+		 }
+
+		 lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
+
+		 brightnessValue = (lp.screenBrightness*14)+1;
+		 this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
+		 getWindow().setAttributes(lp);
+	 }
+
+	 private void doVolumeTouch(float y_changed)
+	 {
+		 int delta = -(int) ((y_changed / getDeviceHeight()) * mAudioMax);
+		 int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
+
+		 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
+	 }
+
+	 @Override
+	 public boolean onKeyDown(int keyCode, KeyEvent event) {
+		 AudioManager mAudioManager = 
+				 (AudioManager)getSystemService(AUDIO_SERVICE);
+		 if(holdCheck==true){
+			 switch (keyCode) {
+			 case KeyEvent.KEYCODE_VOLUME_UP :
+				 mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+						 AudioManager.ADJUST_RAISE, 
+						 AudioManager.FLAG_SHOW_UI);
+				 mControllerHandler = new Handler(){
+					 @Override
+					 public void handleMessage(Message msg) {
+						 mVolumeBrightnessControlView.setVisibility(View.GONE);
+					 }
+				 };
+				 this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+				 this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				 mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+				 return true;
+			 case KeyEvent.KEYCODE_VOLUME_DOWN:
+				 mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+						 AudioManager.ADJUST_LOWER, 
+						 AudioManager.FLAG_SHOW_UI);
+				 mControllerHandler = new Handler(){
+					 @Override
+					 public void handleMessage(Message msg) {
+						 mVolumeBrightnessControlView.setVisibility(View.GONE);
+					 }
+				 };
+				 this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+				 this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				 mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+				 return true;
+			 case KeyEvent.KEYCODE_BACK:
+				 if (onPPL) {
+					 if(mPlay) {
+						 mMpegPlayer.resume();
+						 mTouchPressed = false;
+						 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						 this.mTitleBar.setVisibility(View.GONE);
+						 this.mControlsView.setVisibility(View.GONE);
+						 this.mPPLButton.setVisibility(View.GONE);
+					 }
+
+					 mPPLLayout.setVisibility(View.GONE);
+					 mSeekBar.setEnabled(true);
+					 onPPL = false;
+				 } 
+				 else if (mHold);
+				 else {
+					 mUseSubtitle = false;
+					 saveVideoTime();
+					 SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+					 SharedPreferences.Editor editor = pref.edit();
+					 editor.putFloat("brightness", this.brightnessValue);
+					 editor.commit();
+					 finish();
+				 }
+				 return true;
+			 }
+
+			 return false;
+		 }else if(holdCheck==false){
+			 switch (keyCode) {
+			 case KeyEvent.KEYCODE_VOLUME_UP :
+				 return true;
+			 case KeyEvent.KEYCODE_VOLUME_DOWN:
+				 return true;
+			 case KeyEvent.KEYCODE_BACK:
+				 return true;
+			 }
+			 return false;
+		 }
+		 return false;
+	 }
+
+	 ////////////////////////////////////////////////////////////////////////
+	 public void onUserLeaveHint(){
+		 Log.e("HOMEKEY!!!!!!!!!!", "HOMEKEY");
+		 if (onPPL) {
+			 if(mPlay) {
+				 mMpegPlayer.resume();
+				 mTouchPressed = false;
+				 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				 this.mTitleBar.setVisibility(View.GONE);
+				 this.mControlsView.setVisibility(View.GONE);
+				 this.mPPLButton.setVisibility(View.GONE);
+			 }
+
+			 mPPLLayout.setVisibility(View.GONE);
+			 mSeekBar.setEnabled(true);
+			 onPPL = false;
+		 } 
+		 else if (mHold);
+		 else {
+			 mUseSubtitle = false;
+			 saveVideoTime();
+			 SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+			 SharedPreferences.Editor editor = pref.edit();
+			 editor.putFloat("brightness", this.brightnessValue);
+			 editor.commit();
+			 finish();
+		 }
+	 }
+	 ///////////////////////////////////////////////////////////////////////
+
+	 private void doSeekTouch(float coef, float xgesturesize, boolean seek)
+	 {
+
+		 if(coef > 0.5 || Math.abs(xgesturesize) < 1)
+			 return;
+
+		 long mCurrentTimeUs = mMpegPlayer.getCurrentTime();
+		 long mVideoDurationUs = mMpegPlayer.getVideoDuration();
+		 long value;
+
+		 int jump = (int) (Math.signum(xgesturesize) * ((600000 * Math.pow((xgesturesize), 4)) + 3000));
+
+		 if((jump > 0) && ((mCurrentTimeUs + jump) > mVideoDurationUs))
+			 jump = (int) (mVideoDurationUs - mCurrentTimeUs);
+		 if((jump < 0) && ((mCurrentTimeUs + jump) < 0))
+			 jump = (int) -mCurrentTimeUs;
+
+		 value = mCurrentTimeUs + jump;
+
+		 seekValue = (int)(value / 1000 / 1000);
+
+		 mSeek = true;
+	 }
+
+	 private void changeRatio()
+	 {
+		 if(mCurrentSize < SURFACE_BEST_FIT)
+			 mCurrentSize = mCurrentSize + 1;
+		 else
+			 mCurrentSize = SURFACE_BEST_FIT;
+
+		 switch(mCurrentSize)
+		 {
+		 case SURFACE_BEST_FIT:
+			 mMpegPlayer.changeRatioNative(SURFACE_BEST_FIT);
+			 break;
+		 case SURFACE_4_3:
+			 mMpegPlayer.changeRatioNative(SURFACE_4_3);
+			 break;
+		 case SURFACE_16_9:
+			 mMpegPlayer.changeRatioNative(SURFACE_16_9);
+			 break;
+		 }
+	 }
+
+	 private void cancelAsyncTask()
+	 {        
+		 if(FFmpegPlayer.stopTask != null)
+			 FFmpegPlayer.stopTask.cancel(true);
+		 if(FFmpegPlayer.setDataSourceTask != null)
+			 FFmpegPlayer.setDataSourceTask.cancel(true);
+		 if(FFmpegPlayer.seekTask != null)
+			 FFmpegPlayer.seekTask.cancel(true);
+		 if(FFmpegPlayer.pauseTask != null)
+			 FFmpegPlayer.pauseTask.cancel(true);
+		 if(FFmpegPlayer.resumeTask != null)
+			 FFmpegPlayer.resumeTask.cancel(true);
+	 }
 	 
-	        return false;
-		}else if(holdCheck==false){
-			switch (keyCode) {
-	        case KeyEvent.KEYCODE_VOLUME_UP :
-	            return true;
-	        case KeyEvent.KEYCODE_VOLUME_DOWN:
-	            return true;
-	        case KeyEvent.KEYCODE_BACK:
-	    		return true;
-	        }
-	       return false;
-		}
-		return false;
-	}
-	
-	////////////////////////////////////////////////////////////////////////
-	public void onUserLeaveHint(){
-		Log.e("HOMEKEY!!!!!!!!!!", "HOMEKEY");
-		if (onPPL) {
-			if(mPlay) {
-				mMpegPlayer.resume();
-				mTouchPressed = false;
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				this.mTitleBar.setVisibility(View.GONE);
-				this.mControlsView.setVisibility(View.GONE);
-				this.mPPLButton.setVisibility(View.GONE);
-			}
-
-			mPPLLayout.setVisibility(View.GONE);
-			mSeekBar.setEnabled(true);
-			onPPL = false;
-		} 
-		else if (mHold);
-		else {
-			mUseSubtitle = false;
-			saveVideoTime();
-			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-			SharedPreferences.Editor editor = pref.edit();
-			editor.putFloat("brightness", this.brightnessValue);
-			editor.commit();
-			finish();
-		}
-	}
-	///////////////////////////////////////////////////////////////////////
-
-	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
-	{
-		
-		if(coef > 0.5 || Math.abs(xgesturesize) < 1)
-		return;
-
-		long mCurrentTimeUs = mMpegPlayer.getCurrentTime();
-		long mVideoDurationUs = mMpegPlayer.getVideoDuration();
-		long value;
-		
-		int jump = (int) (Math.signum(xgesturesize) * ((600000 * Math.pow((xgesturesize), 4)) + 3000));
-
-		if((jump > 0) && ((mCurrentTimeUs + jump) > mVideoDurationUs))
-			jump = (int) (mVideoDurationUs - mCurrentTimeUs);
-		if((jump < 0) && ((mCurrentTimeUs + jump) < 0))
-			jump = (int) -mCurrentTimeUs;
-
-		value = mCurrentTimeUs + jump;
-
-		seekValue = (int)(value / 1000 / 1000);
-		
-		mSeek = true;
-	}
-
-	private void changeRatio()
-	{
-		if(mCurrentSize < SURFACE_BEST_FIT)
-			mCurrentSize = mCurrentSize + 1;
-		else
-			mCurrentSize = SURFACE_BEST_FIT;
-
-		switch(mCurrentSize)
-		{
-		case SURFACE_BEST_FIT:
-			mMpegPlayer.changeRatioNative(SURFACE_BEST_FIT);
-			break;
-		case SURFACE_4_3:
-			mMpegPlayer.changeRatioNative(SURFACE_4_3);
-			break;
-		case SURFACE_16_9:
-			mMpegPlayer.changeRatioNative(SURFACE_16_9);
-			break;
-		}
-	}
-
-	private void cancelAsyncTask()
-	{	
-		if(FFmpegPlayer.stopTask != null)
-			FFmpegPlayer.stopTask.cancel(true);
-		if(FFmpegPlayer.setDataSourceTask != null)
-			FFmpegPlayer.setDataSourceTask.cancel(true);
-		if(FFmpegPlayer.seekTask != null)
-			FFmpegPlayer.seekTask.cancel(true);
-		if(FFmpegPlayer.pauseTask != null)
-			FFmpegPlayer.pauseTask.cancel(true);
-		if(FFmpegPlayer.resumeTask != null)
-			FFmpegPlayer.resumeTask.cancel(true);
-	}
+	 
+	 
 }
