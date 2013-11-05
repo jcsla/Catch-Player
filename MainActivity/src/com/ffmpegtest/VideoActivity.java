@@ -109,6 +109,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageButton mHoldButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
+	private int currentTimeS;
 	
 	private View mVolumeBrightnessControlView;
 	private TextView mVolumeBrightnessValue;
@@ -222,6 +223,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		dbAdapter = new VideoFileDBAdapter(this);
 		
+		//currentTimeS =0;
+		
 		//홀드버튼
 		holdCheck = true;
 //		IntentFilter offFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
@@ -259,12 +262,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		
 		//AudioFingerPrintHelper.startAudioFingerPrint();
 
-		setSubtitleSource();
-
+		
 		mMpegPlayer.resume();
-
-		if(mUseSubtitle == true)
-			executeSubtitleThread();
 	}
 	
 	@Override
@@ -384,6 +383,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if(time > 0)
 			mMpegPlayer.seek(String.valueOf(time));
 
+		setSubtitleSource();
+
+		if(mUseSubtitle == true)
+			executeSubtitleThread();
 		Log.e("filePath : ", path);
 	}
 
@@ -508,7 +511,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	
 			if(event.getAction() == MotionEvent.ACTION_MOVE && onPPL == false)
 			{
-				Log.e("GestureSize Move", ""+xgesturesize);
 				mMove = true;
 	
 				if(coef > 5)
@@ -724,6 +726,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			long timeUs = Long.parseLong(value) * 1000 * 1000;
 			int currentTimeS = (int)(timeUs / 1000 / 1000);
 			mCurrentTime.setText(parseTime(currentTimeS));
+			Log.e("Seek Motion", "                                                         "+currentTimeS);
+			/////////////////////////////////////////////////////////////////////////////////////////////////SeekBar
 		}
 	}
 
@@ -774,18 +778,23 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	@Override
 	public void onFFUpdateTime(long currentTimeUs, long videoDurationUs, boolean isFinished)
-	{
-		int currentTimeS = (int)(currentTimeUs / 1000 / 1000);
+	{	
+		currentTimeS = (int)(currentTimeUs / 1000 / 1000);
 		int videoDurationS = (int)(videoDurationUs / 1000 / 1000);
 
 		currentTime = currentTimeUs / 1000;
-
-		mSeekBar.setMax(videoDurationS);
-		mSeekBar.setProgress(currentTimeS);
-
-		mCurrentTime.setText(parseTime(currentTimeS));
-		mTotalTime.setText(parseTime(videoDurationS));
-
+		
+		if(currentTimeS >= 0){
+			mSeekBar.setMax(videoDurationS);
+			mSeekBar.setProgress(currentTimeS);
+		
+			mCurrentTime.setText(parseTime(currentTimeS));
+			mTotalTime.setText(parseTime(videoDurationS));
+			
+		}
+		
+		Log.e("Seek Motion", "currentTimeS                  "+currentTimeS);
+		
 		if (isFinished) {
 			isFinish = true;
 			nextVideo();
@@ -1129,8 +1138,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		long mVideoDurationUs = mMpegPlayer.getVideoDuration();
 		long value;
 		
-		Log.e("Seek Motion", ""+mCurrentTimeUs+"             "+mVideoDurationUs);
-		
 		int jump = (int) (Math.signum(xgesturesize) * ((600000 * Math.pow((xgesturesize), 4)) + 3000));
 
 		if((jump > 0) && ((mCurrentTimeUs + jump) > mVideoDurationUs))
@@ -1141,6 +1148,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		value = mCurrentTimeUs + jump;
 
 		seekValue = (int)(value / 1000 / 1000);
+		
+		//Log.e("Seek Motion", "                                                         "+currentTimeS);
 	/*	
 		mControllerHandler = new Handler(){
 			@Override
@@ -1148,7 +1157,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				mVolumeBrightnessValue.setVisibility(View.GONE);
 			}
 		};
-		Log.e("Seek Motion", "                                                         "+seekValue);
+		
 		this.mVolumeBrightnessValue.setText(""+seekValue);
 		this.mVolumeBrightnessValue.setVisibility(View.VISIBLE);
 		mControllerHandler.sendEmptyMessageDelayed(0, 2000);
