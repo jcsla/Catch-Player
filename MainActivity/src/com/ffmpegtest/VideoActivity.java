@@ -66,6 +66,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -91,7 +92,7 @@ import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.helpers.AudioFingerPrintHelper;
 import com.ffmpegtest.helpers.Util;
 
-public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener
+public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener, View.OnSystemUiVisibilityChangeListener
 {
 	public static FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
@@ -218,6 +219,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
+		mVideoView.setOnSystemUiVisibilityChangeListener(this);
 
 		mPPLList = (ListView) this.findViewById(R.id.lv_ppl);
 
@@ -244,6 +246,20 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		//                registerReceiver(screenoff, offFilter);
 		brightnessCheck = false;
 
+		/*mVideoView.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
+			
+			@Override
+			public void onSystemUiVisibilityChange(int visibility) {
+				if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
+					Toast.makeText(getApplicationContext(), "a;slkdjfalksj", Toast.LENGTH_SHORT).show();
+					
+					
+					
+				}
+			}
+		});*/
+		
+			
 		doBrightnessTouch(0.0f);
 
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
@@ -663,7 +679,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								mSmiview.setLayoutParams(params);
 							}
 							mControllerHandler.sendEmptyMessageDelayed(0, 10000);
-							displaySystemMenu(false);
+							//displaySystemMenu(false);
 
 						}
 						else
@@ -680,7 +696,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.setMargins(20, 20, 20, 20);
 
 								mSmiview.setLayoutParams(params);
-								displaySystemMenu(false);
+								//displaySystemMenu(false);
 							}
 						}
 					}
@@ -727,7 +743,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				if(mPlay)
 				{
 					holdVideo();
-					//displaySystemMenu(false);
+					
 				}
 				break;
 			case R.id.unhold_button:
@@ -854,7 +870,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mPlayPauseButton.setImageResource(R.drawable.pause);
 		this.mPlayPauseButton.setEnabled(true);
 
-		displaySystemMenu(false);
+		//displaySystemMenu(false);
 	}
 
 	@Override
@@ -916,7 +932,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else
 		{
 			mMpegPlayer.resume();
-			displaySystemMenu(true);
+			//displaySystemMenu(true);
 		}
 
 		mPlay = !mPlay;
@@ -1014,7 +1030,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mTitleBar.setVisibility(View.VISIBLE);
 		this.mControlsView.setVisibility(View.VISIBLE);
 		this.mPPLButton.setVisibility(View.VISIBLE);
-		displaySystemMenu(true);
+		//displaySystemMenu(true);
 	}
 
 	public void nextVideo() {
@@ -1241,5 +1257,49 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			FFmpegPlayer.resumeTask.cancel(true);
 	}
 
+	@Override
+	public void onSystemUiVisibilityChange(int visibility) {
+		if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
+			Toast.makeText(getApplicationContext(), "a;slkdjfalksj", Toast.LENGTH_SHORT).show();
+			this.mTitleBar.setVisibility(View.GONE);
+			this.mControlsView.setVisibility(View.GONE);
+			this.mPPLButton.setVisibility(View.GONE);
+			
+			if(mUseSubtitle){
+				RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
+				params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+				params.setMargins(20, 20, 20, 20);
+				
+				mSmiview.setLayoutParams(params);
+			}
+		}
+				
+	}
+	/*mVideoView.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
+	
+	@Override
+	public void onSystemUiVisibilityChange(int visibility) {
+		if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
+			Toast.makeText(getApplicationContext(), "a;slkdjfalksj", Toast.LENGTH_SHORT).show();
+			
+			
+			
+		}
+	}
+});*/
 
+	/*	this.mTitleBar.setVisibility(View.VISIBLE);
+		this.mControlsView.setVisibility(View.VISIBLE);
+		this.mPPLButton.setVisibility(View.VISIBLE);
+		if(mUseSubtitle) {
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
+			params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			params.setMargins(20, 20, 20, 20);
+			
+			mSmiview.setLayoutParams(params);
+	*/
+	
+	
 }
