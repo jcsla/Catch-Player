@@ -168,68 +168,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public static ProgressDialog progess;
 
 
-	public static class IV extends ImageView implements View.OnSystemUiVisibilityChangeListener {
-		private VideoActivity mActivity;
-		private ActionMode mActionMode;
-		public IV(Context context) {
-			super(context);
-		}
-		public IV(Context context, AttributeSet attrs) {
-			super(context, attrs);
-		}
-		public void setActivity(VideoActivity act) {
-			setOnSystemUiVisibilityChangeListener(this);
-			mActivity = act;
-		}
-		
-		@Override
-		public void onSizeChanged(int w, int h, int oldw, int oldh) {
-			//mActivity.refreshSizes();
-		}
-		@Override
-		public void onSystemUiVisibilityChange(int visibility) {
-			//mActivity.updateCheckControls();
-			//mActivity.refreshSizes();
-		}
-
-		private class MyActionModeCallback implements ActionMode.Callback {
-			@Override public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-				mode.setTitle("My Action Mode!");
-				mode.setSubtitle(null);
-				mode.setTitleOptionalHint(false);
-				menu.add("Sort By Size").setIcon(android.R.drawable.ic_menu_sort_by_size);
-				menu.add("Sort By Alpha").setIcon(android.R.drawable.ic_menu_sort_alphabetically);
-				return true;
-			}
-
-			@Override public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-				return true;
-			}
-
-			@Override public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				return true;
-			}
-
-			@Override public void onDestroyActionMode(ActionMode mode) {
-				mActionMode = null;
-				//mActivity.clearActionMode();
-			}
-		}
-
-		public void startActionMode() {
-			if (mActionMode == null) {
-				ActionMode.Callback cb = new MyActionModeCallback();
-				mActionMode = startActionMode(cb);
-			}
-		}
-
-		public void stopActionMode() {
-			if (mActionMode != null) {
-				mActionMode.finish();
-			}
-		}
-		
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -603,7 +541,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							}
 						};
 						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-						mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+						//mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 					}
 					if(mTouchX > (getDeviceWidth() / 2))
 					{
@@ -619,11 +557,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						};
 						this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
 						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
-						mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+						//mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 					}
 
 					return true;
-				}else if(coef < 3)
+				}else if(coef < 3 || mSeekControlView.getVisibility() == View.VISIBLE)
 				{
 					if(xgesturesize < 0.02 && xgesturesize > -0.02)
 					{
@@ -642,7 +580,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						this.mSeekControlSmallValue.setText("[ "+((currentTimeS>seekValue)?"-":"+")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
 						this.mSeekControlValue.setText(parseTime(currentTimeS));
 						this.mSeekControlView.setVisibility(View.VISIBLE);
-						mSeekControlHandler.sendEmptyMessageDelayed(0, 2000);
+						//mSeekControlHandler.sendEmptyMessageDelayed(0, 2000);
 
 						doSeekTouch(coef, xgesturesize, false);        
 
@@ -662,6 +600,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			else if(event.getAction() == MotionEvent.ACTION_UP)
 			{
 				Log.e("GestureSize Up", ""+xgesturesize);
+				
+				if(mSeekControlView.getVisibility()==View.VISIBLE){
+					mSeekControlHandler.sendEmptyMessageDelayed(0, 1000);
+					
+				}else if(mVolumeBrightnessControlView.getVisibility()==View.VISIBLE){
+					mControllerHandler.sendEmptyMessageDelayed(0, 1000);
+				}
+				
 				if(mMove==true && mSeek==true)
 				{
 					mMove = false;
@@ -777,7 +723,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			{
 			case R.id.hold_video:
 				if(mPlay)
+				{
 					holdVideo();
+					//displaySystemMenu(false);
+				}
 				break;
 			case R.id.unhold_button:
 				unholdVideo();
@@ -949,7 +898,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			this.mVideoView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 		} else {
 			this.mVideoView
-			.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+			.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 		}
 	}
 
@@ -1062,6 +1011,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mTitleBar.setVisibility(View.VISIBLE);
 		this.mControlsView.setVisibility(View.VISIBLE);
 		this.mPPLButton.setVisibility(View.VISIBLE);
+		displaySystemMenu(true);
 	}
 
 	public void nextVideo() {
