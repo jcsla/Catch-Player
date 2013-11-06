@@ -37,15 +37,15 @@ public class AudioFingerPrintHelper
 		new AsyncTask<Void, Void, Void>() {
 			
 			protected void onPreExecute() {
-				//VideoActivity.progess.show();
+				VideoActivity.progess.show();
 			};
 			
 			@Override
 			protected Void doInBackground(Void... arg) {
-//				fingerprint.create().run();
-//				float data[] = readAudioDataFile();
-//				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
-//				System.out.println(fp);
+				fingerprint.create().run();
+				float data[] = readAudioDataFile();
+				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
+				System.out.println(fp);
 				return null;
 			}
 			

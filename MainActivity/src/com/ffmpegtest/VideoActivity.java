@@ -273,7 +273,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		progess = util.getProgress(this);
 
-		//AudioFingerPrintHelper.startAudioFingerPrint();
+		AudioFingerPrintHelper.startAudioFingerPrint();
 
 
 		mMpegPlayer.resume();
@@ -663,6 +663,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								mSmiview.setLayoutParams(params);
 							}
 							mControllerHandler.sendEmptyMessageDelayed(0, 10000);
+							displaySystemMenu(false);
 
 						}
 						else
@@ -679,6 +680,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.setMargins(20, 20, 20, 20);
 
 								mSmiview.setLayoutParams(params);
+								displaySystemMenu(false);
 							}
 						}
 					}
@@ -909,6 +911,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if (mPlay)
 		{
 			mMpegPlayer.pause();
+			displaySystemMenu(false);
 		}
 		else
 		{

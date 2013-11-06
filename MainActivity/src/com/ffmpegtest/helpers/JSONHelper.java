@@ -27,13 +27,13 @@ public class JSONHelper
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				//postData2AFPServer(fp);
+				postData2AFPServer(fp);
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				//VideoActivity.progess.dismiss();
+				VideoActivity.progess.dismiss();
 			}
 
 		}.execute();
@@ -100,6 +100,7 @@ public class JSONHelper
 			{
 				JSONObject jsonObject = new JSONObject(line);
 				System.out.println(new String(jsonObject.getString("program_name")));
+				System.out.println(new String(jsonObject.getString("program_entry")));
 			}
 
 			inputStream.close();
