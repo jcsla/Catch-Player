@@ -27,13 +27,13 @@ public class JSONHelper
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				postData2AFPServer(fp);
+				//postData2AFPServer(fp);
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				VideoActivity.progess.dismiss();
+				//VideoActivity.progess.dismiss();
 			}
 
 		}.execute();

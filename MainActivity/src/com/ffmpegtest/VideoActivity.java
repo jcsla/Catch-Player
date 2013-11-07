@@ -72,12 +72,14 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -117,7 +119,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
 	private int currentTimeS;
-
+	
 	private View mVolumeBrightnessControlView;
 	private TextView mVolumeBrightnessValue;
 	private float brightnessValue;
@@ -130,10 +132,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageView mPPLButton;
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
+	
+	private SlidingDrawer drawer;
 
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
 	private Boolean holdCheck;
+	
+	private Button mSlideButton;
 
 	private AudioManager mAudioManager;
 	private int mAudioMax;
@@ -215,7 +221,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPPLButton = (ImageView) this.findViewById(R.id.btn_ppl);
 		mPPLButton.setOnClickListener(this);
-
+		
+		drawer = (SlidingDrawer)findViewById(R.id.slide);
+		
+		mSlideButton = (Button)this.findViewById(R.id.btn_slide);
+		mSlideButton.setOnClickListener(this);
+		
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
@@ -622,6 +633,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					
 				}else if(mVolumeBrightnessControlView.getVisibility()==View.VISIBLE){
 					mControllerHandler.sendEmptyMessageDelayed(0, 1000);
+				}else if(mControlsView.getVisibility() == View.VISIBLE){
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
 				
 				if(mMove==true && mSeek==true)
@@ -678,7 +691,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 								mSmiview.setLayoutParams(params);
 							}
-							mControllerHandler.sendEmptyMessageDelayed(0, 10000);
+							//mControllerHandler.sendEmptyMessageDelayed(0, 10000);
 							//displaySystemMenu(false);
 
 						}
@@ -742,8 +755,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.hold_video:
 				if(mPlay)
 				{
-					holdVideo();
-					
+					holdVideo();	
 				}
 				break;
 			case R.id.unhold_button:
@@ -762,8 +774,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//        changeRatio();
 				//        break;
 			case R.id.btn_ppl:
-
-				this.mTitleBar.setVisibility(View.GONE);
+				drawer.animateOpen();
+				/*this.mTitleBar.setVisibility(View.GONE);
 				this.mControlsView.setVisibility(View.GONE);
 				this.mPPLButton.setVisibility(View.GONE);
 
@@ -771,7 +783,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				onPPL = true;
 				mSeekBar.setEnabled(false);
 				if(mPlay) 
-					mMpegPlayer.pause();
+					mMpegPlayer.pause();*/
+				break;
+			case R.id.btn_slide:
+				drawer.animateClose();
 				break;
 			default:
 				throw new RuntimeException();
@@ -927,7 +942,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if (mPlay)
 		{
 			mMpegPlayer.pause();
-			displaySystemMenu(false);
+			//displaySystemMenu(false);
 		}
 		else
 		{

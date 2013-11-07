@@ -37,15 +37,15 @@ public class AudioFingerPrintHelper
 		new AsyncTask<Void, Void, Void>() {
 			
 			protected void onPreExecute() {
-				VideoActivity.progess.show();
+				//VideoActivity.progess.show();
 			};
 			
 			@Override
 			protected Void doInBackground(Void... arg) {
-				fingerprint.create().run();
-				float data[] = readAudioDataFile();
-				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
-				System.out.println(fp);
+				//fingerprint.create().run();
+				//float data[] = readAudioDataFile();
+				//fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
+				//System.out.println(fp);
 				return null;
 			}
 			
@@ -53,7 +53,7 @@ public class AudioFingerPrintHelper
 			// android json parser needs asynctask class...
 			@Override
 			protected void onPostExecute(Void result) {
-				JSONHelper.postAFPServer(fp);
+				//JSONHelper.postAFPServer(fp);
 			}
 
 		}.execute();
