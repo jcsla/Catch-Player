@@ -73,7 +73,7 @@ public class MainActivity extends Activity implements OnItemClickListener,
 
 		initVideoMap();
 	}
-
+	
 	/**
 	 * 작성자 : 임창민 메소드 이름 : initVideoMap 매개변수 : 없음 반환값 : 없음 메소드 설명 : HashMap에 비디오
 	 * 파일Path와 리스트를 초기화한다.
@@ -334,17 +334,18 @@ public class MainActivity extends Activity implements OnItemClickListener,
 	public boolean onCreateOptionsMenu(Menu menu) {
 		this.optionsMenu = menu;
 		getMenuInflater().inflate(R.menu.menu, menu);
-
+		
 		mActionBar = getActionBar();
 		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setTitle("폴더");
-
+		
 		mSearchView = (SearchView) menu.findItem(R.id.menu_search)
 				.getActionView();
 		mSearchView.setQueryHint("비디오 검색");
+		
 		mSearchView
 				.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
+					
 					@Override
 					public boolean onQueryTextSubmit(String query) {
 						ArrayList<String> findList = new ArrayList<String>();
