@@ -190,6 +190,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mFullLayout = this.findViewById(R.id.full_layout);
 		mFullLayout.setOnTouchListener(this);
+		mFullLayout.setOnSystemUiVisibilityChangeListener(this);
 
 		mTitleBar = this.findViewById(R.id.title_bar);
 		mTitle = (TextView) this.findViewById(R.id.title);
@@ -219,7 +220,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
-		mVideoView.setOnSystemUiVisibilityChangeListener(this);
 
 		mPPLList = (ListView) this.findViewById(R.id.lv_ppl);
 
@@ -586,7 +586,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					{
 						mVolumeBrightnessControlView.setVisibility(View.GONE);
 
-						Log.e("SeekBartest",        "                                               seekbar");
+						Log.e("SeekBartest", "                                               seekbar");
 						mSeekControlHandler = new Handler(){
 							@Override
 							public void handleMessage(Message msg) {
