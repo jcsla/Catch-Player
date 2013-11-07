@@ -657,7 +657,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 				if(mHold == false)
 				{
-					if(mPPLLayout.getVisibility() == View.GONE)
+					if(mPPLLayout.getVisibility() == View.GONE)///////////////////////////////////////////////////////////수정요망
 					{
 						if(mTouchPressed == false)
 						{
@@ -724,7 +724,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							this.mPPLButton.setVisibility(View.GONE);
 						}
 
-						mPPLLayout.setVisibility(View.GONE);
+						//mPPLLayout.setVisibility(View.GONE);
 						mSeekBar.setEnabled(true);
 						onPPL = false;
 					}
@@ -774,19 +774,22 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//        changeRatio();
 				//        break;
 			case R.id.btn_ppl:
-				drawer.animateOpen();
-				/*this.mTitleBar.setVisibility(View.GONE);
-				this.mControlsView.setVisibility(View.GONE);
-				this.mPPLButton.setVisibility(View.GONE);
-
-				mPPLLayout.setVisibility(View.VISIBLE);
-				onPPL = true;
-				mSeekBar.setEnabled(false);
 				if(mPlay) 
-					mMpegPlayer.pause();*/
+					mMpegPlayer.pause();
+				
+				this.mTitleBar.setVisibility(View.INVISIBLE);
+				this.mControlsView.setVisibility(View.INVISIBLE);
+				
+				drawer.animateOpen();
+				//this.mPPLButton.setVisibility(View.GONE);
+				//mPPLLayout.setVisibility(View.VISIBLE);
+				//onPPL = true;
+				//mSeekBar.setEnabled(false);
 				break;
 			case R.id.btn_slide:
 				drawer.animateClose();
+				this.mTitleBar.setVisibility(View.VISIBLE);
+				this.mControlsView.setVisibility(View.VISIBLE);
 				break;
 			default:
 				throw new RuntimeException();
@@ -1151,7 +1154,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						this.mPPLButton.setVisibility(View.GONE);
 					}
 
-					mPPLLayout.setVisibility(View.GONE);
+					//mPPLLayout.setVisibility(View.GONE);
 					mSeekBar.setEnabled(true);
 					onPPL = false;
 				} 
