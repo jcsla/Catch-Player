@@ -75,6 +75,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -269,6 +270,21 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				}
 			}
 		});*/
+		
+		
+		LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
+        for (int i = 2; i < 10; i++) {
+            ImageView imageView = new ImageView(this);
+            imageView.setImageResource(R.drawable.magic_icon);
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            layout.addView(imageView, p);
+        }
+		
+		
+		
 		
 			
 		doBrightnessTouch(0.0f);
