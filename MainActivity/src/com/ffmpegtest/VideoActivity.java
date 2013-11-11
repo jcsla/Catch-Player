@@ -26,8 +26,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -40,6 +46,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -54,6 +62,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.Html;
 import android.util.AttributeSet;
@@ -120,7 +129,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
 	private int currentTimeS;
-	
+
 	private View mVolumeBrightnessControlView;
 	private TextView mVolumeBrightnessValue;
 	private float brightnessValue;
@@ -133,13 +142,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageView mPPLButton;
 	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
-	
+
 	private SlidingDrawer drawer;
 
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
 	private Boolean holdCheck;
-	
+
 	private Button mSlideButton;
 
 	private AudioManager mAudioManager;
@@ -222,12 +231,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPPLButton = (ImageView) this.findViewById(R.id.btn_ppl);
 		mPPLButton.setOnClickListener(this);
-		
+
 		drawer = (SlidingDrawer)findViewById(R.id.slide);
-		
+
 		mSlideButton = (Button)this.findViewById(R.id.btn_slide);
 		mSlideButton.setOnClickListener(this);
-		
+
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
@@ -259,34 +268,51 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		brightnessCheck = false;
 
 		/*mVideoView.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
-			
+
 			@Override
 			public void onSystemUiVisibilityChange(int visibility) {
 				if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
 					Toast.makeText(getApplicationContext(), "a;slkdjfalksj", Toast.LENGTH_SHORT).show();
-					
-					
-					
+
+
+
 				}
 			}
 		});*/
-		
-		
-		LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
-        for (int i = 2; i < 10; i++) {
+
+		if(android.os.Build.VERSION.SDK_INT>9){
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
+
+		/*LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
+        for (int i = 1; i < 3; i++) {
             ImageView imageView = new ImageView(this);
-            imageView.setImageResource(R.drawable.magic_icon);
+
+            URL url;
+			try {
+				Log.e("ImageParser", ""+JSONParserHelper.product_image);
+				url = new URL(JSONParserHelper.product_image);
+				Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+				imageView.setImageBitmap(bmp);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e("ImageParser", "Fuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuck");
+			}
+
+            //imageView.setImageResource();
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
             layout.addView(imageView, p);
         }
-		
-		
-		
-		
-			
+		 */
+
+
+
+
 		doBrightnessTouch(0.0f);
 
 		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
@@ -643,16 +669,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			else if(event.getAction() == MotionEvent.ACTION_UP)
 			{
 				Log.e("GestureSize Up", ""+xgesturesize);
-				
+
 				if(mSeekControlView.getVisibility()==View.VISIBLE){
 					mSeekControlHandler.sendEmptyMessageDelayed(0, 1000);
-					
+
 				}else if(mVolumeBrightnessControlView.getVisibility()==View.VISIBLE){
 					mControllerHandler.sendEmptyMessageDelayed(0, 1000);
 				}else if(mControlsView.getVisibility() == View.VISIBLE){
 					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
-				
+
 				if(mMove==true && mSeek==true)
 				{
 					mMove = false;
@@ -792,10 +818,46 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.btn_ppl:
 				if(mPlay) 
 					mMpegPlayer.pause();
-				
+
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////PPL json parser
+
+				JSONParserHelper.parsingPPL();
+				ImageView imageView = new ImageView(this);
+				//imageView.
+				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
+				for (int i = 1; i < 3; i++) {
+
+
+					URL url;
+					try {
+						Log.e("ImageParser", ""+JSONParserHelper.product_image);
+						url = new URL(JSONParserHelper.product_image);
+						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+						imageView.setImageBitmap(bmp);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						Log.e("ImageParser", "Fuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuck");
+					}
+
+					//imageView.setImageResource();
+					LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+							LinearLayout.LayoutParams.MATCH_PARENT,
+							LinearLayout.LayoutParams.WRAP_CONTENT
+							);
+					layout.addView(imageView, p);
+				}
+
+
+
+
+
+
+
+
 				this.mTitleBar.setVisibility(View.INVISIBLE);
 				this.mControlsView.setVisibility(View.INVISIBLE);
-				
+
 				drawer.animateOpen();
 				//this.mPPLButton.setVisibility(View.GONE);
 				//mPPLLayout.setVisibility(View.VISIBLE);
@@ -1298,27 +1360,27 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			this.mTitleBar.setVisibility(View.GONE);
 			this.mControlsView.setVisibility(View.GONE);
 			this.mPPLButton.setVisibility(View.GONE);
-			
+
 			if(mUseSubtitle){
 				RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
 				params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 				params.setMargins(20, 20, 20, 20);
-				
+
 				mSmiview.setLayoutParams(params);
 			}
 		}
-				
+
 	}
 	/*mVideoView.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
-	
+
 	@Override
 	public void onSystemUiVisibilityChange(int visibility) {
 		if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
 			Toast.makeText(getApplicationContext(), "a;slkdjfalksj", Toast.LENGTH_SHORT).show();
-			
-			
-			
+
+
+
 		}
 	}
 });*/
@@ -1331,9 +1393,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
 			params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			params.setMargins(20, 20, 20, 20);
-			
+
 			mSmiview.setLayoutParams(params);
-	*/
-	
-	
+	 */
+
+
 }
