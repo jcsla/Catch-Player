@@ -46,18 +46,21 @@ public class VideoFileDBAdapter {
 	}
 
 	public void saveVideoTime(String AbsoulteFilePath, int playTime) {
+		if(playTime == 0)
+			playTime = 1;
+		
 		ContentValues cv = new ContentValues();
 		cv.put("file", AbsoulteFilePath);
 		cv.put("playTime", playTime);
 
 		if(getVideoTime(AbsoulteFilePath) == 0) {
 			db.insert(play_time_db_name, null, cv);
-		}
-		else {
+		} else {
 			String whereClause = "file = ?";
 			String[] whereArgs = new String[] { AbsoulteFilePath };
 			db.update(play_time_db_name, cv, whereClause, whereArgs);
 		}
+		
 	}
 
 	private Cursor selectVideoFileDB() {
@@ -120,11 +123,13 @@ public class VideoFileDBAdapter {
 
 			do {
 				String file = c.getString(idxFile);
+				Log.e("fileName = " + file, "time = " + c.getInt(idxPlayTime));
 
 				if(video.equals(file)) {
 					time = c.getInt(idxPlayTime);
 					break;
 				}
+				
 			} while(c.moveToNext());
 		}
 

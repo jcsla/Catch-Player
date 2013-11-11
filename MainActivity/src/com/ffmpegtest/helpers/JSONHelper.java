@@ -18,7 +18,7 @@ import android.os.AsyncTask;
 
 public class JSONHelper
 {
-	private static final String AFPServerURL = "http://14.63.165.205:6080/query";
+	private static final String AFPServerURL = "http://211.110.33.122/query";
 	private static final String codever = "4.12";
 	
 	public static void postAFPServer(final String fp)
@@ -27,13 +27,13 @@ public class JSONHelper
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				postData2AFPServer(fp);
+				//postData2AFPServer(fp);
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				VideoActivity.progess.dismiss();
+				//VideoActivity.progess.dismiss();
 			}
 
 		}.execute();
@@ -98,11 +98,17 @@ public class JSONHelper
 			
 			while ((line = bufferedReader.readLine()) != null)
 			{
+<<<<<<< HEAD
 				//JSONObject jsonObject = new JSONObject(line);
 				//System.out.println(new String(jsonObject.getString("program_name")));
 				//System.out.println(new String(jsonObject.getString("program_entry")));
 				//System.out.println(new String(jsonObject.getString("track_id")));
 				System.out.println(line);
+=======
+				JSONObject jsonObject = new JSONObject(line);
+				System.out.println(new String(jsonObject.getString("program_name")));
+				System.out.println(new String(jsonObject.getString("program_entry")));
+>>>>>>> 9419216ee67562b59d062ae5f1b777069b8a9d04
 			}
 
 			inputStream.close();
