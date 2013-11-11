@@ -822,12 +822,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////PPL json parser
 
 				JSONParserHelper.parsingPPL();
-				ImageView imageView = new ImageView(this);
 				//imageView.
 				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
 				for (int i = 1; i < 3; i++) {
 
 
+					ImageView imageView = new ImageView(this);
 					URL url;
 					try {
 						Log.e("ImageParser", ""+JSONParserHelper.product_image);
