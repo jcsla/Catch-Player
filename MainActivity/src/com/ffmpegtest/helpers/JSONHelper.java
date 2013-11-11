@@ -98,17 +98,14 @@ public class JSONHelper
 			
 			while ((line = bufferedReader.readLine()) != null)
 			{
-<<<<<<< HEAD
 				//JSONObject jsonObject = new JSONObject(line);
 				//System.out.println(new String(jsonObject.getString("program_name")));
 				//System.out.println(new String(jsonObject.getString("program_entry")));
 				//System.out.println(new String(jsonObject.getString("track_id")));
 				System.out.println(line);
-=======
 				JSONObject jsonObject = new JSONObject(line);
 				System.out.println(new String(jsonObject.getString("program_name")));
 				System.out.println(new String(jsonObject.getString("program_entry")));
->>>>>>> 9419216ee67562b59d062ae5f1b777069b8a9d04
 			}
 
 			inputStream.close();
