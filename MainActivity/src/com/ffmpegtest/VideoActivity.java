@@ -823,16 +823,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					mMpegPlayer.pause();
 
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////PPL json parser
-
+				JSONParserHelper.pplData.clear();
 				JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
 				//imageView.
 				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
 				layout.removeAllViews();				
-				for (int i = 1; i < 2; i++) {
+				for (int i = 0; i < JSONParserHelper.pplData.size(); i++) {
 					ImageView imageView = new ImageView(this);
 					URL url;
 					try {
-						url = new URL(JSONParserHelper.product_image);
+						PPLData ppl = JSONParserHelper.pplData.get(i);
+						url = new URL(ppl.product_image);
 						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 						imageView.setImageBitmap(bmp);
 					} catch (Exception e) {
