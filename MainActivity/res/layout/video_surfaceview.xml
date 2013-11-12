@@ -200,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal" >
 
-                    <ImageView
+                    <ImageButton
                         android:id="@+id/ppl_scroll_iv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />

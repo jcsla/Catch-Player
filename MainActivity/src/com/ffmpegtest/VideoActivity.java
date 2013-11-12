@@ -812,13 +812,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
 				layout.removeAllViews();				
 				for (int i = 0; i < JSONParserHelper.pplData.size(); i++) {
-					ImageView imageView = new ImageView(this);
+					ImageButton imageButton = new ImageButton(this);
 					URL url;
 					try {
 						PPLData ppl = JSONParserHelper.pplData.get(i);
 						url = new URL(ppl.product_image);
 						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-						imageView.setImageBitmap(bmp);
+						imageButton.setImageBitmap(bmp);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -828,7 +828,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							LinearLayout.LayoutParams.MATCH_PARENT,
 							LinearLayout.LayoutParams.WRAP_CONTENT
 							);
-					layout.addView(imageView, p);
+					layout.addView(imageButton, p);
+					imageButton.setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							Toast.makeText(getApplicationContext(), "asdf"+v.getId(), Toast.LENGTH_SHORT).show();
+							
+						}
+					});
 				}
 
 
@@ -836,6 +844,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				this.mControlsView.setVisibility(View.INVISIBLE);
 
 				drawer.animateOpen();
+				
+				
+				
 				//this.mPPLButton.setVisibility(View.GONE);
 				//mPPLLayout.setVisibility(View.VISIBLE);
 				//onPPL = true;
