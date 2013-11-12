@@ -32,11 +32,11 @@ public class AudioFingerPrintHelper
 		this.videoFilePath = videoFilePath;
 		fingerTask = new startAudioFingerPrint();
 	}
-	
+
 	public class startAudioFingerPrint extends AsyncTask<Context, Void, Void>{
-		
+
 		Context c;
-		
+
 		protected void onPreExecute() {
 			VideoActivity.progess.show();
 		};
@@ -90,7 +90,7 @@ public class AudioFingerPrintHelper
 		return new ProcessRunnableHelper(pb);
 	}
 
-	public static float[] readAudioDataFile()
+	public float[] readAudioDataFile()
 	{
 		File file = new File(Environment.getExternalStorageDirectory() + "/android/data/audioData");
 		InputStream in = null;
@@ -109,7 +109,7 @@ public class AudioFingerPrintHelper
 		return null;
 	}
 
-	public static float[] readStreamAsFloatArray(InputStream in, long size)
+	public float[] readStreamAsFloatArray(InputStream in, long size)
 	{
 		bufferSize = (int) (size);
 		float[] result = new float[bufferSize];
