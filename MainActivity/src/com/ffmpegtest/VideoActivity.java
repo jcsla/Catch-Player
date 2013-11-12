@@ -675,8 +675,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 				}else if(mVolumeBrightnessControlView.getVisibility()==View.VISIBLE){
 					mControllerHandler.sendEmptyMessageDelayed(0, 1000);
-				}else if(mControlsView.getVisibility() == View.VISIBLE){
-					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
 
 				if(mMove==true && mSeek==true)
@@ -775,6 +773,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				else
 				{
 					mUnHoldButtonView.setVisibility(View.VISIBLE);
+				}
+				
+				if(mControlsView.getVisibility() == View.VISIBLE){
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
 
 				return true;
