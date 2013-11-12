@@ -13,7 +13,7 @@ public class VideoFileDBHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String sql = "CREATE TABLE videoFileDB (filePath text, fileName text);";
 		db.execSQL(sql);
-		sql = "CREATE TABLE playTimeDB (file text, playTime integer);";
+		sql = "CREATE TABLE playTimeDB (file text, playTime integer, finger text);";
 		db.execSQL(sql);
 	}
 

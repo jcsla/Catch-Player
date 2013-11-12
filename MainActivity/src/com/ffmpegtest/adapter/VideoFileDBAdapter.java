@@ -45,13 +45,14 @@ public class VideoFileDBAdapter {
 		}
 	}
 
-	public void saveVideoTime(String AbsoulteFilePath, int playTime) {
+	public void saveVideoTime(String AbsoulteFilePath, int playTime, String finger) {
 		if(playTime == 0)
 			playTime = 1;
 		
 		ContentValues cv = new ContentValues();
 		cv.put("file", AbsoulteFilePath);
 		cv.put("playTime", playTime);
+		cv.put("finger", finger);
 
 		if(getVideoTime(AbsoulteFilePath) == 0) {
 			db.insert(play_time_db_name, null, cv);
@@ -62,6 +63,28 @@ public class VideoFileDBAdapter {
 		}
 		
 	}
+	
+	public String getVideoFingerPrint(String AbsoulteFilePath) {
+		Cursor c = selectPlayTimeDB();
+		String finger = "";
+		if(c.moveToFirst()) {
+			int idxFile = c.getColumnIndex("file");
+			int idxFinger = c.getColumnIndex("finger");
+
+			do {
+				String file = c.getString(idxFile);
+				String tmp = c.getString(idxFinger);
+				Log.e("DB","file = "+file);
+
+				if(AbsoulteFilePath.equals(file)) {
+					finger = tmp;
+					break;
+				}
+				
+			} while(c.moveToNext());
+		}
+		return finger;
+	}
 
 	private Cursor selectVideoFileDB() {
 		Cursor c = db.query(video_file_db_name, new String[] {"filePath", "fileName"}, null, null, null, null, null);
@@ -70,7 +93,7 @@ public class VideoFileDBAdapter {
 	}
 
 	private Cursor selectPlayTimeDB() {
-		Cursor c = db.query(play_time_db_name, new String[] {"file", "playTime"}, null, null, null, null, null);
+		Cursor c = db.query(play_time_db_name, new String[] {"file", "playTime", "finger"}, null, null, null, null, null);
 
 		return c;
 	}

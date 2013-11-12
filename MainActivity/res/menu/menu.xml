@@ -12,5 +12,10 @@
         android:icon="@android:drawable/ic_menu_search"
         android:showAsAction="ifRoom|collapseActionView"
         android:title="Search"/>
-
+	
+	<item 
+	    android:id="@+id/menu_option"
+	    android:showAsAction="always"
+	    android:title="Option"
+	    android:icon="@android:drawable/ic_menu_preferences"/>
 </menu>

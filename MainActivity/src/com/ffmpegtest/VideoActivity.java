@@ -99,7 +99,6 @@ import com.appunite.ffmpeg.FFmpegListener;
 import com.appunite.ffmpeg.FFmpegPlayer;
 import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
-import com.ffmpegtest.adapter.PPLListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.helpers.AudioFingerPrintHelper;
 import com.ffmpegtest.helpers.JSONHelper;
@@ -281,7 +280,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 		});*/
 
-		if(android.os.Build.VERSION.SDK_INT>9){
+		if(android.os.Build.VERSION.SDK_INT > 9){
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 		}
@@ -312,28 +311,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		 */
 
 
-
-
 		doBrightnessTouch(0.0f);
-
-		ViewGroup.LayoutParams params = mPPLList.getLayoutParams();
-		params.width = (getDeviceWidth() / 2);
-		params.height = LayoutParams.MATCH_PARENT;
-		mPPLList.setLayoutParams(params);
-		mPPLList.setBackgroundColor(paint.getColor());
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("짱좋은옷");
-		list.add("짱좋은가방");
-		list.add("짱좋은신발");
-		list.add("짱멋진우산");
-		list.add("완전쩌는스카프");
-		list.add("대박멋진목걸이");
-		list.add("그냥그런바지");
-		list.add("귀티나는양말");
-		list.add("이상한겉옷");
-		list.add("담요");
-		PPLListAdapter adapter = new PPLListAdapter(this, list);
-		mPPLList.setAdapter(adapter);
 
 		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
@@ -342,9 +320,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		setDataSource();
 
 		progess = util.getProgress(this);
-
-		AudioFingerPrintHelper.startAudioFingerPrint();
-
+		JSONHelper.dramaName = "";
+		String finger = dbAdapter.getVideoFingerPrint(path);
+		Log.e("fingerPrint", "hello"+finger);
+		
+		if(finger != null && finger.equals(""))
+			new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path).fingerTask.execute(this);
+		else
+			JSONHelper.dramaName = finger;
 
 		mMpegPlayer.resume();
 	}
@@ -1147,9 +1130,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void saveVideoTime() {
 		int now = (int) (mMpegPlayer.getCurrentTime() / 1000 / 1000);
 		if(isFinish)
-			dbAdapter.saveVideoTime(path, 1);
+			dbAdapter.saveVideoTime(path, 1, JSONHelper.dramaName);
 		else
-			dbAdapter.saveVideoTime(path, now);
+			dbAdapter.saveVideoTime(path, now, JSONHelper.dramaName);
 
 	}
 
@@ -1161,7 +1144,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		if(brightnessCheck == false){
 			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-			lp.screenBrightness = pref.getFloat("brightness", 0.01f);
+			lp.screenBrightness = pref.getFloat("brightness", 0.5f);
 			lp.screenBrightness = (lp.screenBrightness-1)/14;
 			getWindow().setAttributes(lp);
 			brightnessCheck = true;

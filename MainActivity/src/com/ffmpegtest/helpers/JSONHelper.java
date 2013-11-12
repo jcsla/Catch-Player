@@ -1,7 +1,6 @@
 package com.ffmpegtest.helpers;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -13,35 +12,40 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import com.ffmpegtest.VideoActivity;
+import com.ffmpegtest.adapter.VideoFileDBAdapter;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class JSONHelper
 {
-	
+
 	public static String dramaName = "";
 	private static final String AFPServerURL = "http://211.110.33.122/query";
 	private static final String codever = "4.12";
+	private VideoFileDBAdapter dbAdapter;
+	public postAFPServer postAFPTask = new postAFPServer();
 	
-	public static void postAFPServer(final String fp)
-	{
-		new AsyncTask<Void, Void, Void>() {
+	public class postAFPServer extends AsyncTask<Context, Void, InputStream> {
+		
+		Context c;
+		
+		@Override
+		protected InputStream doInBackground(Context... arg) {
+			c = arg[0];
+			return postData2AFPServer(AudioFingerPrintHelper.fp);
+		}
 
-			@Override
-			protected Void doInBackground(Void... arg) {
-				postData2AFPServer(fp);
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Void result) {
-				VideoActivity.progess.dismiss();
-			}
-
-		}.execute();
+		@Override
+		protected void onPostExecute(InputStream result) {
+			VideoActivity.progess.dismiss();
+			dbAdapter = new VideoFileDBAdapter(c);
+			convertInputStreamToString(result);
+		}
 	}
-	
-	public static void postData2AFPServer(String fp)
+
+	public InputStream postData2AFPServer(String fp)
 	{
 		InputStream inputStream = null;
 		try {
@@ -84,20 +88,21 @@ public class JSONHelper
 			inputStream = httpResponse.getEntity().getContent();
 
 			// 10. convert inputstream to string
-			convertInputStreamToString(inputStream);
-			
+			return inputStream;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
-	
-	private static void convertInputStreamToString(InputStream inputStream)
+
+	private void convertInputStreamToString(InputStream inputStream)
 	{
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 		String line = "";
-		
+
 		try {
-			
+
 			while ((line = bufferedReader.readLine()) != null)
 			{
 				//JSONObject jsonObject = new JSONObject(line);
@@ -108,8 +113,9 @@ public class JSONHelper
 				JSONObject jsonObject = new JSONObject(line);
 				System.out.println(new String(jsonObject.getString("program_name")));
 				System.out.println(new String(jsonObject.getString("program_entry")));
-				
+
 				dramaName = new String(jsonObject.getString("key"));
+				Log.e("Key = ",dramaName);
 			}
 
 			inputStream.close();

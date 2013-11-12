@@ -32,7 +32,7 @@ public class JSONParserHelper {
 				
 				Log.e("JSONParser", ""+ppl.store_link);
 				
-				pplData.add(ppl);				
+				pplData.add(ppl);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

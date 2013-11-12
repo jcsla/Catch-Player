@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 
@@ -19,46 +20,47 @@ public class AudioFingerPrintHelper
 {
 	private String ffmpegPath;
 	private String videoFilePath;
-	
-	private static String fp;
-	
+
+	static String fp;
+
 	private static int bufferSize;
-	
+	public startAudioFingerPrint fingerTask;
+
 	public AudioFingerPrintHelper(String ffmpegPath, String videoFilePath)
 	{
 		this.ffmpegPath = ffmpegPath;
 		this.videoFilePath = videoFilePath;
+		fingerTask = new startAudioFingerPrint();
 	}
 	
-	public static void startAudioFingerPrint()
-	{
-		final AudioFingerPrintHelper fingerprint = new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, VideoActivity.path);
+	public class startAudioFingerPrint extends AsyncTask<Context, Void, Void>{
 		
-		new AsyncTask<Void, Void, Void>() {
-			
-			protected void onPreExecute() {
-				VideoActivity.progess.show();
-			};
-			
-			@Override
-			protected Void doInBackground(Void... arg) {
-				fingerprint.create().run();
-				float data[] = readAudioDataFile();
-				fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
-				System.out.println(fp);
-				return null;
-			}
-			
-			// json request & response
-			// android json parser needs asynctask class...
-			@Override
-			protected void onPostExecute(Void result) {
-				JSONHelper.postAFPServer(fp);
-			}
+		Context c;
+		
+		protected void onPreExecute() {
+			VideoActivity.progess.show();
+		};
 
-		}.execute();
+		@Override
+		protected Void doInBackground(Context... arg) {
+			c = arg[0];
+			create().run();
+			float data[] = readAudioDataFile();
+			fp = VideoActivity.mMpegPlayer.codegen(data, bufferSize);
+			System.out.println(fp);
+			return null;
+		}
+
+		// json request & response
+		// android json parser needs asynctask class...
+		@Override
+		protected void onPostExecute(Void result) {
+			new JSONHelper().postAFPTask.execute(c);
+		}
+
 	}
-	
+
+
 	public ProcessRunnableHelper create()
 	{
 		final List<String> cmd = new LinkedList<String>();
@@ -66,7 +68,7 @@ public class AudioFingerPrintHelper
 		File dataFile = new File(path, "audioData");
 		if(dataFile.exists())
 			dataFile.delete();
-		
+
 		FFmpegCreateHelper.doChmod(dataFile, 777);
 		cmd.add(ffmpegPath);
 		cmd.add("-i");
@@ -82,12 +84,12 @@ public class AudioFingerPrintHelper
 		cmd.add("-ss");
 		cmd.add("0");
 		cmd.add(path + "/audioData");
-		
+
 		final ProcessBuilder pb = new ProcessBuilder(cmd);
-		
+
 		return new ProcessRunnableHelper(pb);
 	}
-	
+
 	public static float[] readAudioDataFile()
 	{
 		File file = new File(Environment.getExternalStorageDirectory() + "/android/data/audioData");
@@ -103,10 +105,10 @@ public class AudioFingerPrintHelper
 
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public static float[] readStreamAsFloatArray(InputStream in, long size)
 	{
 		bufferSize = (int) (size);
@@ -124,12 +126,12 @@ public class AudioFingerPrintHelper
 		{
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	public static short swap(short x)
 	{
 		return (short)((x << 8) | ((x >> 8) & 0xff));
-    }
+	}
 }
