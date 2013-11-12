@@ -824,22 +824,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				JSONParserHelper.parsingPPL();
 				//imageView.
 				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
+				layout.removeAllViews();				
 				for (int i = 1; i < 3; i++) {
-
-
 					ImageView imageView = new ImageView(this);
 					URL url;
 					try {
-						Log.e("ImageParser", ""+JSONParserHelper.product_image);
 						url = new URL(JSONParserHelper.product_image);
 						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 						imageView.setImageBitmap(bmp);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						Log.e("ImageParser", "Fuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuck");
 					}
-
 					//imageView.setImageResource();
 					LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
 							LinearLayout.LayoutParams.MATCH_PARENT,
@@ -847,12 +843,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							);
 					layout.addView(imageView, p);
 				}
-
-
-
-
-
-
 
 
 				this.mTitleBar.setVisibility(View.INVISIBLE);
