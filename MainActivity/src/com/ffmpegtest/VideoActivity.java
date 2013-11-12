@@ -102,6 +102,7 @@ import com.appunite.ffmpeg.NotPlayingException;
 import com.ffmpegtest.adapter.PPLListAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.helpers.AudioFingerPrintHelper;
+import com.ffmpegtest.helpers.JSONHelper;
 import com.ffmpegtest.helpers.Util;
 
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener, View.OnSystemUiVisibilityChangeListener
@@ -823,11 +824,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////PPL json parser
 
-				JSONParserHelper.parsingPPL();
+				JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
 				//imageView.
 				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
 				layout.removeAllViews();				
-				for (int i = 1; i < 3; i++) {
+				for (int i = 1; i < 2; i++) {
 					ImageView imageView = new ImageView(this);
 					URL url;
 					try {
@@ -860,6 +861,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				drawer.animateClose();
 				this.mTitleBar.setVisibility(View.VISIBLE);
 				this.mControlsView.setVisibility(View.VISIBLE);
+				this.mPPLButton.setVisibility(View.VISIBLE);
 				break;
 			default:
 				throw new RuntimeException();

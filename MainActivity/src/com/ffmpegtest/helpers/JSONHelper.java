@@ -18,6 +18,8 @@ import android.os.AsyncTask;
 
 public class JSONHelper
 {
+	
+	public static String dramaName = "";
 	private static final String AFPServerURL = "http://211.110.33.122/query";
 	private static final String codever = "4.12";
 	
@@ -27,13 +29,13 @@ public class JSONHelper
 
 			@Override
 			protected Void doInBackground(Void... arg) {
-				//postData2AFPServer(fp);
+				postData2AFPServer(fp);
 				return null;
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				//VideoActivity.progess.dismiss();
+				VideoActivity.progess.dismiss();
 			}
 
 		}.execute();
@@ -106,6 +108,8 @@ public class JSONHelper
 				JSONObject jsonObject = new JSONObject(line);
 				System.out.println(new String(jsonObject.getString("program_name")));
 				System.out.println(new String(jsonObject.getString("program_entry")));
+				
+				dramaName = new String(jsonObject.getString("key"));
 			}
 
 			inputStream.close();
