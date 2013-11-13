@@ -141,6 +141,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private ImageView mPPLButton;
 	private RelativeLayout mPPLLayout;
+	private RelativeLayout mPPLDataLayout;
+	private ImageView mPPLDataImage;
+	private TextView mPPLDataText;
+	private TextView mPPLDataPrice;
+	private TextView mPPLDataSite;
+	private TextView mPPLDataMall;
+	private TextView mPPLDataBrand;
+	private TextView mPPLDataName;
 
 	private SlidingDrawer drawer;
 
@@ -736,6 +744,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					}
 					else
 					{
+						mPPLLayout.setVisibility(View.GONE);
 						if(mPlay) {
 							mMpegPlayer.resume();
 							mTouchPressed = false;
@@ -803,6 +812,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					mMpegPlayer.pause();
 
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////PPL json parser
+				mPPLDataLayout = (RelativeLayout)findViewById(R.id.data_ppl);
+				mPPLDataImage = (ImageView)findViewById(R.id.data_image);
+				mPPLDataText = (TextView)findViewById(R.id.tv_ppl);
+				mPPLDataBrand = (TextView)findViewById(R.id.ppl_brand);
+				mPPLDataMall = (TextView)findViewById(R.id.ppl_mall);
+				mPPLDataName = (TextView)findViewById(R.id.ppl_name);
+				mPPLDataPrice = (TextView)findViewById(R.id.ppl_price);
+				mPPLDataSite = (TextView)findViewById(R.id.ppl_site);
+				
+				mPPLLayout.setVisibility(View.VISIBLE);
+				mPPLDataText.setText("");
+				mPPLDataBrand.setText("");
+				mPPLDataMall.setText("");
+				mPPLDataName.setText("");
+				mPPLDataPrice.setText("");
+				mPPLDataSite.setText("");
+				mPPLDataImage.setVisibility(View.INVISIBLE);
+				
 				JSONParserHelper.pplData.clear();
 				JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
 				//imageView.
@@ -815,6 +842,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						PPLData ppl = JSONParserHelper.pplData.get(i);
 						url = new URL(ppl.product_image);
 						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+						bmp = Bitmap.createScaledBitmap(bmp, layout.getHeight()-30, layout.getHeight()-30, true);
 						imageButton.setImageBitmap(bmp);
 						imageButton.setId(i);
 					} catch (Exception e) {
@@ -831,9 +859,43 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						
 						@Override
 						public void onClick(View v) {
-							mPPLLayout.setVisibility(View.VISIBLE);
+							/*mPPLDataLayout = (RelativeLayout)findViewById(R.id.data_ppl);
+							mPPLDataImage = (ImageView)findViewById(R.id.data_image);
+							mPPLDataText = (TextView)findViewById(R.id.tv_ppl);
+							mPPLDataBrand = (TextView)findViewById(R.id.ppl_brand);
+							mPPLDataMall = (TextView)findViewById(R.id.ppl_mall);
+							mPPLDataName = (TextView)findViewById(R.id.ppl_name);
+							mPPLDataPrice = (TextView)findViewById(R.id.ppl_price);
+							mPPLDataSite = (TextView)findViewById(R.id.ppl_site);*/
+							
+							mPPLDataLayout.setVisibility(View.VISIBLE);
+							
 							PPLData ppl1 = JSONParserHelper.pplData.get(v.getId());
-							Toast.makeText(getApplicationContext(), ""+ppl1.product_name, Toast.LENGTH_SHORT).show();
+							URL url;
+							Bitmap bmp;
+							try {
+								url = new URL(ppl1.product_image);
+								bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+								
+								int layoutSize = mPPLLayout.getHeight()-60;
+								int bitmapHeight = bmp.getHeight();
+								int bitmapWidth = bmp.getWidth();
+								int bitmapReSize = (int)((float)bitmapWidth*((float)layoutSize/bitmapHeight));
+								bmp = Bitmap.createScaledBitmap(bmp, layoutSize, layoutSize, true);
+								mPPLDataImage.setImageBitmap(bmp);
+								mPPLDataImage.setVisibility(View.VISIBLE);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							mPPLDataText.setText(""+ppl1.product_code);
+							mPPLDataBrand.setText(ppl1.brand_name);
+							mPPLDataMall.setText(ppl1.store_link);
+							mPPLDataName.setText(ppl1.product_name);
+							mPPLDataPrice.setText(""+ppl1.price);
+							mPPLDataSite.setText(ppl1.drama_code);
+							//Toast.makeText(getApplicationContext(), ""+ppl1.product_name, Toast.LENGTH_SHORT).show();
 							
 						}
 					});

@@ -190,21 +190,20 @@
 
             <HorizontalScrollView
                 android:id="@+id/ppl_scroll"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:scrollbars="none" >
 
                 <LinearLayout
                     android:id="@+id/layout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal" >
 
                     <ImageButton
                         android:id="@+id/ppl_scroll_iv"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent" />
-
+                        android:layout_width="wrap_content"
+                        android:layout_height="140dp" />
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -271,20 +270,82 @@
         android:layout_above="@+id/slide"
         android:visibility="gone" >
 
+        <RelativeLayout
+            android:id="@+id/data_ppl"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingBottom="30.0dip"
+            android:paddingLeft="30.0dip"
+            android:paddingRight="30.0dip"
+            android:paddingTop="30.0dip"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/data_image"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignParentLeft="true" />
+
+            <TextView
+                android:id="@+id/tv_ppl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/data_image"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/ppl_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_ppl"
+                android:layout_toRightOf="@+id/data_image"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"  />
+
+            <TextView
+                android:id="@+id/ppl_brand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ppl_name"
+                android:layout_toRightOf="@+id/data_image"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"  />
+
+            <TextView
+                android:id="@+id/ppl_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ppl_brand"
+                android:layout_toRightOf="@+id/data_image"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"  />
+
+            <TextView
+                android:id="@+id/ppl_site"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ppl_price"
+                android:layout_toRightOf="@+id/data_image"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"  />
+
+            <TextView
+                android:id="@+id/ppl_mall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ppl_site"
+                android:layout_toRightOf="@+id/data_image"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"  />
+        </RelativeLayout>
+
         <ListView
             android:id="@+id/lv_ppl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/tv_ppl" />
-
-        <TextView
-            android:id="@+id/tv_ppl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/lv_ppl"
-            android:layout_alignParentRight="true"
-            android:text="PPL Information" />
+            android:visibility="gone" />
     </RelativeLayout>
 
     <TextView

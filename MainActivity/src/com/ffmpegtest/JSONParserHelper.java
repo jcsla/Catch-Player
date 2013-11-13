@@ -15,7 +15,7 @@ public class JSONParserHelper {
 
 		JSONParser jParser = new JSONParser();
 		JSONArray json = jParser.getJSONFromUrl("http://kdspykim2.cafe24.com:8080/get_ppl_data?drama_code="+dName+"&current_time="+dTime);
-		Log.e("JSONParser", ""+json.toString());
+		//Log.e("JSONParser", ""+json.toString());
 		try {
 			for(int i=0;i<json.length();i++){
 				JSONObject jObs = json.getJSONObject(i);
@@ -30,7 +30,7 @@ public class JSONParserHelper {
 				ppl.brand_name = jObs.getString("brand_name");
 				ppl.product_name = jObs.getString("product_name");
 				
-				Log.e("JSONParser", ""+ppl.store_link);
+				//Log.e("JSONParser", ""+ppl.store_link);
 				
 				pplData.add(ppl);
 			}
