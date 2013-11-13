@@ -140,7 +140,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private Handler mHoldHandler;
 
 	private ImageView mPPLButton;
-	private ListView mPPLList;
 	private RelativeLayout mPPLLayout;
 
 	private SlidingDrawer drawer;
@@ -241,8 +240,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
-
-		mPPLList = (ListView) this.findViewById(R.id.lv_ppl);
 
 		mPPLLayout = (RelativeLayout) this.findViewById(R.id.ll_ppl);
 		Paint paint = new Paint();
@@ -819,6 +816,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						url = new URL(ppl.product_image);
 						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 						imageButton.setImageBitmap(bmp);
+						imageButton.setId(i);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -833,7 +831,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						
 						@Override
 						public void onClick(View v) {
-							Toast.makeText(getApplicationContext(), "asdf"+v.getId(), Toast.LENGTH_SHORT).show();
+							mPPLLayout.setVisibility(View.VISIBLE);
+							PPLData ppl1 = JSONParserHelper.pplData.get(v.getId());
+							Toast.makeText(getApplicationContext(), ""+ppl1.product_name, Toast.LENGTH_SHORT).show();
 							
 						}
 					});
