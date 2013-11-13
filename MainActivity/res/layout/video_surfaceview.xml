@@ -214,6 +214,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:onClick="true"
+                android:visibility="gone"
                 android:text="닫기" />
         </RelativeLayout>
     </SlidingDrawer>

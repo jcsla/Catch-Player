@@ -745,6 +745,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					else
 					{
 						mPPLLayout.setVisibility(View.GONE);
+						drawer.animateClose();
 						if(mPlay) {
 							mMpegPlayer.resume();
 							mTouchPressed = false;
@@ -859,14 +860,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						
 						@Override
 						public void onClick(View v) {
-							/*mPPLDataLayout = (RelativeLayout)findViewById(R.id.data_ppl);
-							mPPLDataImage = (ImageView)findViewById(R.id.data_image);
-							mPPLDataText = (TextView)findViewById(R.id.tv_ppl);
-							mPPLDataBrand = (TextView)findViewById(R.id.ppl_brand);
-							mPPLDataMall = (TextView)findViewById(R.id.ppl_mall);
-							mPPLDataName = (TextView)findViewById(R.id.ppl_name);
-							mPPLDataPrice = (TextView)findViewById(R.id.ppl_price);
-							mPPLDataSite = (TextView)findViewById(R.id.ppl_site);*/
 							
 							mPPLDataLayout.setVisibility(View.VISIBLE);
 							
@@ -1273,6 +1266,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				return true;
 			case KeyEvent.KEYCODE_BACK:
+				if(mPPLLayout.getVisibility() == View.VISIBLE){
+					mPPLLayout.setVisibility(View.GONE);
+					drawer.animateClose();
+					if(mPlay) {
+						mMpegPlayer.resume();
+						mTouchPressed = false;
+						getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						this.mTitleBar.setVisibility(View.GONE);
+						this.mControlsView.setVisibility(View.GONE);
+						this.mPPLButton.setVisibility(View.GONE);
+					}
+
+					//mPPLLayout.setVisibility(View.GONE);
+					mSeekBar.setEnabled(true);
+					onPPL = false;
+					return true;
+				}
+				
 				if (onPPL) {
 					if(mPlay) {
 						mMpegPlayer.resume();
@@ -1297,6 +1308,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					editor.commit();
 					finish();
 				}
+										
 				return true;
 			}
 

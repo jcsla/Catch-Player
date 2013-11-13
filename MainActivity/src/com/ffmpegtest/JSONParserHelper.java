@@ -19,7 +19,7 @@ public class JSONParserHelper {
 		try {
 			for(int i=0;i<json.length();i++){
 				JSONObject jObs = json.getJSONObject(i);
-				Log.e("JSONParser", ""+jObs.toString());
+				//Log.e("JSONParser", ""+jObs.toString());
 				PPLData ppl = new PPLData();
 				
 				ppl.store_link = jObs.getString("store_link");
