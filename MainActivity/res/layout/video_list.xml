@@ -2,33 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp">
+    android:padding="15dp" >
+
     <ImageView
         android:id="@+id/iv_folder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/tv_video_title"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/iv_folder"
+        android:layout_marginTop="14dp"
         android:layout_toRightOf="@+id/iv_folder"
-        android:textSize="20sp"
-        android:text="Video Title" />
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tv_video_size"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_video_title"
-        android:layout_below="@+id/tv_video_title"
-        android:text="Video Size" />
+        <TextView
+            android:id="@+id/tv_video_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="Video Title"
+            android:textSize="21dp" />
 
-    <ImageView
-        android:id="@+id/iv_new_video"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tv_video_size"
-        android:layout_toRightOf="@+id/tv_video_title" />
+        <TextView
+            android:id="@+id/tv_video_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="Video Size"
+            android:textSize="15dp" />
+    </LinearLayout>
 
 </RelativeLayout>

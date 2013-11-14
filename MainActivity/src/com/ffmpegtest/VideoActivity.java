@@ -321,18 +321,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
 		mMpegPlayer.setMpegListener(this);
+		progess = util.getProgress(this);
 
 		setDataSource();
-
-		progess = util.getProgress(this);
-		JSONHelper.dramaName = "";
-		String finger = dbAdapter.getVideoFingerPrint(path);
-		Log.e("fingerPrint", "hello"+finger);
-		
-		if(finger != null && finger.equals(""))
-			new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path).fingerTask.execute(this);
-		else
-			JSONHelper.dramaName = finger;
 
 		mMpegPlayer.resume();
 	}
@@ -459,6 +450,16 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if(mUseSubtitle == true)
 			executeSubtitleThread();
 		Log.e("filePath : ", path);
+
+
+		JSONHelper.dramaName = "";
+		String finger = dbAdapter.getVideoFingerPrint(path);
+		Log.e("fingerPrint", "hello"+finger);
+		
+		if(finger != null && finger.equals(""))
+			new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path).fingerTask.execute(this);
+		else
+			JSONHelper.dramaName = finger;
 	}
 
 	public void setSubtitleSource()

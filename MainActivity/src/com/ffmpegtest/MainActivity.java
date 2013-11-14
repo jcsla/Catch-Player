@@ -92,8 +92,6 @@ public class MainActivity extends Activity implements OnItemClickListener,
 
 	public void setAdapter(ListAdapter adapter) {
 		if (adapter.getCount() == 0) {
-			listView.setSelector(new PaintDrawable(0xffffff));
-			listView.setDivider(null);
 			ArrayList<String> notData = new ArrayList<String>();
 			notData.add("비디오가 없습니다.");
 			listView.setAdapter(new ArrayAdapter<String>(this,

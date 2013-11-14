@@ -58,7 +58,7 @@ public class FolderListAdapter extends BaseAdapter {
 			viewHolder.tv_title = (TextView)v.findViewById(R.id.tv_video_title);
 			viewHolder.tv_size = (TextView)v.findViewById(R.id.tv_video_size);
 			viewHolder.iv_folder = (ImageView)v.findViewById(R.id.iv_folder);
-			viewHolder.iv_folder.setBackgroundResource(R.drawable.ic_launcher);
+			viewHolder.iv_folder.setBackgroundResource(R.drawable.folder);
 
 			v.setTag(viewHolder);
 
