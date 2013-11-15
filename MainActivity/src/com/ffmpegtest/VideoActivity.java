@@ -56,20 +56,26 @@ import android.media.AudioManager;
 import android.media.audiofx.BassBoost.Settings;
 import android.net.Uri;
 import android.net.rtp.AudioStream;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.os.StrictMode;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -140,23 +146,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private Handler mHoldHandler;
 
 	private ImageView mPPLButton;
+	private ViewPager mPPLViewPager;
 	private RelativeLayout mPPLLayout;
-	private RelativeLayout mPPLDataLayout;
-	private ImageView mPPLDataImage;
-	private TextView mPPLDataText;
-	private TextView mPPLDataPrice;
-	private TextView mPPLDataSite;
-	private TextView mPPLDataMall;
-	private TextView mPPLDataBrand;
-	private TextView mPPLDataName;
-
-	private SlidingDrawer drawer;
+	private LinearLayout mPageMark;
+	private int mPrevPosition;
 
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
 	private Boolean holdCheck;
-
-	private Button mSlideButton;
 
 	private AudioManager mAudioManager;
 	private int mAudioMax;
@@ -239,17 +236,29 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPPLButton = (ImageView) this.findViewById(R.id.btn_ppl);
 		mPPLButton.setOnClickListener(this);
 
-		drawer = (SlidingDrawer)findViewById(R.id.slide);
-
-		mSlideButton = (Button)this.findViewById(R.id.btn_slide);
-		mSlideButton.setOnClickListener(this);
-
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
+		mPPLLayout = (RelativeLayout)this.findViewById(R.id.rl_ppl_all);
+		mPageMark = (LinearLayout) this.findViewById(R.id.page_mark);
+		mPPLViewPager = (ViewPager) this.findViewById(R.id.view_pager);
+		mPPLViewPager.setOnPageChangeListener(new OnPageChangeListener() {    //아이템이 변경되면
 
-		mPPLLayout = (RelativeLayout) this.findViewById(R.id.ll_ppl);
+			//아이템이 선택이 되었으면
+			@Override 
+			public void onPageSelected(int position) {
+				//이전 페이지에 해당하는 페이지 표시 이미지 변경
+				mPageMark.getChildAt(mPrevPosition).setBackgroundResource(R.drawable.page_not);
+
+				//현재 페이지에 해당하는 페이지 표시 이미지 변경    
+				mPageMark.getChildAt(position).setBackgroundResource(R.drawable.page_select);
+				mPrevPosition = position;                //이전 포지션 값을 현재로 변경
+			}
+			@Override public void onPageScrolled(int position, float positionOffest, int positionOffsetPixels) {}
+			@Override public void onPageScrollStateChanged(int state) {}
+		});
+
 		Paint paint = new Paint();
 		paint.setColor(Color.BLACK);
 		paint.setAlpha(160);
@@ -327,6 +336,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mMpegPlayer.resume();
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -455,7 +465,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		JSONHelper.dramaName = "";
 		String finger = dbAdapter.getVideoFingerPrint(path);
 		Log.e("fingerPrint", "hello"+finger);
-		
+
 		if(finger != null && finger.equals(""))
 			new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path).fingerTask.execute(this);
 		else
@@ -746,7 +756,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					else
 					{
 						mPPLLayout.setVisibility(View.GONE);
-						drawer.animateClose();
 						if(mPlay) {
 							mMpegPlayer.resume();
 							mTouchPressed = false;
@@ -766,7 +775,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				{
 					mUnHoldButtonView.setVisibility(View.VISIBLE);
 				}
-				
+
 				if(mControlsView.getVisibility() == View.VISIBLE){
 					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				}
@@ -812,107 +821,53 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.btn_ppl:
 				if(mPlay) 
 					mMpegPlayer.pause();
+				mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this));
 
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////PPL json parser
-				mPPLDataLayout = (RelativeLayout)findViewById(R.id.data_ppl);
-				mPPLDataImage = (ImageView)findViewById(R.id.data_image);
-				mPPLDataText = (TextView)findViewById(R.id.tv_ppl);
-				mPPLDataBrand = (TextView)findViewById(R.id.ppl_brand);
-				mPPLDataMall = (TextView)findViewById(R.id.ppl_mall);
-				mPPLDataName = (TextView)findViewById(R.id.ppl_name);
-				mPPLDataPrice = (TextView)findViewById(R.id.ppl_price);
-				mPPLDataSite = (TextView)findViewById(R.id.ppl_site);
-				
+				//					imageButton.setOnClickListener(new OnClickListener() {
+				//						
+				//						@Override
+				//						public void onClick(View v) {
+				//							
+				//							mPPLDataLayout.setVisibility(View.VISIBLE);
+				//							
+				//							PPLData ppl1 = JSONParserHelper.pplData.get(v.getId());
+				//							URL url;
+				//							Bitmap bmp;
+				//							try {
+				//								url = new URL(ppl1.product_image);
+				//								bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+				//								
+				//								int layoutSize = mPPLLayout.getHeight()-60;
+				//								int bitmapHeight = bmp.getHeight();
+				//								int bitmapWidth = bmp.getWidth();
+				//								int bitmapReSize = (int)((float)bitmapWidth*((float)layoutSize/bitmapHeight));
+				//								bmp = Bitmap.createScaledBitmap(bmp, layoutSize, layoutSize, true);
+				//								mPPLDataImage.setImageBitmap(bmp);
+				//								mPPLDataImage.setVisibility(View.VISIBLE);
+				//							} catch (IOException e) {
+				//								// TODO Auto-generated catch block
+				//								e.printStackTrace();
+				//							}
+				//							
+				//							mPPLDataText.setText(""+ppl1.product_code);
+				//							mPPLDataBrand.setText(ppl1.brand_name);
+				//							mPPLDataMall.setText(ppl1.store_link);
+				//							mPPLDataName.setText(ppl1.product_name);
+				//							mPPLDataPrice.setText(""+ppl1.price);
+				//							mPPLDataSite.setText(ppl1.drama_code);
+				//							//Toast.makeText(getApplicationContext(), ""+ppl1.product_name, Toast.LENGTH_SHORT).show();
+				//							
+				//						}
+				//					});
+				//				}
+
+
+				this.mTitleBar.setVisibility(View.GONE);
+				this.mControlsView.setVisibility(View.GONE);
+				this.mPPLButton.setVisibility(View.GONE);
 				mPPLLayout.setVisibility(View.VISIBLE);
-				mPPLDataText.setText("");
-				mPPLDataBrand.setText("");
-				mPPLDataMall.setText("");
-				mPPLDataName.setText("");
-				mPPLDataPrice.setText("");
-				mPPLDataSite.setText("");
-				mPPLDataImage.setVisibility(View.INVISIBLE);
-				
-				JSONParserHelper.pplData.clear();
-				JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
-				//imageView.
-				LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
-				layout.removeAllViews();				
-				for (int i = 0; i < JSONParserHelper.pplData.size(); i++) {
-					ImageButton imageButton = new ImageButton(this);
-					URL url;
-					try {
-						PPLData ppl = JSONParserHelper.pplData.get(i);
-						url = new URL(ppl.product_image);
-						Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-						bmp = Bitmap.createScaledBitmap(bmp, layout.getHeight()-30, layout.getHeight()-30, true);
-						imageButton.setImageBitmap(bmp);
-						imageButton.setId(i);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					//imageView.setImageResource();
-					LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
-							LinearLayout.LayoutParams.MATCH_PARENT,
-							LinearLayout.LayoutParams.WRAP_CONTENT
-							);
-					layout.addView(imageButton, p);
-					imageButton.setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							
-							mPPLDataLayout.setVisibility(View.VISIBLE);
-							
-							PPLData ppl1 = JSONParserHelper.pplData.get(v.getId());
-							URL url;
-							Bitmap bmp;
-							try {
-								url = new URL(ppl1.product_image);
-								bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-								
-								int layoutSize = mPPLLayout.getHeight()-60;
-								int bitmapHeight = bmp.getHeight();
-								int bitmapWidth = bmp.getWidth();
-								int bitmapReSize = (int)((float)bitmapWidth*((float)layoutSize/bitmapHeight));
-								bmp = Bitmap.createScaledBitmap(bmp, layoutSize, layoutSize, true);
-								mPPLDataImage.setImageBitmap(bmp);
-								mPPLDataImage.setVisibility(View.VISIBLE);
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							mPPLDataText.setText(""+ppl1.product_code);
-							mPPLDataBrand.setText(ppl1.brand_name);
-							mPPLDataMall.setText(ppl1.store_link);
-							mPPLDataName.setText(ppl1.product_name);
-							mPPLDataPrice.setText(""+ppl1.price);
-							mPPLDataSite.setText(ppl1.drama_code);
-							//Toast.makeText(getApplicationContext(), ""+ppl1.product_name, Toast.LENGTH_SHORT).show();
-							
-						}
-					});
-				}
-
-
-				this.mTitleBar.setVisibility(View.INVISIBLE);
-				this.mControlsView.setVisibility(View.INVISIBLE);
-
-				drawer.animateOpen();
-				
-				
-				
-				//this.mPPLButton.setVisibility(View.GONE);
-				//mPPLLayout.setVisibility(View.VISIBLE);
-				//onPPL = true;
-				//mSeekBar.setEnabled(false);
-				break;
-			case R.id.btn_slide:
-				drawer.animateClose();
-				this.mTitleBar.setVisibility(View.VISIBLE);
-				this.mControlsView.setVisibility(View.VISIBLE);
-				this.mPPLButton.setVisibility(View.VISIBLE);
+				onPPL = true;
+				mSeekBar.setEnabled(false);
 				break;
 			default:
 				throw new RuntimeException();
@@ -1269,7 +1224,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case KeyEvent.KEYCODE_BACK:
 				if(mPPLLayout.getVisibility() == View.VISIBLE){
 					mPPLLayout.setVisibility(View.GONE);
-					drawer.animateClose();
 					if(mPlay) {
 						mMpegPlayer.resume();
 						mTouchPressed = false;
@@ -1284,7 +1238,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					onPPL = false;
 					return true;
 				}
-				
+
 				if (onPPL) {
 					if(mPlay) {
 						mMpegPlayer.resume();
@@ -1309,7 +1263,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					editor.commit();
 					finish();
 				}
-										
+
 				return true;
 			}
 
@@ -1460,6 +1414,87 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			mSmiview.setLayoutParams(params);
 	 */
+	private class PPLPagerViewAdapter extends PagerAdapter{
 
+		private LayoutInflater mInflater;
+		private ArrayList<PPLData> mPPLList;
+
+		public PPLPagerViewAdapter(Context c){
+			super();
+			mInflater = LayoutInflater.from(c);
+			mPPLList = new ArrayList<PPLData>();
+			JSONParserHelper.pplData.clear();
+			JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
+			//imageView.			
+			for (int i = 0; i < JSONParserHelper.pplData.size(); i++) {
+				try {
+					PPLData ppl = JSONParserHelper.pplData.get(i);
+					Log.e("Product", ppl.getProduct_name());
+					mPPLList.add(ppl);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			initPageMark();
+		}
+
+		@Override
+		public int getCount() {
+			return mPPLList.size();
+		}
+
+		@Override
+		public Object instantiateItem(View pager, int position) {
+			View v = mInflater.inflate(R.layout.vp_ppl, null);
+			ImageView iv_ppl = (ImageView)v.findViewById(R.id.iv_ppl_image);
+			iv_ppl.setImageBitmap(mPPLList.get(position).getProduct_image());
+			TextView tv_ppl_title = (TextView)v.findViewById(R.id.tv_ppl_title);
+			tv_ppl_title.setText(mPPLList.get(position).getProduct_name());
+			TextView tv_ppl_brand = (TextView)v.findViewById(R.id.tv_ppl_brand);
+			tv_ppl_brand.setText(mPPLList.get(position).getBrand_name());
+			TextView tv_ppl_price = (TextView)v.findViewById(R.id.tv_ppl_price);
+			tv_ppl_price.setText(mPPLList.get(position).getPrice() + "원");
+
+			((ViewPager)pager).addView(v, 0);
+
+			return v; 
+		}
+
+		@Override
+		public void destroyItem(View pager, int position, Object view) {    
+			((ViewPager)pager).removeView((View)view);
+		}
+
+		@Override
+		public boolean isViewFromObject(View pager, Object obj) {
+			return pager == obj; 
+		}
+
+
+		private void initPageMark(){
+			mPageMark.removeAllViews();
+			for(int i=0; i<getCount(); i++)
+			{
+				ImageView iv = new ImageView(getApplicationContext());	//페이지 표시 이미지 뷰 생성
+				iv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+
+				//첫 페이지 표시 이미지 이면 선택된 이미지로
+				if(i==0)
+					iv.setBackgroundResource(R.drawable.page_select);
+				else	//나머지는 선택안된 이미지로
+					iv.setBackgroundResource(R.drawable.page_not);
+
+				//LinearLayout에 추가
+				mPageMark.addView(iv);
+			}
+			mPrevPosition = 0;	//이전 포지션 값 초기화
+		}
+
+		@Override public void restoreState(Parcelable arg0, ClassLoader arg1) {}
+		@Override public Parcelable saveState() { return null; }
+		@Override public void startUpdate(View arg0) {}
+		@Override public void finishUpdate(View arg0) {}
+	}
 
 }

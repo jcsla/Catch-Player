@@ -15,7 +15,6 @@
         android:layout_alignTop="@+id/iv_folder"
         android:layout_marginTop="14dp"
         android:layout_toRightOf="@+id/iv_folder"
-        android:gravity="center_vertical"
         android:orientation="vertical" >
 
         <TextView

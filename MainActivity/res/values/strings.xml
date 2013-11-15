@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, FFmpegExampleActivity!</string>
-    <string name="app_name">FFmpegExample</string>
+    <string name="app_name">Catch-Player</string>
     <string name="no_videos">No videos</string>
     <string name="could_not_read_videos_directory">Could not read videos directory</string>
     <string name="error">Error!</string>
