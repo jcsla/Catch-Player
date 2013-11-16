@@ -420,10 +420,10 @@ int player_decode_audio(struct DecoderData * decoder_data, JNIEnv * env,
 
 	int64_t pts = packet->pts;
 
-	if (len < 0) {
-		LOGE(1, "Fail decoding audio %d\n", len);
-		return -ERROR_WHILE_DECODING_VIDEO;
-	}
+	//if (len < 0) {
+	//	LOGE(1, "Fail decoding audio %d\n", len);
+	//	return -ERROR_WHILE_DECODING_VIDEO;
+	//}
 	if (!got_frame_ptr) {
 		LOGI(10, "player_decode_audio Audio frame not finished\n");
 		return 0;
@@ -1961,7 +1961,7 @@ int player_create_audio_track(struct Player *player, struct State *state) {
 			|| dec_channel_layout != audio_track_layout
 			|| ctx->sample_rate != audio_track_sample_rate) {
 
-		LOGI(3,
+		LOGI(1,
 				"player_set_data_sourcd preparing conversion of %d Hz %s %d "
 				"channels to %d Hz %s %d channels",
 				ctx->sample_rate,
