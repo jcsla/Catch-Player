@@ -1425,6 +1425,25 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mPPLList = new ArrayList<PPLData>();
 			JSONParserHelper.pplData.clear();
 			JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
+			if(JSONParserHelper.pplData.size()==0){
+				PPLData ppl = new PPLData();
+				Bitmap bitmap = null;
+				try {
+					bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.parser);
+					bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
+					ppl.setProduct_image(bitmap);
+				} catch(Exception e){
+
+				}
+
+				ppl.setPrice(0);
+				ppl.setProduct_code(0);
+				ppl.setDrama_code("");
+				ppl.setBrand_name("현재 시청장면에");
+				ppl.setProduct_name("등록된 상품이 없습니다.");
+
+				JSONParserHelper.pplData.add(ppl);
+			}
 			//imageView.			
 			for (int i = 0; i < JSONParserHelper.pplData.size(); i++) {
 				try {
@@ -1455,6 +1474,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			tv_ppl_brand.setText(mPPLList.get(position).getBrand_name());
 			TextView tv_ppl_price = (TextView)v.findViewById(R.id.tv_ppl_price);
 			tv_ppl_price.setText(mPPLList.get(position).getPrice() + "원");
+			if(mPPLList.get(position).getPrice()==0){
+				tv_ppl_price.setText("");
+			}
 
 			((ViewPager)pager).addView(v, 0);
 
