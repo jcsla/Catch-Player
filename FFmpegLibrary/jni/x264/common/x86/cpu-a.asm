@@ -1,7 +1,7 @@
 ;*****************************************************************************
 ;* cpu-a.asm: x86 cpu utilities
 ;*****************************************************************************
-;* Copyright (C) 2003-2012 x264 project
+;* Copyright (C) 2003-2013 x264 project
 ;*
 ;* Authors: Laurent Aimar <fenrir@via.ecp.fr>
 ;*          Loren Merritt <lorenm@u.washington.edu>
@@ -66,7 +66,27 @@ cglobal cpu_xgetbv, 3,7
     mov [r4], edx
     RET
 
-%if ARCH_X86_64 == 0
+%if ARCH_X86_64
+
+;-----------------------------------------------------------------------------
+; void stack_align( void (*func)(void*), void *arg );
+;-----------------------------------------------------------------------------
+cglobal stack_align
+    push rbp
+    mov  rbp, rsp
+%if WIN64
+    sub  rsp, 32 ; shadow space
+%endif
+    and  rsp, ~31
+    mov  rax, r0
+    mov   r0, r1
+    mov   r1, r2
+    mov   r2, r3
+    call rax
+    leave
+    ret
+
+%else
 
 ;-----------------------------------------------------------------------------
 ; int cpu_cpuid_test( void )
@@ -94,14 +114,11 @@ cglobal cpu_cpuid_test
     popfd
     ret
 
-;-----------------------------------------------------------------------------
-; void stack_align( void (*func)(void*), void *arg );
-;-----------------------------------------------------------------------------
 cglobal stack_align
     push ebp
     mov  ebp, esp
     sub  esp, 12
-    and  esp, ~15
+    and  esp, ~31
     mov  ecx, [ebp+8]
     mov  edx, [ebp+12]
     mov  [esp], edx
@@ -129,13 +146,52 @@ cglobal cpu_sfence
     sfence
     ret
 
+cextern intel_cpu_indicator_init
+
 ;-----------------------------------------------------------------------------
-; void cpu_mask_misalign_sse( void )
+; void safe_intel_cpu_indicator_init( void );
 ;-----------------------------------------------------------------------------
-cglobal cpu_mask_misalign_sse
-    sub   rsp, 4
-    stmxcsr [rsp]
-    or dword [rsp], 1<<17
-    ldmxcsr [rsp]
-    add   rsp, 4
+cglobal safe_intel_cpu_indicator_init
+    push r0
+    push r1
+    push r2
+    push r3
+    push r4
+    push r5
+    push r6
+%if ARCH_X86_64
+    push r7
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+%endif
+    push rbp
+    mov  rbp, rsp
+%if WIN64
+    sub  rsp, 32 ; shadow space
+%endif
+    and  rsp, ~31
+    call intel_cpu_indicator_init
+    leave
+%if ARCH_X86_64
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop r7
+%endif
+    pop r6
+    pop r5
+    pop r4
+    pop r3
+    pop r2
+    pop r1
+    pop r0
     ret

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * raw.c: raw input
  *****************************************************************************
- * Copyright (C) 2003-2012 x264 project
+ * Copyright (C) 2003-2013 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -70,7 +70,7 @@ static int open_file( char *psz_filename, hnd_t *p_handle, video_info_t *info, c
     if( !strcmp( psz_filename, "-" ) )
         h->fh = stdin;
     else
-        h->fh = fopen( psz_filename, "rb" );
+        h->fh = x264_fopen( psz_filename, "rb" );
     if( h->fh == NULL )
         return -1;
 

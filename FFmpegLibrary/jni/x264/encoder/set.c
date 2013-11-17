@@ -1,7 +1,7 @@
 /*****************************************************************************
  * set: header writing
  *****************************************************************************
- * Copyright (C) 2003-2012 x264 project
+ * Copyright (C) 2003-2013 x264 project
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Loren Merritt <lorenm@u.washington.edu>
@@ -31,6 +31,7 @@
 
 // Indexed by pic_struct values
 static const uint8_t num_clock_ts[10] = { 0, 1, 1, 1, 2, 2, 3, 3, 2, 3 };
+const static uint8_t avcintra_uuid[] = {0xF7, 0x49, 0x3E, 0xB3, 0xD4, 0x00, 0x47, 0x96, 0x86, 0x86, 0xC9, 0x70, 0x7B, 0x64, 0x37, 0x2A};
 
 static void transpose( uint8_t *buf, int w )
 {
@@ -91,7 +92,7 @@ void x264_sei_write( bs_t *s, uint8_t *payload, int payload_size, int payload_ty
     bs_write( s, 8, payload_size-i );
 
     for( i = 0; i < payload_size; i++ )
-        bs_write(s, 8, payload[i] );
+        bs_write( s, 8, payload[i] );
 
     bs_rbsp_trailing( s );
     bs_flush( s );
@@ -208,9 +209,9 @@ void x264_sps_init( x264_sps_t *sps, int i_id, x264_param_t *param )
                            ( csp >= X264_CSP_BGR ? 1 : 0 ) );
     sps->vui.b_color_description_present = 0;
 
-    sps->vui.i_colorprim = ( param->vui.i_colorprim >= 0 && param->vui.i_colorprim <=  8 ? param->vui.i_colorprim : 2 );
-    sps->vui.i_transfer  = ( param->vui.i_transfer  >= 0 && param->vui.i_transfer  <= 10 ? param->vui.i_transfer  : 2 );
-    sps->vui.i_colmatrix = ( param->vui.i_colmatrix >= 0 && param->vui.i_colmatrix <=  8 ? param->vui.i_colmatrix :
+    sps->vui.i_colorprim = ( param->vui.i_colorprim >= 0 && param->vui.i_colorprim <=  9 ? param->vui.i_colorprim : 2 );
+    sps->vui.i_transfer  = ( param->vui.i_transfer  >= 0 && param->vui.i_transfer  <= 15 ? param->vui.i_transfer  : 2 );
+    sps->vui.i_colmatrix = ( param->vui.i_colmatrix >= 0 && param->vui.i_colmatrix <= 10 ? param->vui.i_colmatrix :
                            ( csp >= X264_CSP_BGR ? 0 : 2 ) );
     if( sps->vui.i_colorprim != 2 ||
         sps->vui.i_transfer  != 2 ||
@@ -249,7 +250,7 @@ void x264_sps_init( x264_sps_t *sps, int i_id, x264_param_t *param )
 
     // NOTE: HRD related parts of the SPS are initialised in x264_ratecontrol_init_reconfigurable
 
-    sps->vui.b_bitstream_restriction = 1;
+    sps->vui.b_bitstream_restriction = param->i_keyint_max > 1;
     if( sps->vui.b_bitstream_restriction )
     {
         sps->vui.b_motion_vectors_over_pic_boundaries = 1;
@@ -421,7 +422,7 @@ void x264_pps_init( x264_pps_t *pps, int i_id, x264_param_t *param, x264_sps_t *
     pps->i_sps_id = sps->i_id;
     pps->b_cabac = param->b_cabac;
 
-    pps->b_pic_order = param->b_interlaced;
+    pps->b_pic_order = !param->b_avcintra_compat && param->b_interlaced;
     pps->i_num_slice_groups = 1;
 
     pps->i_num_ref_idx_l0_default_active = param->i_frame_reference;
@@ -430,7 +431,7 @@ void x264_pps_init( x264_pps_t *pps, int i_id, x264_param_t *param, x264_sps_t *
     pps->b_weighted_pred = param->analyse.i_weighted_pred > 0;
     pps->b_weighted_bipred = param->analyse.b_weighted_bipred ? 2 : 0;
 
-    pps->i_pic_init_qp = param->rc.i_rc_method == X264_RC_ABR ? 26 + QP_BD_OFFSET : SPEC_QP( param->rc.i_qp_constant );
+    pps->i_pic_init_qp = param->rc.i_rc_method == X264_RC_ABR || param->b_stitchable ? 26 + QP_BD_OFFSET : SPEC_QP( param->rc.i_qp_constant );
     pps->i_pic_init_qs = 26 + QP_BD_OFFSET;
 
     pps->i_chroma_qp_index_offset = param->analyse.i_chroma_qp_offset;
@@ -575,7 +576,7 @@ int x264_sei_version_write( x264_t *h, bs_t *s )
 
     memcpy( payload, uuid, 16 );
     sprintf( payload+16, "x264 - core %d%s - H.264/MPEG-4 AVC codec - "
-             "Copy%s 2003-2012 - http://www.videolan.org/x264.html - options: %s",
+             "Copy%s 2003-2013 - http://www.videolan.org/x264.html - options: %s",
              X264_BUILD, X264_VERSION, HAVE_GPL?"left":"right", opts );
     length = strlen(payload)+1;
 
@@ -725,25 +726,68 @@ void x264_sei_dec_ref_pic_marking_write( x264_t *h, bs_t *s )
     x264_sei_write( s, tmp_buf, bs_pos( &q ) / 8, SEI_DEC_REF_PIC_MARKING );
 }
 
+int x264_sei_avcintra_umid_write( x264_t *h, bs_t *s )
+{
+    uint8_t data[512];
+    const char *msg = "UMID";
+    const int len = 497;
+
+    memset( data, 0xff, len );
+    memcpy( data, avcintra_uuid, sizeof(avcintra_uuid) );
+    memcpy( data+16, msg, strlen(msg) );
+
+    data[20] = 0x13;
+    /* These bytes appear to be some sort of frame/seconds counter in certain applications,
+     * but others jump around, so leave them as zero for now */
+    data[21] = data[22] = 0;
+
+    data[28] = 0x14;
+    data[36] = 0x60;
+    data[41] = 0x22; /* Believed to be some sort of end of basic UMID identifier */
+
+    x264_sei_write( &h->out.bs, data, len, SEI_USER_DATA_UNREGISTERED );
+
+    return 0;
+}
+
+int x264_sei_avcintra_vanc_write( x264_t *h, bs_t *s, int len )
+{
+    uint8_t data[6000];
+    const char *msg = "VANC";
+    if( len > sizeof(data) )
+    {
+        x264_log( h, X264_LOG_ERROR, "AVC-Intra SEI is too large (%d)\n", len );
+        return -1;
+    }
+
+    memset( data, 0xff, len );
+    memcpy( data, avcintra_uuid, sizeof(avcintra_uuid) );
+    memcpy( data+16, msg, strlen(msg) );
+
+    x264_sei_write( &h->out.bs, data, len, SEI_USER_DATA_UNREGISTERED );
+
+    return 0;
+}
+
 const x264_level_t x264_levels[] =
 {
-    { 10,    1485,    99,   152064,     64,    175,  64, 64,  0, 2, 0, 0, 1 },
-    {  9,    1485,    99,   152064,    128,    350,  64, 64,  0, 2, 0, 0, 1 }, /* "1b" */
-    { 11,    3000,   396,   345600,    192,    500, 128, 64,  0, 2, 0, 0, 1 },
-    { 12,    6000,   396,   912384,    384,   1000, 128, 64,  0, 2, 0, 0, 1 },
-    { 13,   11880,   396,   912384,    768,   2000, 128, 64,  0, 2, 0, 0, 1 },
-    { 20,   11880,   396,   912384,   2000,   2000, 128, 64,  0, 2, 0, 0, 1 },
-    { 21,   19800,   792,  1824768,   4000,   4000, 256, 64,  0, 2, 0, 0, 0 },
-    { 22,   20250,  1620,  3110400,   4000,   4000, 256, 64,  0, 2, 0, 0, 0 },
-    { 30,   40500,  1620,  3110400,  10000,  10000, 256, 32, 22, 2, 0, 1, 0 },
-    { 31,  108000,  3600,  6912000,  14000,  14000, 512, 16, 60, 4, 1, 1, 0 },
-    { 32,  216000,  5120,  7864320,  20000,  20000, 512, 16, 60, 4, 1, 1, 0 },
-    { 40,  245760,  8192, 12582912,  20000,  25000, 512, 16, 60, 4, 1, 1, 0 },
-    { 41,  245760,  8192, 12582912,  50000,  62500, 512, 16, 24, 2, 1, 1, 0 },
-    { 42,  522240,  8704, 13369344,  50000,  62500, 512, 16, 24, 2, 1, 1, 1 },
-    { 50,  589824, 22080, 42393600, 135000, 135000, 512, 16, 24, 2, 1, 1, 1 },
-    { 51,  983040, 36864, 70778880, 240000, 240000, 512, 16, 24, 2, 1, 1, 1 },
-    { 52, 2073600, 36864, 70778880, 240000, 240000, 512, 16, 24, 2, 1, 1, 1 },
+    { 10,    1485,    99,    396,     64,    175,  64, 64,  0, 2, 0, 0, 1 },
+    {  9,    1485,    99,    396,    128,    350,  64, 64,  0, 2, 0, 0, 1 }, /* "1b" */
+    { 11,    3000,   396,    900,    192,    500, 128, 64,  0, 2, 0, 0, 1 },
+    { 12,    6000,   396,   2376,    384,   1000, 128, 64,  0, 2, 0, 0, 1 },
+    { 13,   11880,   396,   2376,    768,   2000, 128, 64,  0, 2, 0, 0, 1 },
+    { 20,   11880,   396,   2376,   2000,   2000, 128, 64,  0, 2, 0, 0, 1 },
+    { 21,   19800,   792,   4752,   4000,   4000, 256, 64,  0, 2, 0, 0, 0 },
+    { 22,   20250,  1620,   8100,   4000,   4000, 256, 64,  0, 2, 0, 0, 0 },
+    { 30,   40500,  1620,   8100,  10000,  10000, 256, 32, 22, 2, 0, 1, 0 },
+    { 31,  108000,  3600,  18000,  14000,  14000, 512, 16, 60, 4, 1, 1, 0 },
+    { 32,  216000,  5120,  20480,  20000,  20000, 512, 16, 60, 4, 1, 1, 0 },
+    { 40,  245760,  8192,  32768,  20000,  25000, 512, 16, 60, 4, 1, 1, 0 },
+    { 41,  245760,  8192,  32768,  50000,  62500, 512, 16, 24, 2, 1, 1, 0 },
+    { 42,  522240,  8704,  34816,  50000,  62500, 512, 16, 24, 2, 1, 1, 1 },
+    { 50,  589824, 22080, 110400, 135000, 135000, 512, 16, 24, 2, 1, 1, 1 },
+    { 51,  983040, 36864, 184320, 240000, 240000, 512, 16, 24, 2, 1, 1, 1 },
+    { 52, 2073600, 36864, 184320, 240000, 240000, 512, 16, 24, 2, 1, 1, 1 },
     { 0 }
 };
 
@@ -758,7 +802,7 @@ int x264_validate_levels( x264_t *h, int verbose )
 {
     int ret = 0;
     int mbs = h->sps->i_mb_width * h->sps->i_mb_height;
-    int dpb = mbs * 384 * h->sps->vui.i_max_dec_frame_buffering;
+    int dpb = mbs * h->sps->vui.i_max_dec_frame_buffering;
     int cbp_factor = h->sps->i_profile_idc>=PROFILE_HIGH422 ? 16 :
                      h->sps->i_profile_idc==PROFILE_HIGH10 ? 12 :
                      h->sps->i_profile_idc==PROFILE_HIGH ? 5 : 4;
@@ -773,12 +817,12 @@ int x264_validate_levels( x264_t *h, int verbose )
         ERROR( "frame MB size (%dx%d) > level limit (%d)\n",
                h->sps->i_mb_width, h->sps->i_mb_height, l->frame_size );
     if( dpb > l->dpb )
-        ERROR( "DPB size (%d frames, %d bytes) > level limit (%d frames, %d bytes)\n",
-                h->sps->vui.i_max_dec_frame_buffering, dpb, (int)(l->dpb / (384*mbs)), l->dpb );
+        ERROR( "DPB size (%d frames, %d mbs) > level limit (%d frames, %d mbs)\n",
+                h->sps->vui.i_max_dec_frame_buffering, dpb, l->dpb / mbs, l->dpb );
 
 #define CHECK( name, limit, val ) \
     if( (val) > (limit) ) \
-        ERROR( name " (%d) > level limit (%d)\n", (int)(val), (limit) );
+        ERROR( name " (%"PRId64") > level limit (%d)\n", (int64_t)(val), (limit) );
 
     CHECK( "VBV bitrate", (l->bitrate * cbp_factor) / 4, h->param.rc.i_vbv_max_bitrate );
     CHECK( "VBV buffer", (l->cpb * cbp_factor) / 4, h->param.rc.i_vbv_buffer_size );

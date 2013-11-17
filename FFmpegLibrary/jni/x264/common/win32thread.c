@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32thread.c: windows threading
  *****************************************************************************
- * Copyright (C) 2010-2012 x264 project
+ * Copyright (C) 2010-2013 x264 project
  *
  * Authors: Steven Walters <kemuri9@gmail.com>
  *          Pegasys Inc. <http://www.pegasys-inc.com>
@@ -62,7 +62,7 @@ static x264_win32thread_control_t thread_control;
 static unsigned __stdcall x264_win32thread_worker( void *arg )
 {
     x264_pthread_t *h = arg;
-    h->ret = h->func( h->arg );
+    *h->p_ret = h->func( h->arg );
     return 0;
 }
 
@@ -71,6 +71,8 @@ int x264_pthread_create( x264_pthread_t *thread, const x264_pthread_attr_t *attr
 {
     thread->func   = start_routine;
     thread->arg    = arg;
+    thread->p_ret  = &thread->ret;
+    thread->ret    = NULL;
     thread->handle = (void*)_beginthreadex( NULL, 0, x264_win32thread_worker, thread, 0, NULL );
     return !thread->handle;
 }
@@ -81,7 +83,7 @@ int x264_pthread_join( x264_pthread_t thread, void **value_ptr )
     if( ret != WAIT_OBJECT_0 )
         return -1;
     if( value_ptr )
-        *value_ptr = thread.ret;
+        *value_ptr = *thread.p_ret;
     CloseHandle( thread.handle );
     return 0;
 }
@@ -259,7 +261,7 @@ int x264_pthread_cond_wait( x264_pthread_cond_t *cond, x264_pthread_mutex_t *mut
 int x264_win32_threading_init( void )
 {
     /* find function pointers to API functions, if they exist */
-    HANDLE kernel_dll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+    HANDLE kernel_dll = GetModuleHandleW( L"kernel32.dll" );
     thread_control.cond_init = (void*)GetProcAddress( kernel_dll, "InitializeConditionVariable" );
     if( thread_control.cond_init )
     {
@@ -277,7 +279,7 @@ void x264_win32_threading_destroy( void )
     memset( &thread_control, 0, sizeof(x264_win32thread_control_t) );
 }
 
-int x264_pthread_num_processors_np()
+int x264_pthread_num_processors_np( void )
 {
     DWORD_PTR system_cpus, process_cpus = 0;
     int cpus = 0;
@@ -286,7 +288,7 @@ int x264_pthread_num_processors_np()
      * On platforms that support processor grouping, use GetThreadGroupAffinity to get the current thread's affinity instead. */
 #if ARCH_X86_64
     /* find function pointers to API functions specific to x86_64 platforms, if they exist */
-    HANDLE kernel_dll = GetModuleHandle( TEXT( "kernel32.dll" ) );
+    HANDLE kernel_dll = GetModuleHandleW( L"kernel32.dll" );
     BOOL (*get_thread_affinity)( HANDLE thread, x264_group_affinity_t *group_affinity ) = (void*)GetProcAddress( kernel_dll, "GetThreadGroupAffinity" );
     if( get_thread_affinity )
     {

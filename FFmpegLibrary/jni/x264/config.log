@@ -1,11 +1,11 @@
 x264 configure script
-Command line options: "--host=arm-linux" "--cross-prefix=arm-linux-androideabi" "--enable-shared" "--enable-static" "--prefix="
+Command line options: "--host=arm-linux" "--cross-prefix=arm-linux-androideabi-" "--enable-shared" "--enable-static" "--prefix=../ffmpeg-build/armeabi"
 
-checking whether arm-linux-androideabigcc works... no
+checking whether arm-linux-androideabi-gcc works... no
 Failed commandline was:
 --------------------------------------------------
-arm-linux-androideabigcc conftest.c  -Wall -I. -I$(SRCPATH)    -lm -o conftest
-./configure: 줄 140: arm-linux-androideabigcc: 명령어를 찾을 수 없음
+arm-linux-androideabi-gcc conftest.c  -Wall -I. -I$(SRCPATH)    -lm -o conftest
+./configure: 줄 144: arm-linux-androideabi-gcc: 명령어를 찾을 수 없음
 --------------------------------------------------
 Failed program was:
 --------------------------------------------------
