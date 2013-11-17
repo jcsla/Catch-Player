@@ -67,8 +67,7 @@ import com.ffmpegtest.helpers.AudioFingerPrintHelper;
 import com.ffmpegtest.helpers.JSONHelper;
 import com.ffmpegtest.helpers.Util;
 
-public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, 
-							OnSeekBarChangeListener, OnTouchListener, View.OnSystemUiVisibilityChangeListener
+public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener, View.OnSystemUiVisibilityChangeListener
 {
 	public static FFmpegPlayer mMpegPlayer;
 	protected boolean mPlay = false;
@@ -127,10 +126,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
-	private static final int SURFACE_BEST_FIT = 0;
-	private static final int SURFACE_4_3 = 1;
-	private static final int SURFACE_16_9 = 2;
-	private int mCurrentSize = SURFACE_BEST_FIT;
 
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
@@ -146,8 +141,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private VideoFileDBAdapter dbAdapter;
 	public static ProgressDialog progess;
-
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -165,7 +158,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mFullLayout = this.findViewById(R.id.full_layout);
 		mFullLayout.setOnTouchListener(this);
-		mFullLayout.setOnSystemUiVisibilityChangeListener(this);
 
 		mTitleBar = this.findViewById(R.id.title_bar);
 		mTitle = (TextView) this.findViewById(R.id.title);
@@ -450,7 +442,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			if(event.getAction() == MotionEvent.ACTION_MOVE && onPPL == false)
 			{
 				mMove = true;	
-				mControllerHandler.removeMessages(0);
+				mControllerHandler.removeMessages(0);//////////////////
 				
 				if(coef > 3)
 				{
@@ -674,6 +666,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onClick(View v)
 	{
+		mControllerHandler.removeMessages(0);
 		if(onPPL == false) {
 			switch (v.getId())
 			{
@@ -752,6 +745,40 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			default:
 				throw new RuntimeException();
 			}
+			
+			
+			mControllerHandler = new Handler(){
+				@Override
+				public void handleMessage(Message msg) {
+					mTitleBar.setVisibility(View.GONE);
+					mControlsView.setVisibility(View.GONE);
+					mPPLButton.setVisibility(View.GONE);
+					if(mUseSubtitle) {
+						RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+						params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+						params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+						params.setMargins(20, 20, 20, 20);
+
+						mSmiview.setLayoutParams(params);
+					}
+					mTouchPressed = false;
+				}
+			};
+			this.mTitleBar.setVisibility(View.VISIBLE);
+			this.mControlsView.setVisibility(View.VISIBLE);
+			this.mPPLButton.setVisibility(View.VISIBLE);
+			if(mUseSubtitle) {
+				RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
+				params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+				params.setMargins(20, 20, 20, 20);
+
+				mSmiview.setLayoutParams(params);
+			}
+			
+			mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+			
+			
 		}
 	}
 
@@ -866,34 +893,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		//if (result != null)
 		//        throw new RuntimeException(result);
-	}
-
-	private void displaySystemMenu(boolean visible) {
-		if (Build.VERSION.SDK_INT >= 14) {
-			displaySystemMenu14(visible);
-		} else if (Build.VERSION.SDK_INT >= 11) {
-			displaySystemMenu11(visible);
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	@TargetApi(11)
-	private void displaySystemMenu11(boolean visible) {
-		if (visible) {
-			this.mVideoView.setSystemUiVisibility(View.STATUS_BAR_VISIBLE);
-		} else {
-			this.mVideoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-		}
-	}
-
-	@TargetApi(14)
-	private void displaySystemMenu14(boolean visible) {
-		if (visible) {
-			this.mVideoView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-		} else {
-			this.mVideoView
-			.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-		}
 	}
 
 	public void resumePause()
@@ -1214,41 +1213,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mSeek = true;
 	}
 
-	private void changeRatio()
-	{
-		if(mCurrentSize < SURFACE_BEST_FIT)
-			mCurrentSize = mCurrentSize + 1;
-		else
-			mCurrentSize = SURFACE_BEST_FIT;
-
-		switch(mCurrentSize)
-		{
-		case SURFACE_BEST_FIT:
-			mMpegPlayer.changeRatioNative(SURFACE_BEST_FIT);
-			break;
-		case SURFACE_4_3:
-			mMpegPlayer.changeRatioNative(SURFACE_4_3);
-			break;
-		case SURFACE_16_9:
-			mMpegPlayer.changeRatioNative(SURFACE_16_9);
-			break;
-		}
-	}
-
-	private void cancelAsyncTask()
-	{        
-		if(FFmpegPlayer.stopTask != null)
-			FFmpegPlayer.stopTask.cancel(true);
-		if(FFmpegPlayer.setDataSourceTask != null)
-			FFmpegPlayer.setDataSourceTask.cancel(true);
-		if(FFmpegPlayer.seekTask != null)
-			FFmpegPlayer.seekTask.cancel(true);
-		if(FFmpegPlayer.pauseTask != null)
-			FFmpegPlayer.pauseTask.cancel(true);
-		if(FFmpegPlayer.resumeTask != null)
-			FFmpegPlayer.resumeTask.cancel(true);
-	}
-
 	@Override
 	public void onSystemUiVisibilityChange(int visibility) {
 		if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
@@ -1396,5 +1360,4 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		@Override public void startUpdate(View arg0) {}
 		@Override public void finishUpdate(View arg0) {}
 	}
-
 }

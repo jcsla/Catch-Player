@@ -106,7 +106,7 @@
             android:paddingLeft="8.0dip"
             android:paddingRight="8.0dip"
             android:progressDrawable="@drawable/video_progress"
-            android:thumb="@drawable/now_time_bar" />
+            android:thumb="@null" />
 
         <LinearLayout
             android:id="@+id/buttons"
