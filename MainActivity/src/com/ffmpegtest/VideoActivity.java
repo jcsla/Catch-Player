@@ -473,7 +473,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			if(event.getAction() == MotionEvent.ACTION_MOVE && onPPL == false)
 			{
 				mMove = true;
-
+				mControllerHandler.removeMessages(0);
 				if(coef > 3)
 				{
 					mSeekControlView.setVisibility(View.GONE);
@@ -549,20 +549,51 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					mControllerHandler.sendEmptyMessageDelayed(0, 1000);
 				}
 
-				if(mMove==true && mSeek==true)
-				{
-					mMove = false;
-					mSeek = false;
-
-
-					mMpegPlayer.seek(String.valueOf(seekValue));
-
-					return true;
-				}
-
 				if(mMove == true)
 				{
 					mMove = false;
+					
+					mControllerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							mTitleBar.setVisibility(View.GONE);
+							mControlsView.setVisibility(View.GONE);
+							mPPLButton.setVisibility(View.GONE);
+							if(mUseSubtitle) {
+								RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+								params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+								params.setMargins(20, 20, 20, 20);
+
+								mSmiview.setLayoutParams(params);
+							}
+							mTouchPressed = false;
+						}
+					};
+					this.mTitleBar.setVisibility(View.VISIBLE);
+					this.mControlsView.setVisibility(View.VISIBLE);
+					this.mPPLButton.setVisibility(View.VISIBLE);
+					if(mUseSubtitle) {
+						RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+						params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
+						params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+						params.setMargins(20, 20, 20, 20);
+
+						mSmiview.setLayoutParams(params);
+					}
+					
+					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+					
+					if(mSeek==true)
+					{
+						mSeek = false;
+
+						mMpegPlayer.seek(String.valueOf(seekValue));
+
+						return true;
+					}
+
+					
 					return true;
 				}
 
