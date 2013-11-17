@@ -1,32 +1,21 @@
 package com.ffmpegtest;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,11 +24,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
-import android.media.audiofx.BassBoost.Settings;
 import android.net.Uri;
-import android.net.rtp.AudioStream;
-import android.opengl.Visibility;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,37 +32,27 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.StrictMode;
-import android.provider.Settings.SettingNotFoundException;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
-import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -210,7 +185,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
 		mPlayPauseButton.setOnClickListener(this);
-
+		
+		mControllerHandler = new Handler();
+		
 		mHoldButton = (ImageButton) this.findViewById(R.id.hold_video);
 		mHoldButton.setOnClickListener(this);
 
@@ -472,8 +449,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 			if(event.getAction() == MotionEvent.ACTION_MOVE && onPPL == false)
 			{
-				mMove = true;
+				mMove = true;	
 				mControllerHandler.removeMessages(0);
+				
 				if(coef > 3)
 				{
 					mSeekControlView.setVisibility(View.GONE);
