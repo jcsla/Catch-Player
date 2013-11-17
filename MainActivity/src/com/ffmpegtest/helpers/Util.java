@@ -4,8 +4,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Point;
+import android.os.Build;
 
 public class Util {
 	private Util() {}
@@ -81,5 +84,25 @@ public class Util {
 		pDialog.setCancelable(false);
 
 		return pDialog;
+	}
+
+	public int getDeviceWidth(Activity activity) {
+		if (12 < Build.VERSION.SDK_INT) {
+			Point p = new Point();
+			activity.getWindowManager().getDefaultDisplay().getSize(p);
+			return p.x;
+		} else {
+			return activity.getWindowManager().getDefaultDisplay().getWidth();
+		}
+	}
+
+	public int getDeviceHeight(Activity activity) {
+		if (12 < Build.VERSION.SDK_INT) {
+			Point p = new Point();
+			activity.getWindowManager().getDefaultDisplay().getSize(p);
+			return p.y;
+		} else {
+			return activity.getWindowManager().getDefaultDisplay().getHeight();
+		}
 	}
 }
