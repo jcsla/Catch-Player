@@ -163,14 +163,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
+		mControlsView.setOnTouchListener(this);
 
-		mVolumeBrightnessControlView = this.findViewById(R.id.volume_brightness_control);
+		mVolumeBrightnessControlView = this.findViewById(R.id.volume_brightness_variation_view);
 		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
 		mVolumeBrightnessImage = (ImageView)this.findViewById(R.id.volume_brightness_image);
 
-		mSeekControlView = this.findViewById(R.id.seek_control);
-		mSeekControlValue = (TextView)this.findViewById(R.id.seek_value);
-		mSeekControlSmallValue = (TextView)this.findViewById(R.id.seek_small_value);
+		mSeekControlView = this.findViewById(R.id.seek_variation_view);
+		mSeekControlValue = (TextView)this.findViewById(R.id.current_time_value);
+		mSeekControlSmallValue = (TextView)this.findViewById(R.id.seek_variation_value);
 
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
@@ -183,14 +184,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mHoldButton = (ImageButton) this.findViewById(R.id.hold_video);
 		mHoldButton.setOnClickListener(this);
 
-		mPPLButton = (ImageView) this.findViewById(R.id.btn_ppl);
+		mPPLButton = (ImageView) this.findViewById(R.id.ppl_button);
 		mPPLButton.setOnClickListener(this);
 
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
 		mTotalTime = (TextView) this.findViewById(R.id.total_time);
 
 		mVideoView = this.findViewById(R.id.video_view);
-		mPPLLayout = (RelativeLayout)this.findViewById(R.id.rl_ppl_all);
+		mPPLLayout = (RelativeLayout)this.findViewById(R.id.ppl_view);
 		mPageMark = (LinearLayout) this.findViewById(R.id.page_mark);
 		mPPLViewPager = (ViewPager) this.findViewById(R.id.view_pager);
 		mPPLViewPager.setOnPageChangeListener(new OnPageChangeListener() {    //아이템이 변경되면
@@ -328,7 +329,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if(subtitleFile.isFile() && subtitleFile.canRead())
 		{
 			mUseSubtitle = true;
-			mSmiview = (TextView)findViewById(R.id.tv_smi);
+			mSmiview = (TextView)findViewById(R.id.subtitle_view);
 			parsedSubtitleDataList = new ArrayList<SubtitleData>();
 			try {
 				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(subtitleFile.toString())), "MS949"));
@@ -691,7 +692,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//case R.id.ratio_video:
 				//        changeRatio();
 				//        break;
-			case R.id.btn_ppl:
+			case R.id.ppl_button:
 				if(mPlay) 
 					mMpegPlayer.pause();
 				mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this));
