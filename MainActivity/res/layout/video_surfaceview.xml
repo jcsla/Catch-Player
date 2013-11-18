@@ -60,7 +60,7 @@
         android:visibility="gone" >
 
         <ImageButton
-            android:id="@+id/unhold_button"
+            android:id="@+id/unhold_video"
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
@@ -123,7 +123,7 @@
                 android:layout_width="0px"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="#a80000FF"
+                android:background="@null"
                 android:src="@drawable/hold" />
 
             <ImageButton
@@ -131,7 +131,7 @@
                 android:layout_width="0px"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="#a800FF00"
+                android:background="@null"
                 android:onClick="onClick"
                 android:src="@drawable/left" />
 
@@ -140,7 +140,7 @@
                 android:layout_width="0px"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="#a8FF0000"
+                android:background="@null"
                 android:contentDescription="@null"
                 android:enabled="false"
                 android:src="@drawable/play" />
@@ -150,7 +150,7 @@
                 android:layout_width="0px"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="#a800FF00"
+                android:background="@null"
                 android:onClick="onClick"
                 android:src="@drawable/right" />
 
@@ -159,7 +159,7 @@
                 android:layout_width="0px"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="#a80000FF"
+                android:background="@null"
                 android:src="@drawable/ppl" />
             
         </LinearLayout>

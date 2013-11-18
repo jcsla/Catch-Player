@@ -35,7 +35,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -161,7 +160,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
-		mControlsView.setOnTouchListener(this);
+		//mControlsView.setOnTouchListener(this);
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
@@ -174,7 +173,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPPLButton.setOnClickListener(this);
 		
 		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
-		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
+		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_video);
 		mUnHoldButton.setOnClickListener(this);
 		
 		mSeekVariationView = this.findViewById(R.id.seek_variation_view);
@@ -408,19 +407,154 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
-		return false;
+		switch (keyCode) 
+		{
+		case KeyEvent.KEYCODE_BACK:
+			if(onPPL == true)
+				closePPLView();
+			break;
+		}
+		return true;
+	}
+	
+	public void closePPLView()
+	{
+		onPPL = false;
+		mTouchPressed = false;
+		
+		mPPLLayout.setVisibility(View.GONE);
+		mMpegPlayer.resume();
 	}
 	
 	@Override
 	public void onClick(View v)
 	{
+		switch (v.getId())
+		{
+		case R.id.play_pause:
+			resumePause();
+			break;
+		case R.id.next_video:
+			nextVideo();
+			break;
+		case R.id.prev_video:
+			prevVideo();
+			break;
+		case R.id.hold_video:
+			break;
+		case R.id.unhold_video:
+			break;
+		case R.id.ppl_button:
+			viewPPL();
+			break;
+		}
+	}
+	
+	public void resumePause()
+	{
+		this.mPlayPauseButton.setEnabled(false);
+
+		if (mPlay)
+			mMpegPlayer.pause();
+		else
+			mMpegPlayer.resume();
+
+		mPlay = !mPlay;
+	}
+
+	////////////////////////////////////////////////////////////////////////
+	// not yet
+	public void holdVideo()
+	{
+		mHold = true;
+
+		mHoldHandler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				mUnHoldButtonView.setVisibility(View.GONE);
+			}
+		};
+		mUnHoldButtonView.setVisibility(View.VISIBLE);
+		mHoldHandler.sendEmptyMessageDelayed(0, 4000);
+
+		this.mTitleBar.setVisibility(View.GONE);
+		this.mControlsView.setVisibility(View.GONE);
+		this.mPPLButton.setVisibility(View.GONE);
+	}
+
+	public void unholdVideo()
+	{
+		mHold = false;
+		mUnHoldButtonView.setVisibility(View.GONE);
+
+		this.mTitleBar.setVisibility(View.VISIBLE);
+		this.mControlsView.setVisibility(View.VISIBLE);
+		this.mPPLButton.setVisibility(View.VISIBLE);
+	}
+	////////////////////////////////////////////////////////////////////////
+	public void nextVideo()
+	{
+		if (videoList != null && index < videoList.size() - 1)
+		{
+			saveVideoTime();
+			file = new File(videoList.get(++index));
+			path = file.getAbsolutePath();
+			setDataSource();
+			mMpegPlayer.resume();
+		}
+	}
+
+	public void prevVideo()
+	{
+		if (index > 0) {
+			saveVideoTime();
+			file = new File(videoList.get(--index));
+			path = file.getAbsolutePath();
+			setDataSource();
+			mMpegPlayer.resume();
+		}
+	}
+	
+	public void viewPPL()
+	{
+		if(mPlay) 
+			mMpegPlayer.pause();
 		
+		mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this));
+		
+		mTitleBar.setVisibility(View.GONE);
+		mControlsView.setVisibility(View.GONE);
+		
+		onPPL = true;
+		mPPLLayout.setVisibility(View.VISIBLE);
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		return false;
+		switch(event.getAction())
+		{
+		case MotionEvent.ACTION_UP:
+			doActionUP();
+			break;
+		}
+		return true;
+	}
+	
+	public void doActionUP()
+	{
+		mTouchPressed = !mTouchPressed;
+		
+		if(mTouchPressed == true)
+		{
+			mTitleBar.setVisibility(View.VISIBLE);
+			mControlsView.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			mTitleBar.setVisibility(View.GONE);
+			mControlsView.setVisibility(View.GONE);
+		}
 	}
 
 	@Override
@@ -516,18 +650,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 	}
 
-	public void resumePause()
-	{
-		this.mPlayPauseButton.setEnabled(false);
-
-		if (mPlay)
-			mMpegPlayer.pause();
-		else
-			mMpegPlayer.resume();
-
-		mPlay = !mPlay;
-	}
-
 	/**
 	 * 작성자 : 이준영
 	 * 메소드 이름 : parseTIme
@@ -594,58 +716,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else
 		{
 			return getWindowManager().getDefaultDisplay().getHeight();
-		}
-	}
-	
-	////////////////////////////////////////////////////////////////////////
-	// not yet
-	public void holdVideo()
-	{
-		mHold = true;
-
-		mHoldHandler = new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				mUnHoldButtonView.setVisibility(View.GONE);
-			}
-		};
-		mUnHoldButtonView.setVisibility(View.VISIBLE);
-		mHoldHandler.sendEmptyMessageDelayed(0, 4000);
-
-		this.mTitleBar.setVisibility(View.GONE);
-		this.mControlsView.setVisibility(View.GONE);
-		this.mPPLButton.setVisibility(View.GONE);
-	}
-
-	public void unholdVideo()
-	{
-		mHold = false;
-		mUnHoldButtonView.setVisibility(View.GONE);
-
-		this.mTitleBar.setVisibility(View.VISIBLE);
-		this.mControlsView.setVisibility(View.VISIBLE);
-		this.mPPLButton.setVisibility(View.VISIBLE);
-	}
-
-	public void nextVideo()
-	{
-		if(videoList != null && index < videoList.size() - 1)
-		{
-			saveVideoTime();
-			file = new File(videoList.get(++index));
-			path = file.getAbsolutePath();
-			setDataSource();
-			mMpegPlayer.resume();
-		}
-	}
-
-	public void prevVideo() {
-		if(index > 0) {
-			saveVideoTime();
-			file = new File(videoList.get(--index));
-			path = file.getAbsolutePath();
-			setDataSource();
-			mMpegPlayer.resume();
 		}
 	}
 
