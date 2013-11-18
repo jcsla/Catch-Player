@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -77,6 +78,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageButton mPlayPauseButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
+	private TextView mRealTime;
 
 	private View mSeekVariationView;
 	private TextView mSeekCurrentTimeValue;
@@ -171,7 +173,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mHoldButton.setOnClickListener(this);
 		mPPLButton = (ImageView) this.findViewById(R.id.ppl_button);
 		mPPLButton.setOnClickListener(this);
-
+		mRealTime = (TextView) this.findViewById(R.id.time);
+		
 		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
 		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_video);
 		mUnHoldButton.setOnClickListener(this);
@@ -247,7 +250,27 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		progess = util.getProgress(this);
 
 		setDataSource();
-
+		
+		final Handler mTimeChangeHandler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				mRealTime.setText(getCurrentTime());
+			}
+		};
+		
+		new Thread() { // 현재 시간을 출력해주는 Thread
+			public void run() {
+				while(!isFinish) {
+					mTimeChangeHandler.sendEmptyMessage(0);
+					try {
+						Thread.sleep(1000 * 60);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+		}.start();
+		
 		mMpegPlayer.resume();
 	}
 
@@ -257,6 +280,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		super.onPause();
 		mPlay = false;
 		mMpegPlayer.pause();
+		Log.e("Hello", "Home!");
 	}
 
 	@Override
@@ -297,11 +321,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		String title = split[split.length - 1];
 		mTitle.setText(title);
 
-		mPlayPauseButton.setImageResource(R.drawable.pause);
+		mPlayPauseButton.setImageResource(R.drawable.selector_pause);
 		mPlayPauseButton.setEnabled(true);
 
 		mPlay = true;
-		mTouchPressed = false;
 		mHold = false;
 
 		mMpegPlayer.setDataSource(path, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
@@ -437,31 +460,33 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
-		switch (keyCode) 
-		{
-		case KeyEvent.KEYCODE_VOLUME_UP:
-			mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
-					AudioManager.ADJUST_RAISE,
-					AudioManager.FLAG_SHOW_UI);
-			doVolumeUpDown();
-			break;
-		case KeyEvent.KEYCODE_VOLUME_DOWN:
-			mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
-					AudioManager.ADJUST_LOWER, 
-					AudioManager.FLAG_SHOW_UI);
-			doVolumeUpDown();
-			break;
-		case KeyEvent.KEYCODE_BACK:
-			if(onPPL == true)
-				closePPLView();
-			else if(mHold == true);
-			else {
-				saveVideoTime();
-				saveBrightness();
-				finish();
-			}
+		if(mHold == false) {
+			switch (keyCode) 
+			{
+			case KeyEvent.KEYCODE_VOLUME_UP:
+				mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+						AudioManager.ADJUST_RAISE,
+						AudioManager.FLAG_SHOW_UI);
+				doVolumeUpDown();
+				break;
+			case KeyEvent.KEYCODE_VOLUME_DOWN:
+				mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+						AudioManager.ADJUST_LOWER, 
+						AudioManager.FLAG_SHOW_UI);
+				doVolumeUpDown();
+				break;
+			case KeyEvent.KEYCODE_BACK:
+				if(onPPL == true)
+					closePPLView();
+				else {
+					saveVideoTime();
+					saveBrightness();
+					isFinish = true;
+					finish();
+				}
 
-			break;
+				break;
+			}
 		}
 		return true;
 	}
@@ -478,6 +503,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onClick(View v)
 	{
+		mControllerHandler.removeMessages(0);
 		switch (v.getId())
 		{
 		case R.id.play_pause:
@@ -530,6 +556,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	}
 
 	public void hideControlsView() {
+		mControllerHandler.removeMessages(0);
 		mControlsView.startAnimation(anim_out_bottom);
 		mControlsView.setVisibility(View.GONE);
 
@@ -540,6 +567,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public void unholdVideo()
 	{
 		mHold = false;
+		mTouchPressed = false;
 		mUnHoldButtonView.setVisibility(View.GONE);
 	}
 	////////////////////////////////////////////////////////////////////////
@@ -612,6 +640,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		else {
 			mHoldHandler.removeMessages(0);
 			mUnHoldButtonView.setVisibility(View.VISIBLE);
+			mHoldHandler.sendEmptyMessageDelayed(0, 4000);
 		}
 		return true;
 	}
@@ -706,6 +735,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mCurrentTime.setText(parseTime(currentTimeS));
 		}
 	}
+	
+	public String getCurrentTime() {
+	    String time = "";
+	    Calendar cal = Calendar.getInstance();
+	    time = String.format("%02d : %02d",
+	            cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+	         
+	    return time;
+	}
 
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar)
@@ -769,14 +807,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onFFResume(NotPlayingException result)
 	{
-		this.mPlayPauseButton.setImageResource(R.drawable.pause);
+		this.mPlayPauseButton.setImageResource(R.drawable.selector_pause);
 		this.mPlayPauseButton.setEnabled(true);
 	}
 
 	@Override
 	public void onFFPause(NotPlayingException err)
 	{
-		this.mPlayPauseButton.setImageResource(R.drawable.play);
+		this.mPlayPauseButton.setImageResource(R.drawable.selector_play);
 		this.mPlayPauseButton.setEnabled(true);
 	}
 
@@ -792,7 +830,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	/**
 	 * 작성자 : 이준영
-	 * 메소드 이름 : parseTIme
+	 * 메소드 이름 : parseTime
 	 * 매개변수 : 가공되지 않은 시간
 	 * 반환값 : 가공된 시간
 	 * 메소드 설명 : 시간을 매개변수로 받아 처리해서 반환해준다(TextView에 적절하게 뿌리기 위해)
