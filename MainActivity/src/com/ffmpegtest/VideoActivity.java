@@ -734,7 +734,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		if(brightnessCheck == false){
 			SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-			lp.screenBrightness = pref.getFloat("brightness", 0.5f);
+			lp.screenBrightness = pref.getFloat("brightness", 1f);
 			lp.screenBrightness = (lp.screenBrightness-1)/14;
 			getWindow().setAttributes(lp);
 			brightnessCheck = true;
