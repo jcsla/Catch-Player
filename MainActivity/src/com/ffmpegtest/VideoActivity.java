@@ -30,6 +30,8 @@ import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,6 +39,8 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -120,15 +124,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	private float brightnessValue;
 	private Handler mSeekControlHandler;
+	private Handler mVolumeBrightnessVariationHandler;
 	private Handler mControllerHandler;
 	private Handler mHoldHandler;
 	private float mVolume;
 	private boolean onPPL = false;
 	private boolean mMove = false;
+	private Animation anim_in_bottom, anim_out_bottom, anim_in_top, anim_out_top;
 	private boolean mSeek = false;
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -168,7 +175,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
 		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_video);
 		mUnHoldButton.setOnClickListener(this);
-		
+
 		mSeekVariationView = this.findViewById(R.id.seek_variation_view);
 		mSeekCurrentTimeValue = (TextView)this.findViewById(R.id.current_time_value);
 		mSeekVariationValue = (TextView)this.findViewById(R.id.seek_variation_value);
@@ -205,11 +212,30 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mControllerHandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				mControlsView.setVisibility(View.GONE);
-				mTitleBar.setVisibility(View.GONE);
+				mTouchPressed = !mTouchPressed;
+				hideControlsView();
 			}
 		};
 
+		mVolumeBrightnessVariationHandler = new Handler() {
+			public void handleMessage(Message msg) {
+				mVolumeBrightnessVariationView.setVisibility(View.GONE);
+			}
+		};
+
+		mSeekControlHandler = new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				mSeekVariationView.setVisibility(View.GONE);
+			}
+		};
+
+
+		anim_in_bottom  = AnimationUtils.loadAnimation(this, R.anim.slide_from_bottom);
+		anim_out_bottom = AnimationUtils.loadAnimation(this, R.anim.slide_to_bottom);
+		anim_in_top = AnimationUtils.loadAnimation(this, R.anim.slide_from_top);
+		anim_out_top = AnimationUtils.loadAnimation(this, R.anim.slide_to_top);
+		doBrightnessTouch(1f);
 		dbAdapter = new VideoFileDBAdapter(this);
 
 		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -294,7 +320,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path).fingerTask.execute(this);
 		else
 			JSONHelper.dramaName = dramaName;
-		
+
 		mControllerHandler.removeMessages(0);
 		mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	}
@@ -413,12 +439,27 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		switch (keyCode) 
 		{
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+					AudioManager.ADJUST_RAISE,
+					AudioManager.FLAG_SHOW_UI);
+			doVolumeUpDown();
+			break;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, 
+					AudioManager.ADJUST_LOWER, 
+					AudioManager.FLAG_SHOW_UI);
+			doVolumeUpDown();
+			break;
 		case KeyEvent.KEYCODE_BACK:
 			if(onPPL == true)
 				closePPLView();
 			else if(mHold == true);
-			else
+			else {
+				saveVideoTime();
+				saveBrightness();
 				finish();
+			}
 
 			break;
 		}
@@ -471,7 +512,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPlay = !mPlay;
 	}
-	
+
 	public void holdVideo()
 	{
 		mHold = true;
@@ -485,8 +526,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mUnHoldButtonView.setVisibility(View.VISIBLE);
 		mHoldHandler.sendEmptyMessageDelayed(0, 4000);
 
-		this.mTitleBar.setVisibility(View.GONE);
-		this.mControlsView.setVisibility(View.GONE);
+		hideControlsView();
+	}
+
+	public void hideControlsView() {
+		mControlsView.startAnimation(anim_out_bottom);
+		mControlsView.setVisibility(View.GONE);
+
+		mTitleBar.startAnimation(anim_out_top);
+		mTitleBar.setVisibility(View.GONE);
 	}
 
 	public void unholdVideo()
@@ -497,7 +545,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	////////////////////////////////////////////////////////////////////////
 	public void nextVideo()
 	{
-		if (videoList != null && index < videoList.size() - 1)
+		if (videoList != null && index < videoList.size() - 1) 
 		{
 			saveVideoTime();
 			file = new File(videoList.get(++index));
@@ -509,7 +557,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void prevVideo()
 	{
-		if (index > 0) {
+		if (index > 0) 
+		{
 			saveVideoTime();
 			file = new File(videoList.get(--index));
 			path = file.getAbsolutePath();
@@ -526,8 +575,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this, currentTimeS, mPageMark));
 		mPPLPosition = 0;
 
-		mTitleBar.setVisibility(View.GONE);
-		mControlsView.setVisibility(View.GONE);
+		hideControlsView();
 
 		onPPL = true;
 		mPPLLayout.setVisibility(View.VISIBLE);
@@ -537,34 +585,113 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public boolean onTouch(View v, MotionEvent event)
 	{
 		if(mHold == false) { //홀드가 걸려있지 않으면
+			DisplayMetrics screen = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(screen);
+
+			float x_changed = event.getRawX() - mTouchX;
+			float y_changed = event.getRawY() - mTouchY;
+
+			float coef = Math.abs (y_changed / x_changed);
+			float xgesturesize = ((x_changed / screen.xdpi) * 2.54f);
+
+
 			switch(event.getAction())
 			{
 			case MotionEvent.ACTION_UP:
 				doActionUP();
 				break;
+			case MotionEvent.ACTION_DOWN:
+				doActionDown(event);
+				break;
+			case MotionEvent.ACTION_MOVE:
+				doActionMove(coef, x_changed, y_changed, xgesturesize);
+				break;
 			}
-		} else {
+		} 
+
+		else {
 			mHoldHandler.removeMessages(0);
 			mUnHoldButtonView.setVisibility(View.VISIBLE);
 		}
 		return true;
 	}
 
+	public void doActionMove(float coef, float x_changed, float y_changed, float xgesturesize) {
+		mMove = true;
+		mControllerHandler.removeMessages(0);
+		if(coef > 3)
+		{
+			mSeekVariationView.setVisibility(View.GONE);
+			if(mTouchX < (getDeviceWidth() / 2)) {
+				mVolumeBrightnessVariationHandler.removeMessages(0);
+				mVolumeBrightnessVariationView.setVisibility(View.VISIBLE);
+				mVolumeBrightnessVariationHandler.sendEmptyMessageDelayed(0, 2000);
+				doBrightnessTouch(y_changed);
+			}
+
+			if(mTouchX > (getDeviceWidth() / 2)) {
+				doVolumeTouch(y_changed);
+			}
+		} 
+
+		else if(coef < 3 || mSeekVariationView.getVisibility() == View.VISIBLE)
+		{
+			if(xgesturesize < 0.02 && xgesturesize > -0.02)
+				mMove = false;
+			else if(coef < 0.5 && Math.abs(xgesturesize) > 1)
+			{
+				mVolumeBrightnessVariationView.setVisibility(View.GONE);
+
+				Log.e("SeekBartest", "Value is " + xgesturesize);
+
+				mSeekVariationValue.setText("[ "+((currentTimeS>seekValue)?"-":"+")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
+				mSeekCurrentTimeValue.setText(parseTime(currentTimeS));
+				mSeekVariationView.setVisibility(View.VISIBLE);
+				mSeekControlHandler.sendEmptyMessageDelayed(0, 2000);
+
+				doSeekTouch(coef, xgesturesize, false);        
+			}
+		}
+	}
+
+	public void doActionDown(MotionEvent event) 
+	{
+		mTouchX = event.getRawX();
+		mTouchY = event.getRawY();
+
+		mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+	}
+
 	public void doActionUP()
 	{
-		mTouchPressed = !mTouchPressed;
+		if(mMove == false) {
+			mTouchPressed = !mTouchPressed;
+			mControllerHandler.removeMessages(0);
+			Log.e("mTouchPressed = " + mTouchPressed, "mMove = " + mMove);
 
-		if(mTouchPressed == true)
-		{
-			mTitleBar.setVisibility(View.VISIBLE);
-			mControlsView.setVisibility(View.VISIBLE);
+			if(mTouchPressed == true && mMove == false)
+			{
+				mTitleBar.startAnimation(anim_in_top);
+				mTitleBar.setVisibility(View.VISIBLE);
+
+				mControlsView.startAnimation(anim_in_bottom);
+				mControlsView.setVisibility(View.VISIBLE);
+
+				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
+			} else {
+				hideControlsView();
+			}
+		}
+		else {
+			mMove = false;
 			mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 		}
-		else
+
+		if(mSeek==true)
 		{
-			mControllerHandler.removeMessages(0);
-			mTitleBar.setVisibility(View.GONE);
-			mControlsView.setVisibility(View.GONE);
+			mSeek = false;
+
+			mMpegPlayer.seek(String.valueOf(seekValue));
 		}
 	}
 
@@ -740,6 +867,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			dbAdapter.saveVideoTime(path, now, JSONHelper.dramaName);
 	}
 
+	public void saveBrightness() {
+		SharedPreferences pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.putFloat("brightness", this.brightnessValue);
+		editor.commit();
+	}
+
 	private void doBrightnessTouch(float y_changed)
 	{
 		float delta = -y_changed / getDeviceHeight() * 0.07f;
@@ -756,8 +890,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		lp.screenBrightness = Math.min(Math.max(lp.screenBrightness + delta, 0.01f), 1);
 
 		brightnessValue = (lp.screenBrightness*14)+1;
-		this.mVolumeBrightnessValue.setText(""+(int)brightnessValue);
-		this.mVolumeBrightnessImage.setBackgroundResource(R.drawable.bright);
+		mVolumeBrightnessValue.setText(""+(int)brightnessValue);
+		mVolumeBrightnessImage.setBackgroundResource(R.drawable.bright);
 		getWindow().setAttributes(lp);
 	}
 
@@ -767,6 +901,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		int vol = (int) Math.min(Math.max(mVolume + delta, 0), mAudioMax);
 
 		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
+		doVolumeUpDown();
+	}
+
+	private void doVolumeUpDown() {
+		mVolumeBrightnessVariationHandler.removeMessages(0);
+		mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+		mVolumeBrightnessImage.setBackgroundResource(R.drawable.sound);
+		mVolumeBrightnessVariationView.setVisibility(View.VISIBLE);
+		mVolumeBrightnessVariationHandler.sendEmptyMessageDelayed(0, 2000);
 	}
 
 	private void doSeekTouch(float coef, float xgesturesize, boolean seek)
