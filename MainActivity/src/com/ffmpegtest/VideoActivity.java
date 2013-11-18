@@ -105,19 +105,25 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	//////////////////////////////////////////////////
 	// Value Variable
 	//////////////////////////////////////////////////
+	private VideoFileDBAdapter dbAdapter;
+	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
+	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
+	private AudioManager mAudioManager;
+	private int mAudioMax;											// Device의 Audio Max 값
+	private int mPPLPosition;										// PPL 선택 시의 현재 위치 변수
+	private boolean brightnessCheck = false;						// 밝기 체크 변수
+	private boolean mHold = false;									// boolean 홀드
+	
+	
 	private int currentTimeS;
 	private float brightnessValue;
-	private Boolean brightnessCheck;
+	
 	private Handler mSeekControlHandler;
 	private Handler mControllerHandler;
 	private Handler mHoldHandler;
-	private int mPrevPosition;
-	private Boolean holdCheck;
-	private AudioManager mAudioManager;
-	private int mAudioMax;
 	private float mVolume;
 	private boolean onPPL = false;
-	private boolean mHold = false;
+	
 	private boolean mMove = false;
 	private boolean mSeek = false;
 	private boolean isFinish = false;
@@ -125,8 +131,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
-	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
-	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 	private boolean mTouchPressed = false;
 	ArrayList<String> videoList;
 	ArrayList<SubtitleData> parsedSubtitleDataList;
@@ -136,7 +140,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int indexSubtitle;
 	private long currentTime;
 	private boolean mPlay = false;
-	private VideoFileDBAdapter dbAdapter;
+	
 	private Util util = Util.getInstance();
 
 	@Override
@@ -155,53 +159,48 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mFullLayout = this.findViewById(R.id.full_layout);
 		mFullLayout.setOnTouchListener(this);
+		
+		mVideoView = this.findViewById(R.id.video_view);
 
 		mTitleBar = this.findViewById(R.id.title_bar);
 		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
 		mControlsView.setOnTouchListener(this);
-
-		mVolumeBrightnessVariationView = this.findViewById(R.id.volume_brightness_variation_view);
-		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
-		mVolumeBrightnessImage = (ImageView)this.findViewById(R.id.volume_brightness_image);
-
+		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
+		mSeekBar.setOnSeekBarChangeListener(this);
+		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
+		mTotalTime = (TextView) this.findViewById(R.id.total_time);
+		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
+		mPlayPauseButton.setOnClickListener(this);
+		mHoldButton = (ImageButton) this.findViewById(R.id.hold_video);
+		mHoldButton.setOnClickListener(this);
+		mPPLButton = (ImageView) this.findViewById(R.id.ppl_button);
+		mPPLButton.setOnClickListener(this);
+		
+		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
+		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
+		mUnHoldButton.setOnClickListener(this);
+		
 		mSeekVariationView = this.findViewById(R.id.seek_variation_view);
 		mSeekCurrentTimeValue = (TextView)this.findViewById(R.id.current_time_value);
 		mSeekVariationValue = (TextView)this.findViewById(R.id.seek_variation_value);
-
-		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
-		mSeekBar.setOnSeekBarChangeListener(this);
-
-		mPlayPauseButton = (ImageButton) this.findViewById(R.id.play_pause);
-		mPlayPauseButton.setOnClickListener(this);
+		mVolumeBrightnessVariationView = this.findViewById(R.id.volume_brightness_variation_view);
+		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
+		mVolumeBrightnessImage = (ImageView)this.findViewById(R.id.volume_brightness_image);
 		
-		mControllerHandler = new Handler();
-		
-		mHoldButton = (ImageButton) this.findViewById(R.id.hold_video);
-		mHoldButton.setOnClickListener(this);
-
-		mPPLButton = (ImageView) this.findViewById(R.id.ppl_button);
-		mPPLButton.setOnClickListener(this);
-
-		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
-		mTotalTime = (TextView) this.findViewById(R.id.total_time);
-
-		mVideoView = this.findViewById(R.id.video_view);
 		mPPLLayout = (RelativeLayout)this.findViewById(R.id.ppl_view);
 		mPageMark = (LinearLayout) this.findViewById(R.id.page_mark);
 		mPPLViewPager = (ViewPager) this.findViewById(R.id.view_pager);
-		mPPLViewPager.setOnPageChangeListener(new OnPageChangeListener() {    //아이템이 변경되면
-
-			//아이템이 선택이 되었으면
+		mPPLViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 			@Override 
 			public void onPageSelected(int position) {
 				//이전 페이지에 해당하는 페이지 표시 이미지 변경
-				mPageMark.getChildAt(mPrevPosition).setBackgroundResource(R.drawable.page_not);
+				mPageMark.getChildAt(mPPLPosition).setBackgroundResource(R.drawable.page_not);
 
 				//현재 페이지에 해당하는 페이지 표시 이미지 변경    
 				mPageMark.getChildAt(position).setBackgroundResource(R.drawable.page_select);
-				mPrevPosition = position;                //이전 포지션 값을 현재로 변경
+				mPPLPosition = position;                //이전 포지션 값을 현재로 변경
 			}
 			@Override public void onPageScrolled(int position, float positionOffest, int positionOffsetPixels) {}
 			@Override public void onPageScrollStateChanged(int state) {}
@@ -211,26 +210,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		paint.setColor(Color.BLACK);
 		paint.setAlpha(160);
 		mPPLLayout.setBackgroundColor(paint.getColor());
-
-		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
-		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_button);
-		mUnHoldButton.setOnClickListener(this);
+		if(android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+		}
+		
+		dbAdapter = new VideoFileDBAdapter(this);
 
 		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 		mAudioMax = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
-		dbAdapter = new VideoFileDBAdapter(this);
-
-		//홀드버튼
-		holdCheck = true;
-		brightnessCheck = false;
-
-		if(android.os.Build.VERSION.SDK_INT > 9){
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-		}
-
-		doBrightnessTouch(0.5f);
 
 		mMpegPlayer = null;
 		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
@@ -254,9 +242,8 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	protected void onDestroy()
 	{
 		super.onDestroy();
-		this.mMpegPlayer.setMpegListener(null);
-		this.mMpegPlayer.stop();
-		stop();
+		mMpegPlayer.setMpegListener(null);
+		mMpegPlayer.stop();
 	}
 
 	private void setDataSource()
@@ -427,7 +414,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		if(holdCheck==true){
+		if(mHold==false){
 			DisplayMetrics screen = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(screen);
 
@@ -654,7 +641,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 
 			return true;
-		}else if(holdCheck == false){
+		}else if(mHold == true){
 			holdVideo();
 			return true;
 		}
@@ -686,53 +673,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			case R.id.prev_video:
 				prevVideo();
 				break;
-				//case R.id.ratio_video:
-				//        changeRatio();
-				//        break;
 			case R.id.ppl_button:
 				if(mPlay) 
 					mMpegPlayer.pause();
 				mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this));
-
-				//					imageButton.setOnClickListener(new OnClickListener() {
-				//						
-				//						@Override
-				//						public void onClick(View v) {
-				//							
-				//							mPPLDataLayout.setVisibility(View.VISIBLE);
-				//							
-				//							PPLData ppl1 = JSONParserHelper.pplData.get(v.getId());
-				//							URL url;
-				//							Bitmap bmp;
-				//							try {
-				//								url = new URL(ppl1.product_image);
-				//								bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-				//								
-				//								int layoutSize = mPPLLayout.getHeight()-60;
-				//								int bitmapHeight = bmp.getHeight();
-				//								int bitmapWidth = bmp.getWidth();
-				//								int bitmapReSize = (int)((float)bitmapWidth*((float)layoutSize/bitmapHeight));
-				//								bmp = Bitmap.createScaledBitmap(bmp, layoutSize, layoutSize, true);
-				//								mPPLDataImage.setImageBitmap(bmp);
-				//								mPPLDataImage.setVisibility(View.VISIBLE);
-				//							} catch (IOException e) {
-				//								// TODO Auto-generated catch block
-				//								e.printStackTrace();
-				//							}
-				//							
-				//							mPPLDataText.setText(""+ppl1.product_code);
-				//							mPPLDataBrand.setText(ppl1.brand_name);
-				//							mPPLDataMall.setText(ppl1.store_link);
-				//							mPPLDataName.setText(ppl1.product_name);
-				//							mPPLDataPrice.setText(""+ppl1.price);
-				//							mPPLDataSite.setText(ppl1.drama_code);
-				//							//Toast.makeText(getApplicationContext(), ""+ppl1.product_name, Toast.LENGTH_SHORT).show();
-				//							
-				//						}
-				//					});
-				//				}
-
-
 				this.mTitleBar.setVisibility(View.GONE);
 				this.mControlsView.setVisibility(View.GONE);
 				this.mPPLButton.setVisibility(View.GONE);
@@ -789,29 +733,19 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			long timeUs = Long.parseLong(value) * 1000 * 1000;
 			int currentTimeS = (int)(timeUs / 1000 / 1000);
 			mCurrentTime.setText(parseTime(currentTimeS));
-			/////////////////////////////////////////////////////////////////////////////////////////////////SeekBar
-
 		}
 	}
 
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar)
 	{
-
 	}
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar)
 	{
 		String value = String.valueOf(seekBar.getProgress());
-		Log.e("seekbar value : ", value);
-		//if (fromUser)
-		//{
-		//System.out.println(seekBar.getProgress());
-		//long timeUs = Long.parseLong(value) * 1000 * 1000;
-		//System.out.println("timeUs = " + timeUs);
 		mMpegPlayer.seek(value);
-		//}
 	}
 
 	@Override
@@ -870,8 +804,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		this.mPlayPauseButton.setImageResource(R.drawable.pause);
 		this.mPlayPauseButton.setEnabled(true);
-
-		//displaySystemMenu(false);
 	}
 
 	@Override
@@ -889,8 +821,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onFFSeeked(NotPlayingException result)
 	{
-		//if (result != null)
-		//        throw new RuntimeException(result);
 	}
 
 	public void resumePause()
@@ -898,22 +828,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		this.mPlayPauseButton.setEnabled(false);
 
 		if (mPlay)
-		{
 			mMpegPlayer.pause();
-			//displaySystemMenu(false);
-		}
 		else
-		{
 			mMpegPlayer.resume();
-			//displaySystemMenu(true);
-		}
 
 		mPlay = !mPlay;
-	}
-
-	private void stop()
-	{
-		this.mControlsView.setVisibility(View.GONE);
 	}
 
 	/**
@@ -979,7 +898,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	// 홀드 처리
 	public void holdVideo() {
 		mHold = true;
-		holdCheck = false;
 
 		mHoldHandler = new Handler(){
 			@Override
@@ -997,13 +915,11 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 	public void unholdVideo() {
 		mHold = false;
-		holdCheck = true;
 		mUnHoldButtonView.setVisibility(View.GONE);
 
 		this.mTitleBar.setVisibility(View.VISIBLE);
 		this.mControlsView.setVisibility(View.VISIBLE);
 		this.mPPLButton.setVisibility(View.VISIBLE);
-		//displaySystemMenu(true);
 	}
 
 	public void nextVideo() {
@@ -1069,7 +985,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		AudioManager mAudioManager = 
 				(AudioManager)getSystemService(AUDIO_SERVICE);
-		if(holdCheck==true){
+		if(mHold==false){
 			switch (keyCode) {
 			case KeyEvent.KEYCODE_VOLUME_UP :
 				mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
@@ -1146,7 +1062,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			}
 
 			return false;
-		}else if(holdCheck==false){
+		}else if(mHold==true){
 			switch (keyCode) {
 			case KeyEvent.KEYCODE_VOLUME_UP :
 				return true;
@@ -1230,30 +1146,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		}
 
 	}
-	/*mVideoView.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
 
-	@Override
-	public void onSystemUiVisibilityChange(int visibility) {
-		if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION){
-			Toast.makeText(getApplicationContext(), "a;slkdjfalksj", Toast.LENGTH_SHORT).show();
-
-
-
-		}
-	}
-});*/
-
-	/*	this.mTitleBar.setVisibility(View.VISIBLE);
-		this.mControlsView.setVisibility(View.VISIBLE);
-		this.mPPLButton.setVisibility(View.VISIBLE);
-		if(mUseSubtitle) {
-			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			params.addRule(RelativeLayout.ABOVE, mControlsView.getId());
-			params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			params.setMargins(20, 20, 20, 20);
-
-			mSubtitleView.setLayoutParams(params);
-	 */
 	private class PPLPagerViewAdapter extends PagerAdapter{
 
 		private LayoutInflater mInflater;
@@ -1350,7 +1243,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				//LinearLayout에 추가
 				mPageMark.addView(iv);
 			}
-			mPrevPosition = 0;	//이전 포지션 값 초기화
+			mPPLPosition = 0;	//이전 포지션 값 초기화
 		}
 
 		@Override public void restoreState(Parcelable arg0, ClassLoader arg1) {}
