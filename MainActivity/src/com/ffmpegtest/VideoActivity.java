@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -70,53 +69,53 @@ import com.ffmpegtest.helpers.Util;
 public class VideoActivity extends Activity implements FFmpegListener, OnClickListener, OnSeekBarChangeListener, OnTouchListener, View.OnSystemUiVisibilityChangeListener
 {
 	public static FFmpegPlayer mMpegPlayer;
-	protected boolean mPlay = false;
-
+	//////////////////////////////////////////////////
+	// UI Variable
+	//////////////////////////////////////////////////
 	private View mFullLayout;
-	private boolean mTouchPressed = false;
-	private Util util = Util.getInstance();
-
+	private View mVideoView;
 	private View mTitleBar;
 	private TextView mTitle;
-	private TextView mSmiview;
-
-	private View mVideoView;
-
-	private View mSeekControlView;
-	private TextView mSeekControlValue;
-	private TextView mSeekControlSmallValue;
 	private View mControlsView;
 	private SeekBar mSeekBar;
-	private ImageButton mPlayPauseButton;
 	private ImageButton mHoldButton;
+	private ImageButton mPlayPauseButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
-	private int currentTimeS;
-
-	private View mVolumeBrightnessControlView;
+	
+	private View mSeekVariationView;
+	private TextView mSeekCurrentTimeValue;
+	private TextView mSeekVariationValue;
+	private View mVolumeBrightnessVariationView;
 	private TextView mVolumeBrightnessValue;
 	private ImageView mVolumeBrightnessImage;
-	private float brightnessValue;
-	private Boolean brightnessCheck;
-
-	private Handler mSeekControlHandler;
-	private Handler mControllerHandler;
-	private Handler mHoldHandler;
-
+	
+	private TextView mSubtitleView;
+	
+	private View mUnHoldButtonView;
+	private ImageButton mUnHoldButton;
+	
 	private ImageView mPPLButton;
 	private ViewPager mPPLViewPager;
 	private RelativeLayout mPPLLayout;
 	private LinearLayout mPageMark;
+	
+	public static ProgressDialog progess;
+	
+	//////////////////////////////////////////////////
+	// Value Variable
+	//////////////////////////////////////////////////
+	private int currentTimeS;
+	private float brightnessValue;
+	private Boolean brightnessCheck;
+	private Handler mSeekControlHandler;
+	private Handler mControllerHandler;
+	private Handler mHoldHandler;
 	private int mPrevPosition;
-
-	private View mUnHoldButtonView;
-	private ImageButton mUnHoldButton;
 	private Boolean holdCheck;
-
 	private AudioManager mAudioManager;
 	private int mAudioMax;
 	private float mVolume;
-
 	private boolean onPPL = false;
 	private boolean mHold = false;
 	private boolean mMove = false;
@@ -126,21 +125,19 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int seekValue;
 	private float mTouchX;
 	private float mTouchY;
-
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
-
+	private boolean mTouchPressed = false;
 	ArrayList<String> videoList;
 	ArrayList<SubtitleData> parsedSubtitleDataList;
-
 	private File file;
 	public static String path;
 	private int index;
 	private int indexSubtitle;
 	private long currentTime;
-
+	private boolean mPlay = false;
 	private VideoFileDBAdapter dbAdapter;
-	public static ProgressDialog progess;
+	private Util util = Util.getInstance();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -165,13 +162,13 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mControlsView = this.findViewById(R.id.controls);
 		mControlsView.setOnTouchListener(this);
 
-		mVolumeBrightnessControlView = this.findViewById(R.id.volume_brightness_variation_view);
+		mVolumeBrightnessVariationView = this.findViewById(R.id.volume_brightness_variation_view);
 		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
 		mVolumeBrightnessImage = (ImageView)this.findViewById(R.id.volume_brightness_image);
 
-		mSeekControlView = this.findViewById(R.id.seek_variation_view);
-		mSeekControlValue = (TextView)this.findViewById(R.id.current_time_value);
-		mSeekControlSmallValue = (TextView)this.findViewById(R.id.seek_variation_value);
+		mSeekVariationView = this.findViewById(R.id.seek_variation_view);
+		mSeekCurrentTimeValue = (TextView)this.findViewById(R.id.current_time_value);
+		mSeekVariationValue = (TextView)this.findViewById(R.id.seek_variation_value);
 
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
@@ -329,7 +326,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		if(subtitleFile.isFile() && subtitleFile.canRead())
 		{
 			mUseSubtitle = true;
-			mSmiview = (TextView)findViewById(R.id.subtitle_view);
+			mSubtitleView = (TextView)findViewById(R.id.subtitle_view);
 			parsedSubtitleDataList = new ArrayList<SubtitleData>();
 			try {
 				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(subtitleFile.toString())), "MS949"));
@@ -398,9 +395,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 					indexSubtitle = getIndexSubtitle(currentTime);
 
 					if(indexSubtitle == -1)
-						mSmiview.setText("");
+						mSubtitleView.setText("");
 					else
-						mSmiview.setText(Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()));
+						mSubtitleView.setText(Html.fromHtml(parsedSubtitleDataList.get(indexSubtitle).getText()));
 
 				} catch(Exception e) {}
 			}
@@ -447,17 +444,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				
 				if(coef > 3)
 				{
-					mSeekControlView.setVisibility(View.GONE);
+					mSeekVariationView.setVisibility(View.GONE);
 					if(mTouchX < (getDeviceWidth() / 2))
 					{
 						doBrightnessTouch(y_changed);
 						mControllerHandler = new Handler(){
 							@Override
 							public void handleMessage(Message msg) {
-								mVolumeBrightnessControlView.setVisibility(View.GONE);
+								mVolumeBrightnessVariationView.setVisibility(View.GONE);
 							}
 						};
-						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+						this.mVolumeBrightnessVariationView.setVisibility(View.VISIBLE);
 					}
 					if(mTouchX > (getDeviceWidth() / 2))
 					{
@@ -465,34 +462,34 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						mControllerHandler = new Handler(){
 							@Override
 							public void handleMessage(Message msg) {
-								mVolumeBrightnessControlView.setVisibility(View.GONE);
+								mVolumeBrightnessVariationView.setVisibility(View.GONE);
 							}
 						};
 						this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
 						this.mVolumeBrightnessImage.setBackgroundResource(R.drawable.sound);
-						this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+						this.mVolumeBrightnessVariationView.setVisibility(View.VISIBLE);
 					}
 
 					return true;
-				}else if(coef < 3 || mSeekControlView.getVisibility() == View.VISIBLE)
+				}else if(coef < 3 || mSeekVariationView.getVisibility() == View.VISIBLE)
 				{
 					if(xgesturesize < 0.02 && xgesturesize > -0.02)
 					{
 						mMove = false;
 					}else if(coef < 0.5 && Math.abs(xgesturesize) > 1)
 					{
-						mVolumeBrightnessControlView.setVisibility(View.GONE);
+						mVolumeBrightnessVariationView.setVisibility(View.GONE);
 
 						Log.e("SeekBartest", "                                               seekbar");
 						mSeekControlHandler = new Handler(){
 							@Override
 							public void handleMessage(Message msg) {
-								mSeekControlView.setVisibility(View.GONE);
+								mSeekVariationView.setVisibility(View.GONE);
 							}
 						};
-						this.mSeekControlSmallValue.setText("[ "+((currentTimeS>seekValue)?"-":"+")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
-						this.mSeekControlValue.setText(parseTime(currentTimeS));
-						this.mSeekControlView.setVisibility(View.VISIBLE);
+						this.mSeekVariationValue.setText("[ "+((currentTimeS>seekValue)?"-":"+")+parseTime(Math.abs(currentTimeS-seekValue))+" ]");
+						this.mSeekCurrentTimeValue.setText(parseTime(currentTimeS));
+						this.mSeekVariationView.setVisibility(View.VISIBLE);
 
 						doSeekTouch(coef, xgesturesize, false);        
 
@@ -513,10 +510,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			{
 				Log.e("GestureSize Up", ""+xgesturesize);
 
-				if(mSeekControlView.getVisibility()==View.VISIBLE){
+				if(mSeekVariationView.getVisibility()==View.VISIBLE){
 					mSeekControlHandler.sendEmptyMessageDelayed(0, 1000);
 
-				}else if(mVolumeBrightnessControlView.getVisibility()==View.VISIBLE){
+				}else if(mVolumeBrightnessVariationView.getVisibility()==View.VISIBLE){
 					mControllerHandler.sendEmptyMessageDelayed(0, 1000);
 				}
 
@@ -536,7 +533,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 								params.setMargins(20, 20, 20, 20);
 
-								mSmiview.setLayoutParams(params);
+								mSubtitleView.setLayoutParams(params);
 							}
 							mTouchPressed = false;
 						}
@@ -550,7 +547,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 						params.setMargins(20, 20, 20, 20);
 
-						mSmiview.setLayoutParams(params);
+						mSubtitleView.setLayoutParams(params);
 					}
 					
 					mControllerHandler.sendEmptyMessageDelayed(0, 4000);
@@ -588,7 +585,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 										params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 										params.setMargins(20, 20, 20, 20);
 
-										mSmiview.setLayoutParams(params);
+										mSubtitleView.setLayoutParams(params);
 									}
 									mTouchPressed = false;
 								}
@@ -602,7 +599,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 								params.setMargins(20, 20, 20, 20);
 
-								mSmiview.setLayoutParams(params);
+								mSubtitleView.setLayoutParams(params);
 							}
 							//mControllerHandler.sendEmptyMessageDelayed(0, 10000);
 							//displaySystemMenu(false);
@@ -621,7 +618,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 								params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 								params.setMargins(20, 20, 20, 20);
 
-								mSmiview.setLayoutParams(params);
+								mSubtitleView.setLayoutParams(params);
 								//displaySystemMenu(false);
 							}
 						}
@@ -760,7 +757,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 						params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 						params.setMargins(20, 20, 20, 20);
 
-						mSmiview.setLayoutParams(params);
+						mSubtitleView.setLayoutParams(params);
 					}
 					mTouchPressed = false;
 				}
@@ -774,7 +771,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 				params.setMargins(20, 20, 20, 20);
 
-				mSmiview.setLayoutParams(params);
+				mSubtitleView.setLayoutParams(params);
 			}
 			
 			mControllerHandler.sendEmptyMessageDelayed(0, 4000);
@@ -1081,12 +1078,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				mControllerHandler = new Handler(){
 					@Override
 					public void handleMessage(Message msg) {
-						mVolumeBrightnessControlView.setVisibility(View.GONE);
+						mVolumeBrightnessVariationView.setVisibility(View.GONE);
 					}
 				};
 				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
 				this.mVolumeBrightnessImage.setBackgroundResource(R.drawable.sound);
-				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				this.mVolumeBrightnessVariationView.setVisibility(View.VISIBLE);
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				return true;
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
@@ -1096,12 +1093,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				mControllerHandler = new Handler(){
 					@Override
 					public void handleMessage(Message msg) {
-						mVolumeBrightnessControlView.setVisibility(View.GONE);
+						mVolumeBrightnessVariationView.setVisibility(View.GONE);
 					}
 				};
 				this.mVolumeBrightnessValue.setText(""+mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
 				this.mVolumeBrightnessImage.setBackgroundResource(R.drawable.sound);
-				this.mVolumeBrightnessControlView.setVisibility(View.VISIBLE);
+				this.mVolumeBrightnessVariationView.setVisibility(View.VISIBLE);
 				mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 				return true;
 			case KeyEvent.KEYCODE_BACK:
@@ -1228,7 +1225,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 				params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 				params.setMargins(20, 20, 20, 20);
 
-				mSmiview.setLayoutParams(params);
+				mSubtitleView.setLayoutParams(params);
 			}
 		}
 
@@ -1255,7 +1252,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			params.setMargins(20, 20, 20, 20);
 
-			mSmiview.setLayoutParams(params);
+			mSubtitleView.setLayoutParams(params);
 	 */
 	private class PPLPagerViewAdapter extends PagerAdapter{
 
