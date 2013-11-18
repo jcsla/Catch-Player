@@ -12,12 +12,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -29,20 +26,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.os.StrictMode;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -59,6 +51,7 @@ import com.appunite.ffmpeg.FFmpegListener;
 import com.appunite.ffmpeg.FFmpegPlayer;
 import com.appunite.ffmpeg.FFmpegStreamInfo;
 import com.appunite.ffmpeg.NotPlayingException;
+import com.ffmpegtest.adapter.PPLPagerViewAdapter;
 import com.ffmpegtest.adapter.VideoFileDBAdapter;
 import com.ffmpegtest.helpers.AudioFingerPrintHelper;
 import com.ffmpegtest.helpers.JSONHelper;
@@ -80,26 +73,26 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private ImageButton mPlayPauseButton;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
-	
+
 	private View mSeekVariationView;
 	private TextView mSeekCurrentTimeValue;
 	private TextView mSeekVariationValue;
 	private View mVolumeBrightnessVariationView;
 	private TextView mVolumeBrightnessValue;
 	private ImageView mVolumeBrightnessImage;
-	
+
 	private TextView mSubtitleView;
-	
+
 	private View mUnHoldButtonView;
 	private ImageButton mUnHoldButton;
-	
+
 	private ImageView mPPLButton;
 	private ViewPager mPPLViewPager;
 	private RelativeLayout mPPLLayout;
 	private LinearLayout mPageMark;
-	
+
 	public static ProgressDialog progess;
-	
+
 	//////////////////////////////////////////////////
 	// Value Variable
 	//////////////////////////////////////////////////
@@ -124,7 +117,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 	private boolean isFinish = false;								// finish flag
 	private Util util = Util.getInstance();
-	
+
 	private float brightnessValue;
 	private Handler mSeekControlHandler;
 	private Handler mControllerHandler;
@@ -153,14 +146,14 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mFullLayout = this.findViewById(R.id.full_layout);
 		mFullLayout.setOnTouchListener(this);
-		
+
 		mVideoView = this.findViewById(R.id.video_view);
 
 		mTitleBar = this.findViewById(R.id.title_bar);
 		mTitle = (TextView) this.findViewById(R.id.title);
 
 		mControlsView = this.findViewById(R.id.controls);
-		//mControlsView.setOnTouchListener(this);
+		mControlsView.setOnTouchListener(this);
 		mSeekBar = (SeekBar) this.findViewById(R.id.seek_bar);
 		mSeekBar.setOnSeekBarChangeListener(this);
 		mCurrentTime = (TextView) this.findViewById(R.id.current_time);
@@ -171,7 +164,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mHoldButton.setOnClickListener(this);
 		mPPLButton = (ImageView) this.findViewById(R.id.ppl_button);
 		mPPLButton.setOnClickListener(this);
-		
+
 		mUnHoldButtonView = this.findViewById(R.id.unhold_area);
 		mUnHoldButton = (ImageButton) this.findViewById(R.id.unhold_video);
 		mUnHoldButton.setOnClickListener(this);
@@ -182,7 +175,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		mVolumeBrightnessVariationView = this.findViewById(R.id.volume_brightness_variation_view);
 		mVolumeBrightnessValue = (TextView)this.findViewById(R.id.volume_brightness_value);
 		mVolumeBrightnessImage = (ImageView)this.findViewById(R.id.volume_brightness_image);
-		
+
 		mPPLLayout = (RelativeLayout)this.findViewById(R.id.ppl_view);
 		mPageMark = (LinearLayout) this.findViewById(R.id.page_mark);
 		mPPLViewPager = (ViewPager) this.findViewById(R.id.view_pager);
@@ -205,10 +198,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		paint.setAlpha(160);
 		mPPLLayout.setBackgroundColor(paint.getColor());
 		if(android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+			StrictMode.setThreadPolicy(policy);
 		}
-		
+
+		mControllerHandler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				mControlsView.setVisibility(View.GONE);
+				mTitleBar.setVisibility(View.GONE);
+			}
+		};
+
 		dbAdapter = new VideoFileDBAdapter(this);
 
 		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -270,15 +271,15 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		String title = split[split.length - 1];
 		mTitle.setText(title);
 
-		this.mPlayPauseButton.setImageResource(R.drawable.pause);
-		this.mPlayPauseButton.setEnabled(true);
+		mPlayPauseButton.setImageResource(R.drawable.pause);
+		mPlayPauseButton.setEnabled(true);
 
 		mPlay = true;
 		mTouchPressed = false;
 		mHold = false;
 
 		mMpegPlayer.setDataSource(path, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo, mSubtitleStreamNo);
-		
+
 		int time = dbAdapter.getVideoTime(path);
 		if(time > 0)
 			mMpegPlayer.seek(String.valueOf(time));
@@ -293,6 +294,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			new AudioFingerPrintHelper(MainActivity.mFFmpegInstallPath, path).fingerTask.execute(this);
 		else
 			JSONHelper.dramaName = dramaName;
+		
+		mControllerHandler.removeMessages(0);
+		mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	}
 
 	public void setSubtitleSource()
@@ -378,7 +382,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 				}
 				catch(Exception e) {
-					
+
 				}
 			}
 		}
@@ -403,7 +407,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		return -1;
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
@@ -412,20 +416,24 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		case KeyEvent.KEYCODE_BACK:
 			if(onPPL == true)
 				closePPLView();
+			else if(mHold == true);
+			else
+				finish();
+
 			break;
 		}
 		return true;
 	}
-	
+
 	public void closePPLView()
 	{
 		onPPL = false;
 		mTouchPressed = false;
-		
+
 		mPPLLayout.setVisibility(View.GONE);
 		mMpegPlayer.resume();
 	}
-	
+
 	@Override
 	public void onClick(View v)
 	{
@@ -441,15 +449,17 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			prevVideo();
 			break;
 		case R.id.hold_video:
+			holdVideo();
 			break;
 		case R.id.unhold_video:
+			unholdVideo();
 			break;
 		case R.id.ppl_button:
 			viewPPL();
 			break;
 		}
 	}
-	
+
 	public void resumePause()
 	{
 		this.mPlayPauseButton.setEnabled(false);
@@ -461,9 +471,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		mPlay = !mPlay;
 	}
-
-	////////////////////////////////////////////////////////////////////////
-	// not yet
+	
 	public void holdVideo()
 	{
 		mHold = true;
@@ -479,17 +487,12 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 
 		this.mTitleBar.setVisibility(View.GONE);
 		this.mControlsView.setVisibility(View.GONE);
-		this.mPPLButton.setVisibility(View.GONE);
 	}
 
 	public void unholdVideo()
 	{
 		mHold = false;
 		mUnHoldButtonView.setVisibility(View.GONE);
-
-		this.mTitleBar.setVisibility(View.VISIBLE);
-		this.mControlsView.setVisibility(View.VISIBLE);
-		this.mPPLButton.setVisibility(View.VISIBLE);
 	}
 	////////////////////////////////////////////////////////////////////////
 	public void nextVideo()
@@ -514,17 +517,18 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 			mMpegPlayer.resume();
 		}
 	}
-	
+
 	public void viewPPL()
 	{
 		if(mPlay) 
 			mMpegPlayer.pause();
-		
-		mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this));
-		
+
+		mPPLViewPager.setAdapter(new PPLPagerViewAdapter(this, currentTimeS, mPageMark));
+		mPPLPosition = 0;
+
 		mTitleBar.setVisibility(View.GONE);
 		mControlsView.setVisibility(View.GONE);
-		
+
 		onPPL = true;
 		mPPLLayout.setVisibility(View.VISIBLE);
 	}
@@ -532,26 +536,33 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public boolean onTouch(View v, MotionEvent event)
 	{
-		switch(event.getAction())
-		{
-		case MotionEvent.ACTION_UP:
-			doActionUP();
-			break;
+		if(mHold == false) { //홀드가 걸려있지 않으면
+			switch(event.getAction())
+			{
+			case MotionEvent.ACTION_UP:
+				doActionUP();
+				break;
+			}
+		} else {
+			mHoldHandler.removeMessages(0);
+			mUnHoldButtonView.setVisibility(View.VISIBLE);
 		}
 		return true;
 	}
-	
+
 	public void doActionUP()
 	{
 		mTouchPressed = !mTouchPressed;
-		
+
 		if(mTouchPressed == true)
 		{
 			mTitleBar.setVisibility(View.VISIBLE);
 			mControlsView.setVisibility(View.VISIBLE);
+			mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 		}
 		else
 		{
+			mControllerHandler.removeMessages(0);
 			mTitleBar.setVisibility(View.GONE);
 			mControlsView.setVisibility(View.GONE);
 		}
@@ -572,6 +583,7 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar)
 	{
+		mControllerHandler.removeMessages(0);
 	}
 
 	@Override
@@ -579,8 +591,9 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	{
 		String value = String.valueOf(seekBar.getProgress());
 		mMpegPlayer.seek(value);
+		mControllerHandler.sendEmptyMessageDelayed(0, 4000);
 	}
-	
+
 	@Override
 	public void onFFDataSourceLoaded(FFmpegError err, FFmpegStreamInfo[] streams)
 	{
@@ -597,10 +610,10 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 							VideoActivity.this.finish();
 						}
 					}).show();
-			
+
 			return;
 		}
-		
+
 		mPlayPauseButton.setEnabled(true);
 	}
 
@@ -777,114 +790,5 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		seekValue = (int)(value / 1000 / 1000);
 
 		mSeek = true;
-	}
-
-	private class PPLPagerViewAdapter extends PagerAdapter
-	{
-		private LayoutInflater mInflater;
-		private ArrayList<PPLData> mPPLList;
-
-		public PPLPagerViewAdapter(Context c)
-		{
-			super();
-			mInflater = LayoutInflater.from(c);
-			mPPLList = new ArrayList<PPLData>();
-			JSONParserHelper.pplData.clear();
-			JSONParserHelper.parsingPPL(JSONHelper.dramaName, currentTimeS);
-			if(JSONParserHelper.pplData.size()==0){
-				PPLData ppl = new PPLData();
-				Bitmap bitmap = null;
-				try {
-					bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.parser);
-					bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
-					ppl.setProduct_image(bitmap);
-				} catch(Exception e){
-
-				}
-
-				ppl.setPrice(0);
-				ppl.setProduct_code(0);
-				ppl.setDrama_code("");
-				ppl.setBrand_name("현재 시청장면에");
-				ppl.setProduct_name("등록된 상품이 없습니다.");
-
-				JSONParserHelper.pplData.add(ppl);
-			}
-			//imageView.			
-			for (int i = 0; i < JSONParserHelper.pplData.size(); i++) {
-				try {
-					PPLData ppl = JSONParserHelper.pplData.get(i);
-					Log.e("Product", ppl.getProduct_name());
-					mPPLList.add(ppl);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			initPageMark();
-		}
-
-		@Override
-		public int getCount()
-		{
-			return mPPLList.size();
-		}
-
-		@Override
-		public Object instantiateItem(View pager, int position)
-		{
-			View v = mInflater.inflate(R.layout.vp_ppl, null);
-			ImageView iv_ppl = (ImageView)v.findViewById(R.id.iv_ppl_image);
-			iv_ppl.setImageBitmap(mPPLList.get(position).getProduct_image());
-			TextView tv_ppl_title = (TextView)v.findViewById(R.id.tv_ppl_title);
-			tv_ppl_title.setText(mPPLList.get(position).getProduct_name());
-			TextView tv_ppl_brand = (TextView)v.findViewById(R.id.tv_ppl_brand);
-			tv_ppl_brand.setText(mPPLList.get(position).getBrand_name());
-			TextView tv_ppl_price = (TextView)v.findViewById(R.id.tv_ppl_price);
-			tv_ppl_price.setText(mPPLList.get(position).getPrice() + "원");
-			if(mPPLList.get(position).getPrice()==0){
-				tv_ppl_price.setText("");
-			}
-
-			((ViewPager)pager).addView(v, 0);
-
-			return v; 
-		}
-
-		@Override
-		public void destroyItem(View pager, int position, Object view)
-		{    
-			((ViewPager)pager).removeView((View)view);
-		}
-
-		@Override
-		public boolean isViewFromObject(View pager, Object obj)
-		{
-			return pager == obj; 
-		}
-
-		private void initPageMark()
-		{
-			mPageMark.removeAllViews();
-			for(int i=0; i<getCount(); i++)
-			{
-				ImageView iv = new ImageView(getApplicationContext());	//페이지 표시 이미지 뷰 생성
-				iv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-				//첫 페이지 표시 이미지 이면 선택된 이미지로
-				if(i==0)
-					iv.setBackgroundResource(R.drawable.page_select);
-				else	//나머지는 선택안된 이미지로
-					iv.setBackgroundResource(R.drawable.page_not);
-
-				//LinearLayout에 추가
-				mPageMark.addView(iv);
-			}
-			mPPLPosition = 0;	//이전 포지션 값 초기화
-		}
-
-		@Override public void restoreState(Parcelable arg0, ClassLoader arg1) {}
-		@Override public Parcelable saveState() { return null; }
-		@Override public void startUpdate(View arg0) {}
-		@Override public void finishUpdate(View arg0) {}
 	}
 }
