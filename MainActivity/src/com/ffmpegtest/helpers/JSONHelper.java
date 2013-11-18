@@ -20,7 +20,6 @@ import android.util.Log;
 
 public class JSONHelper
 {
-
 	public static String dramaName = "";
 	private static final String AFPServerURL = "http://211.110.33.122/query";
 	private static final String codever = "4.12";
