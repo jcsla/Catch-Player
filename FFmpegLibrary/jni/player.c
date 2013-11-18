@@ -2515,7 +2515,7 @@ void jni_player_pause(JNIEnv *env, jobject thiz) {
 	if (player->pause)
 		goto do_nothing;
 
-	LOGI(3, "jni_player_pause Pausing");
+	LOGI(1, "jni_player_pause Pausing");
 	player->pause = TRUE;
 	player->pause_time = av_gettime();
 	pthread_cond_broadcast(&player->cond_queue);

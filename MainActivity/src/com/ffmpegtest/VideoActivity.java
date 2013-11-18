@@ -112,33 +112,31 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 	private long currentTime;										// 현재시간 for 자막
 	private int indexSubtitle;										// 자막 인덱스
 	private int mAudioMax;											// Device의 Audio Max 값
+	private float mVolume;
+	private boolean mSeek = false;
+	private int seekValue;
 	private boolean mPlay = false;									// 플레이 체크 flag
 	private boolean brightnessCheck = false;						// 밝기 체크 flag
+	private float brightnessValue;
 	private boolean mHold = false;									// 홀드 체크 flag
 	private int currentTimeS;										// 현재시간 for PPL
+	private boolean onPPL = false;
 	private int mPPLPosition;										// PPL 선택 시의 현재 위치 변수
 	private boolean mUseSubtitle = false;							// 자막 flag
 	private boolean mTouchPressed = false;							// 터치 체크 flag
 	private int mAudioStreamNo = FFmpegPlayer.UNKNOWN_STREAM;
 	private int mSubtitleStreamNo = FFmpegPlayer.NO_STREAM;
 	private boolean isFinish = false;								// finish flag
-	private Util util = Util.getInstance();
-
-	private float brightnessValue;
+	private float mTouchX;
+	private float mTouchY;
+	private Animation anim_in_bottom, anim_out_bottom, anim_in_top, anim_out_top;
 	private Handler mSeekControlHandler;
 	private Handler mVolumeBrightnessVariationHandler;
 	private Handler mControllerHandler;
 	private Handler mHoldHandler;
-	private float mVolume;
-	private boolean onPPL = false;
+	private Util util = Util.getInstance();
 	private boolean mMove = false;
-	private Animation anim_in_bottom, anim_out_bottom, anim_in_top, anim_out_top;
-	private boolean mSeek = false;
-	private int seekValue;
-	private float mTouchX;
-	private float mTouchY;
-
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -280,7 +278,6 @@ public class VideoActivity extends Activity implements FFmpegListener, OnClickLi
 		super.onPause();
 		mPlay = false;
 		mMpegPlayer.pause();
-		Log.e("Hello", "Home!");
 	}
 
 	@Override

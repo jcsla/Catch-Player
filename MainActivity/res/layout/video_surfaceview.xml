@@ -47,17 +47,6 @@
             android:textColor="#ffffffff"
             android:textSize="12.0sp"
             android:textStyle="bold" />
- 
-        <!--
-        이 위치에 배터리 상태, 시간 삽입
-        <ImageButton
-            android:id="@+id/screen_change"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:paddingRight="10dp"
-            android:src="@drawable/rotate_norm" />
-        -->
         
     </LinearLayout>
 
